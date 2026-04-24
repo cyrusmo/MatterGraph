@@ -1,24 +1,34 @@
 from __future__ import annotations
 
-from ase import Atoms
-from ase.calculators.emt import EMT
-from ase.optimize import BFGS
+from typing import Any
+
 from mattergraph.schema.structure import CrystalStructure
 
 from mattergraph_sim.job_spec import AseJobSpec, SimulationJob
 
 
-def _crystal_to_ase(c: CrystalStructure) -> Atoms:
-  s = c.to_pymatgen()
-  from pymatgen.io.ase import AseAtomsAdaptor
+def _load_ase() -> tuple[Any, Any, Any]:
+  try:
+    from ase.calculators.emt import EMT
+    from ase.optimize import BFGS
+    from pymatgen.io.ase import AseAtomsAdaptor
+  except ImportError as e:
+    msg = "Install the optional `ase` dependency to run local ASE relaxations."
+    raise ImportError(msg) from e
+  return EMT, BFGS, AseAtomsAdaptor
 
+
+def _crystal_to_ase(c: CrystalStructure) -> Any:
+  s = c.to_pymatgen()
+  _, _, AseAtomsAdaptor = _load_ase()
   return AseAtomsAdaptor.get_atoms(s)  # type: ignore[return-value]
 
 
 def ase_relax(job: SimulationJob) -> SimulationJob:
   """
-  Local relaxation using ASE + EMT (MVP). Swap calculators for DFT/MLIPs in private workflows.
+  Local relaxation using ASE + EMT (MVP). Swap calculators for your own backend as needed.
   """
+  EMT, BFGS, _ = _load_ase()
   spec: AseJobSpec = job.spec
   c = CrystalStructure.model_validate(job.input_structure)
   atoms = _crystal_to_ase(c)

@@ -13,7 +13,7 @@ class Scorecard:
   """
   Toy scorecard: min–max–normalize each objective, apply optional weights,
   filter by hard constraints, then return a ranked :class:`pandas.DataFrame`.
-  This is a transparent baseline, not a mission-optimization engine.
+  This is a transparent baseline, not a production decision engine.
   """
 
   def __init__(

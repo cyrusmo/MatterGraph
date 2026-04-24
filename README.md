@@ -32,9 +32,9 @@ Materials data is fragmented across repositories, schemas, units, structures, an
 - Provide adapters for benchmarking and **simulation job specs** (e.g. ASE)
 - Expose a **small demo API** and **minimal web UI** for end-to-end exploration
 
-## What it is *not* (in the open repository)
+## Scope
 
-The public repo intentionally excludes proprietary product modules such as: advanced closed-loop learning, full mission scorecards, agent orchestration, and customer-specific data. The **open** stack is a trustworthy foundation; **product** value lives in private extensions.
+The public repository focuses on transparent, reusable infrastructure for open materials workflows. Production-specific orchestration, hosting, and organization-specific workflows are out of scope for this demo.
 
 ## Quickstart
 

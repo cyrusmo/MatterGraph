@@ -1,4 +1,4 @@
-# Toy scorecard (open-source template). Tuned engineering lives in private product code.
+# Toy scorecard (open-source template). Adjust weights and limits for your dataset and application.
 name: underwater_robot_material_screen
 objectives:
   density:

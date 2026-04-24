@@ -10,6 +10,7 @@ venv/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+.hypothesis/
 .coverage
 htmlcov/
 
@@ -21,6 +22,7 @@ htmlcov/
 # Node
 node_modules/
 apps/web/dist/
+*.tsbuildinfo
 .next/
 out/
 

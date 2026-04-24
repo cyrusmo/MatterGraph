@@ -5,7 +5,6 @@ from typing import Any
 
 from mattergraph.schema.material import Material, MaterialProperty
 from mattergraph.schema.structure import CrystalStructure
-from mp_api.client import MPRester  # type: ignore[import-untyped]
 from pymatgen.core import Composition, Structure
 
 
@@ -18,6 +17,15 @@ def _struct_from_mp(doc: Any) -> CrystalStructure | None:
     return None
   s: Structure = doc.structure
   return CrystalStructure.from_pymatgen(s)
+
+
+def _get_rester(api_key: str) -> Any:
+  try:
+    from mp_api.client import MPRester  # type: ignore[import-untyped]
+  except ImportError as e:
+    msg = "Install the optional `mp-api` dependency to use MaterialsProjectConnector."
+    raise ImportError(msg) from e
+  return MPRester(api_key)
 
 
 def _mp_doc_to_material(doc: Any) -> Material:
@@ -89,7 +97,7 @@ class MaterialsProjectConnector:
     num_chunks: int = 1,
     chunk_size: int = 20,
   ) -> list[Material]:
-    with MPRester(self._key) as m:
+    with _get_rester(self._key) as m:
       if material_ids:
         docs = m.materials.summary.search(
           material_ids=material_ids,  # type: ignore[call-overload, attr-defined]

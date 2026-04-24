@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Placeholder: create a database for a production deployment (Postgres/SQLite).
+"""Placeholder: create a database for a persistent installation (Postgres/SQLite).
 
 The open-source demo uses JSONL in memory; this script documents the extension point.
 """

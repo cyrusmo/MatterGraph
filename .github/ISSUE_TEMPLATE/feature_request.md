@@ -12,7 +12,7 @@ What workflow or integration is harder than it should be?
 Describe the feature at a high level. Prefer one focused issue per request.
 
 **Alternatives**  
-What workarounds exist today (scripts, private forks, other tools)?
+What workarounds exist today (scripts, notebooks, other tools)?
 
 **Scope**  
 Note if this is core schema, a connector, benchmarks, the demo API, or documentation.

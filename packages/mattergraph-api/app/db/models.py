@@ -1,4 +1,4 @@
-# Placeholder: SQLAlchemy models for a production database-backed deployment.
+# Placeholder: SQLAlchemy models for setups that persist material records.
 
 from typing import Any
 
