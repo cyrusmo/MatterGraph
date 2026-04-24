@@ -1,10 +1,15 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from mattergraph.schema.property import PropertyMethod
 
 
 class ProvenanceRecord(BaseModel):
-  """Lineage and confidence for a value or field."""
+  """Lineage and confidence for a value or field.
+
+  JSON contract: enum values serialize as strings; source-specific fields belong in ``extra``.
+  """
+
+  model_config = ConfigDict(extra="forbid", use_enum_values=True, validate_assignment=True)
 
   source: str
   method: PropertyMethod = Field(
@@ -14,6 +19,10 @@ class ProvenanceRecord(BaseModel):
   confidence: float | None = None
   notes: str | None = None
   model_version: str | None = None
+  source_id: str | None = Field(
+    default=None,
+    description="Optional upstream record identifier, task ID, DOI, or dataset row ID",
+  )
 
   @field_validator("source")
   @classmethod
@@ -33,3 +42,11 @@ class ProvenanceRecord(BaseModel):
       msg = "confidence must be between 0 and 1"
       raise ValueError(msg)
     return value
+
+  @field_validator("source_id", "model_version", "notes")
+  @classmethod
+  def _strip_optional_strings(cls, value: str | None) -> str | None:
+    if value is None:
+      return None
+    out = value.strip()
+    return out or None

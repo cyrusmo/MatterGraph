@@ -1,10 +1,16 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class SimulationJobRef(BaseModel):
-  """Reference to a simulation that produced or post-processes a material result."""
+  """Reference to a simulation that produced or post-processes a material result.
+
+  The object is deliberately small: store full scheduler payloads outside core and link them
+  through URI fields.
+  """
+
+  model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
   job_id: str
   engine: Literal["ase", "lammps", "qe", "custom"] = Field(
