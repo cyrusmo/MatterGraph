@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - "packages/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - ".github/workflows/tests.yml"
+  pull_request:
+    paths:
+      - "packages/**"
+      - "tests/**"
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      - run: uv sync --all-packages --group dev
+      - run: uv run pytest

@@ -1,0 +1,18 @@
+# Toy scorecard (open-source template). Tuned engineering lives in private product code.
+name: underwater_robot_material_screen
+objectives:
+  density:
+    direction: minimize
+    weight: 0.25
+  bulk_modulus:
+    direction: maximize
+    weight: 0.25
+  # Use proxy properties present in *your* dataset
+  energy_above_hull:
+    direction: minimize
+    weight: 0.10
+constraints:
+  energy_above_hull:
+    max: 0.05
+  density:
+    max: 6.0

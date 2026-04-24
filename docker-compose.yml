@@ -1,0 +1,20 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: packages/mattergraph-api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - MATTERGRAPH_DEMO_DATA=/app/data/demo/materials_sample.jsonl
+    volumes:
+      - ./data:/app/data:ro
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - api

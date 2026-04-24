@@ -1,0 +1,23 @@
+[project]
+name = "mattergraph-sim"
+version = "0.1.0"
+description = "ASE/LAMMPS/QE simulation job specs and runners (MVP wrappers)."
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+  "mattergraph-core",
+  "pymatgen>=2024.1.1",
+  "pydantic>=2.5",
+  "ase>=3.22",
+  "h5py",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+mattergraph-core = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["mattergraph_sim"]

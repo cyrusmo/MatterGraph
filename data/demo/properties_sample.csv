@@ -1,0 +1,4 @@
+material_id,formula,bulk_modulus,energy_above_hull,density
+demo-fe-bcc-1,Fe,170,0,7.8
+demo-ti-bcc-1,Ti,110,0.01,4.5
+demo-al-fcc-1,Al,72,0,2.7

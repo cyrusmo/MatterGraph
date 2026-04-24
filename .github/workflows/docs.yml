@@ -1,0 +1,16 @@
+name: Docs
+
+on:
+  push:
+    paths:
+      - "docs/**"
+      - "README.md"
+      - "ROADMAP.md"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Key docs present
+        run: test -f docs/index.md && test -f README.md

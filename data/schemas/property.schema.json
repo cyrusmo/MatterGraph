@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MatterGraph MaterialProperty (subset)",
+  "type": "object",
+  "required": ["name", "value"],
+  "properties": {
+    "name": { "type": "string" },
+    "value": { "oneOf": [{ "type": "number" }, { "type": "string" }, { "type": "object" }] },
+    "unit": { "type": ["string", "null"] },
+    "source": { "type": "string" },
+    "method": { "type": "string" },
+    "confidence": { "type": ["number", "null"] },
+    "uncertainty": { "type": ["number", "null"] }
+  }
+}

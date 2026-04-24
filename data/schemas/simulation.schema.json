@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MatterGraph Simulation job reference (subset)",
+  "type": "object",
+  "required": ["job_id", "engine"],
+  "properties": {
+    "job_id": { "type": "string" },
+    "engine": { "type": "string" },
+    "spec_version": { "type": "string" },
+    "input_uri": { "type": ["string", "null"] },
+    "output_uri": { "type": ["string", "null"] },
+    "status": { "type": "string" }
+  }
+}
