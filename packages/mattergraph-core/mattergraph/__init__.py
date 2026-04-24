@@ -2,7 +2,9 @@
 
 from importlib import metadata
 
-from mattergraph.schema.material import Material, MaterialProperty, ProvenanceRecord
+from mattergraph.schema.material import Material
+from mattergraph.schema.property import MaterialProperty
+from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.scoring.scorecard import Scorecard
 from mattergraph.store import MaterialStore
 
