@@ -2,21 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
+from mattergraph.schema.property import MaterialProperty
 from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.structure import CrystalStructure
-
-
-class MaterialProperty(BaseModel):
-  name: str
-  value: float | str | dict[str, Any]
-  unit: str | None = None
-  source: str = "unknown"
-  method: str = "unknown"  # dft, experimental, model_predicted, unknown
-  confidence: float | None = None
-  uncertainty: float | None = None
-  extra: dict[str, Any] = Field(default_factory=dict)
 
 
 class Material(BaseModel):
@@ -29,15 +19,39 @@ class Material(BaseModel):
   provenance: list[ProvenanceRecord] = Field(default_factory=list)
   metadata: dict[str, Any] = Field(default_factory=dict)
 
+  @field_validator("material_id", "formula")
+  @classmethod
+  def _non_empty_strings(cls, value: str, info: Any) -> str:
+    out = value.strip()
+    if not out:
+      msg = f"{info.field_name} must not be empty"
+      raise ValueError(msg)
+    return out
+
   @model_validator(mode="after")
   def _backfill(self) -> Material:
     from pymatgen.core import Composition
 
     c = Composition(self.formula)
-    if not self.reduced_formula:
-      self.reduced_formula = c.reduced_formula
-    if not self.elements:
-      self.elements = sorted(str(e) for e in c.elements)
+    reduced = c.reduced_formula
+    if self.reduced_formula:
+      provided = Composition(self.reduced_formula).reduced_formula
+      if provided != reduced:
+        msg = "reduced_formula must match formula"
+        raise ValueError(msg)
+      self.reduced_formula = provided
+    else:
+      self.reduced_formula = reduced
+
+    derived_elements = sorted(str(e) for e in c.elements)
+    if self.elements:
+      provided_elements = sorted({element.strip() for element in self.elements})
+      if provided_elements != derived_elements:
+        msg = "elements must match formula"
+        raise ValueError(msg)
+      self.elements = provided_elements
+    else:
+      self.elements = derived_elements
     return self
 
   def get_property(self, name: str) -> MaterialProperty | None:
