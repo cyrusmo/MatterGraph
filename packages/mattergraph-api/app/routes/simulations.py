@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from mattergraph_sim.ase_runner import ase_relax
 from mattergraph_sim.job_spec import AseJobSpec, SimulationJob
 from pydantic import BaseModel, Field
 
@@ -17,6 +16,11 @@ class RelaxRequest(BaseModel):
 
 @router.post("/simulations/ase/relax")
 def run_relax(body: RelaxRequest) -> dict:
+  try:
+    from mattergraph_sim import ase_relax
+  except ImportError as e:
+    raise HTTPException(status_code=503, detail=str(e)) from e
+
   store = store_service.get_store()
   m = store.get(body.material_id)
   if m is None or m.structure is None:

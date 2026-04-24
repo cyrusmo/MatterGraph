@@ -8,6 +8,7 @@ def test_ase_relax_has_helpful_optional_dependency_error(
   monkeypatch: pytest.MonkeyPatch,
 ) -> None:
   module = importlib.reload(mattergraph_sim)
+  module.__dict__.pop("ase_relax", None)
   real_import_module = module.import_module
 
   def fake_import_module(name: str, package: str | None = None) -> object:
