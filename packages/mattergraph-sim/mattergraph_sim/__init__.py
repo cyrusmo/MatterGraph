@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
   from mattergraph_sim.ase_runner import ase_relax
-  from mattergraph_sim.job_spec import AseJobSpec, SimulationJob
+  from mattergraph_sim.job_spec import AseJobSpec, SimulationJob, SimulationResult
 
 _EXPORTS: dict[str, tuple[str, str, str | None]] = {
   "AseJobSpec": (
@@ -16,6 +16,11 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
   "SimulationJob": (
     "mattergraph_sim.job_spec",
     "SimulationJob",
+    None,
+  ),
+  "SimulationResult": (
+    "mattergraph_sim.job_spec",
+    "SimulationResult",
     None,
   ),
   "ase_relax": (
@@ -31,6 +36,7 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
 __all__ = [
   "AseJobSpec",
   "SimulationJob",
+  "SimulationResult",
   "ase_relax",
 ]
 

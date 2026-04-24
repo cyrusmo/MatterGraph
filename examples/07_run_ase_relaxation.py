@@ -8,10 +8,10 @@ from mattergraph_sim.job_spec import AseJobSpec, SimulationJob
 
 root = Path(__file__).resolve().parents[1]
 store = MaterialStore.from_jsonl(root / "data" / "demo" / "materials_sample.jsonl")
-m0 = store.materials[0]
-if m0.structure is None:
-  raise SystemExit("no structure")
-st = m0.structure
+material = next((m for m in store.materials if m.material_id == "demo-al-fcc-1"), None)
+if material is None or material.structure is None:
+  raise SystemExit("demo-al-fcc-1 structure not found")
+st = material.structure
 job = SimulationJob(spec=AseJobSpec(), input_structure=st.to_json_dict(), kind="relax")
 out = ase_relax(job)
-print(out)
+print(out.model_dump())
