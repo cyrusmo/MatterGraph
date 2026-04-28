@@ -1,15 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "MatterGraph MaterialProperty (subset)",
+  "title": "MatterGraph MaterialProperty",
   "type": "object",
   "required": ["name", "value"],
+  "additionalProperties": false,
   "properties": {
-    "name": { "type": "string" },
+    "name": { "type": "string", "minLength": 1 },
     "value": { "oneOf": [{ "type": "number" }, { "type": "string" }, { "type": "object" }] },
     "unit": { "type": ["string", "null"] },
-    "source": { "type": "string" },
-    "method": { "type": "string" },
-    "confidence": { "type": ["number", "null"] },
-    "uncertainty": { "type": ["number", "null"] }
+    "source": { "type": "string", "minLength": 1, "default": "unknown" },
+    "method": {
+      "type": "string",
+      "enum": ["dft", "experimental", "model_predicted", "unknown"],
+      "default": "unknown"
+    },
+    "confidence": { "type": ["number", "null"], "minimum": 0.0, "maximum": 1.0 },
+    "uncertainty": { "type": ["number", "null"], "minimum": 0.0 },
+    "extra": { "type": "object", "additionalProperties": true }
   }
 }

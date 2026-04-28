@@ -1,16 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "MatterGraph Material (subset)",
+  "title": "MatterGraph Material",
   "type": "object",
   "required": ["material_id", "formula"],
+  "additionalProperties": false,
   "properties": {
-    "material_id": { "type": "string" },
-    "formula": { "type": "string" },
-    "reduced_formula": { "type": "string" },
-    "elements": { "type": "array", "items": { "type": "string" } },
+    "material_id": { "type": "string", "minLength": 1 },
+    "formula": { "type": "string", "minLength": 1 },
+    "reduced_formula": { "type": "string", "minLength": 1 },
+    "elements": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
     "structure": { "type": ["object", "null"] },
-    "properties": { "type": "array" },
-    "provenance": { "type": "array" },
-    "metadata": { "type": "object" }
+    "properties": { "type": "array", "items": { "type": "object" } },
+    "provenance": { "type": "array", "items": { "type": "object" } },
+    "metadata": { "type": "object", "additionalProperties": true }
   }
 }
