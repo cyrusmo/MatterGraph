@@ -3,7 +3,9 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from mattergraph.normalization.properties import canonical_property_name
 
 
 class PropertyMethod(str, Enum):
@@ -14,13 +16,25 @@ class PropertyMethod(str, Enum):
 
 
 class MaterialProperty(BaseModel):
-  name: str
+  """A provenance-aware property value attached to a material.
+
+  JSON contract: enum values serialize as strings; unknown fields are rejected and should be
+  placed in ``extra`` by callers that need source-specific metadata.
+  """
+
+  model_config = ConfigDict(extra="forbid", use_enum_values=True, validate_assignment=True)
+
+  name: str = Field(description="Canonical property name, e.g. density or energy_above_hull")
   value: float | str | dict[str, Any]
-  unit: str | None = None
-  source: str = "unknown"
+  unit: str | None = Field(default=None, description="Unit string as supplied or normalized")
+  source: str = Field(default="unknown", description="Database, experiment, or model source")
   method: PropertyMethod = PropertyMethod.UNKNOWN
   confidence: float | None = None
   uncertainty: float | None = None
+  source_id: str | None = Field(
+    default=None,
+    description="Optional upstream property identifier, e.g. MP task ID or DOI field",
+  )
   extra: dict[str, Any] = Field(default_factory=dict)
 
   @field_validator("name", "source")
@@ -30,7 +44,23 @@ class MaterialProperty(BaseModel):
     if not out:
       msg = f"{info.field_name} must not be empty"
       raise ValueError(msg)
-    return out
+    return canonical_property_name(out) if info.field_name == "name" else out
+
+  @field_validator("unit")
+  @classmethod
+  def _strip_unit(cls, value: str | None) -> str | None:
+    if value is None:
+      return None
+    out = value.strip()
+    return out or None
+
+  @field_validator("source_id")
+  @classmethod
+  def _strip_source_id(cls, value: str | None) -> str | None:
+    if value is None:
+      return None
+    out = value.strip()
+    return out or None
 
   @field_validator("confidence")
   @classmethod

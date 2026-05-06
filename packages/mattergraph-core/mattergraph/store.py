@@ -27,6 +27,14 @@ class MaterialStore:
         return m
     return None
 
+  def to_jsonl(self, path: str | Path) -> None:
+    """Write materials as newline-delimited JSON using stable field aliases and enum values."""
+    p = Path(path)
+    with p.open("w") as f:
+      for material in self._materials:
+        f.write(material.model_dump_json(exclude_none=True))
+        f.write("\n")
+
   @classmethod
   def from_jsonl(
     cls,
@@ -63,7 +71,10 @@ class MaterialStore:
 
 def _material_from_dict(d: dict[str, Any]) -> Material:
   props: list[MaterialProperty] = []
+  prop_fields = set(MaterialProperty.model_fields)
   for p in d.get("properties", []):
+    extra = dict(p.get("extra", {}))
+    extra.update({k: v for k, v in p.items() if k not in prop_fields})
     props.append(
       MaterialProperty(
         name=p.get("name", ""),
@@ -73,7 +84,8 @@ def _material_from_dict(d: dict[str, Any]) -> Material:
         method=p.get("method", "unknown"),
         confidence=p.get("confidence"),
         uncertainty=p.get("uncertainty"),
-        extra={k: v for k, v in p.items() if k not in {"name", "value", "unit", "source", "method"}},
+        source_id=p.get("source_id"),
+        extra=extra,
       )
     )
   prov: list[ProvenanceRecord] = [
@@ -82,6 +94,8 @@ def _material_from_dict(d: dict[str, Any]) -> Material:
       method=x.get("method", "unknown"),
       confidence=x.get("confidence"),
       notes=x.get("notes"),
+      model_version=x.get("model_version"),
+      source_id=x.get("source_id"),
     )
     for x in d.get("provenance", [])
   ]
@@ -96,5 +110,6 @@ def _material_from_dict(d: dict[str, Any]) -> Material:
     structure=st,
     properties=props,
     provenance=prov,
+    source_id=d.get("source_id"),
     metadata=dict(d.get("metadata", {})),
   )

@@ -4,12 +4,14 @@ import json
 import math
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pymatgen.core import Lattice, Structure
 
 
 class CrystalStructure(BaseModel):
   """Unit cell + fractional sites; can round-trip to :class:`pymatgen.core.Structure`."""
+
+  model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
   lattice: list[list[float]] = Field(
     ...,
@@ -52,6 +54,13 @@ class CrystalStructure(BaseModel):
       if isinstance(specie, dict) and not specie:
         msg = "species mapping entries must not be empty"
         raise ValueError(msg)
+      if isinstance(specie, dict):
+        if any(not key.strip() for key in specie):
+          msg = "species mapping keys must not be empty"
+          raise ValueError(msg)
+        if any(value <= 0 or not math.isfinite(value) for value in specie.values()):
+          msg = "species occupancies must be positive finite values"
+          raise ValueError(msg)
     if self.site_properties and len(self.site_properties) != len(self.coords):
       msg = "site_properties length must match sites when set"
       raise ValueError(msg)
@@ -59,9 +68,7 @@ class CrystalStructure(BaseModel):
 
   def to_pymatgen(self) -> Structure:
     """Convert to a pymatgen :class:`Structure` (Cartesian built internally)."""
-    sp: Any = self.site_properties
-    if not sp or len(sp) != len(self.coords):
-      sp = None
+    sp = _site_properties_to_pymatgen(self.site_properties)
     return Structure(
       Lattice(self.lattice),
       self.species,
@@ -72,14 +79,39 @@ class CrystalStructure(BaseModel):
   @classmethod
   def from_pymatgen(cls, s: Structure) -> CrystalStructure:
     n = len(s)
-    spec = [str(s[i].species) for i in range(n)]
+    spec = [_species_to_jsonable(s[i].species) for i in range(n)]
     fracs = [list(s[i].frac_coords) for i in range(n)]
+    props = [dict(s[i].properties) for i in range(n)]
+    props_out = props if any(props) else None
     return cls(
       lattice=(s.lattice.matrix.tolist()),
       species=spec,  # type: ignore[arg-type]
       coords=fracs,
-      site_properties=None,
+      site_properties=props_out,
     )
 
   def to_json_dict(self) -> dict[str, Any]:
     return json.loads(self.model_dump_json())
+
+
+def _species_to_jsonable(species: Any) -> str | dict[str, float]:
+  items = list(species.items())
+  if len(items) == 1:
+    sp, occ = items[0]
+    if math.isclose(float(occ), 1.0):
+      return str(sp)
+  return {str(sp): float(occ) for sp, occ in items}
+
+
+def _site_properties_to_pymatgen(
+  site_properties: list[dict[str, Any] | None] | None,
+) -> dict[str, list[Any]] | None:
+  if not site_properties:
+    return None
+  keys = sorted({key for props in site_properties if props for key in props})
+  if not keys:
+    return None
+  return {
+    key: [(props or {}).get(key) for props in site_properties]
+    for key in keys
+  }
