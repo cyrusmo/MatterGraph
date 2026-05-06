@@ -45,7 +45,7 @@ class CrystalGraphBuilder:
     for i, site in enumerate(structure):
       z = min(site.specie.Z, 99)
       out[i, z - 1] = 1.0
-      el: Element = site.specie.element
+      el: Element = getattr(site.specie, "element", site.specie)
       en = el.X if el and el.X is not None else 0.0
       r = el.atomic_radius if el and el.atomic_radius is not None else 0.0
       nval = float(getattr(el, "group", 0) or 0)
