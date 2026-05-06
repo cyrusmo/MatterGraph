@@ -44,6 +44,24 @@ class CrystalGraphBuilder:
     self.cutoff_radius = cutoff_radius
     self.max_neighbors = max_neighbors
 
+  def _node_feature_matrix(self, structure: Structure) -> NDArray[np.float64]:
+    from pymatgen.core.periodic_table import Element
+
+    n = len(structure)
+    feat_dim = 100  # up to Z=99, padding one slot; plus 3 real stats
+    out = np.zeros((n, feat_dim + 3), dtype=np.float64)
+    for i, site in enumerate(structure):
+      z = min(site.specie.Z, 99)
+      out[i, z - 1] = 1.0
+      el: Element = getattr(site.specie, "element", site.specie)
+      en = el.X if el and el.X is not None else 0.0
+      r = el.atomic_radius if el and el.atomic_radius is not None else 0.0
+      nval = float(getattr(el, "group", 0) or 0)
+      out[i, feat_dim] = en
+      out[i, feat_dim + 1] = r
+      out[i, feat_dim + 2] = nval
+    return out
+
   def _global_features(self, structure: Structure) -> dict[str, float | int]:
     d = float(structure.density)
     nsites = int(len(structure))

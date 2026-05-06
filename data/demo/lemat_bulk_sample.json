@@ -1,0 +1,73 @@
+[
+  {
+    "material_id": "lemat-tin-alpha",
+    "formula": "TiN",
+    "elements": ["Ti", "N"],
+    "nelements": 2,
+    "nsites": 2,
+    "structure": {
+      "lattice": [[4.24, 0.0, 0.0], [0.0, 4.24, 0.0], [0.0, 0.0, 4.24]],
+      "species": ["Ti", "N"],
+      "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]],
+      "site_properties": null
+    },
+    "immutable_id": "lemat-imm-001",
+    "structure_fingerprint": "lemat-fp-001",
+    "functional": "PBEsol",
+    "density": 5.4,
+    "bulk_modulus": 285.0,
+    "energy_above_hull": 0.01
+  },
+  {
+    "material_id": "lemat-tin-beta",
+    "formula": "TiN",
+    "elements": ["Ti", "N"],
+    "nelements": 2,
+    "nsites": 4,
+    "structure": {
+      "lattice": [[2.99, 0.0, 0.0], [0.0, 2.99, 0.0], [0.0, 0.0, 4.85]],
+      "species": ["Ti", "Ti", "N", "N"],
+      "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5], [0.25, 0.25, 0.25], [0.75, 0.75, 0.75]],
+      "site_properties": null
+    },
+    "immutable_id": "lemat-imm-002",
+    "structure_fingerprint": "lemat-fp-002",
+    "functional": "PBEsol",
+    "density": 5.5,
+    "bulk_modulus": 278.0,
+    "energy_above_hull": 0.02
+  },
+  {
+    "material_id": "lemat-aln",
+    "formula": "AlN",
+    "elements": ["Al", "N"],
+    "nelements": 2,
+    "nsites": 2,
+    "structure": {
+      "lattice": [[3.11, 0.0, 0.0], [0.0, 3.11, 0.0], [0.0, 0.0, 4.98]],
+      "species": ["Al", "N"],
+      "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.38]],
+      "site_properties": null
+    },
+    "immutable_id": "lemat-imm-003",
+    "structure_fingerprint": "lemat-fp-003",
+    "functional": "PBEsol",
+    "density": 3.2,
+    "bulk_modulus": 205.0,
+    "energy_above_hull": 0.0
+  },
+  {
+    "material_id": "lemat-tialn-screen",
+    "formula": "TiAlN",
+    "elements": ["Ti", "Al", "N"],
+    "nelements": 3,
+    "nsites": 3,
+    "structure": null,
+    "immutable_id": "lemat-imm-004",
+    "structure_fingerprint": "lemat-fp-004",
+    "functional": "PBEsol",
+    "density": 4.6,
+    "bulk_modulus": 240.0,
+    "energy_above_hull": 0.03
+  }
+]

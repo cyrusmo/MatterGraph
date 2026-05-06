@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
   from mattergraph_connectors.jarvis import JarvisConnector
+  from mattergraph_connectors.lematerial import LeMatBulk
   from mattergraph_connectors.local_csv import load_materials_from_csv
   from mattergraph_connectors.materials_project import MaterialsProjectConnector
   from mattergraph_connectors.nomad import NOMADStubConnector
@@ -32,6 +33,11 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
     "load_materials_from_csv",
     None,
   ),
+  "LeMatBulk": (
+    "mattergraph_connectors.lematerial",
+    "LeMatBulk",
+    None,
+  ),
   "OQMDStubConnector": (
     "mattergraph_connectors.oqmd",
     "OQMDStubConnector",
@@ -47,6 +53,7 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
 __all__ = [
   "MaterialsProjectConnector",
   "JarvisConnector",
+  "LeMatBulk",
   "load_materials_from_csv",
   "OQMDStubConnector",
   "NOMADStubConnector",

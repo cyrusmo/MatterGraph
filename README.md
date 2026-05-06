@@ -5,9 +5,11 @@
 ![CI](https://github.com/cyrusmo/MatterGraph/actions/workflows/ci.yml/badge.svg)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
-Open-source **materials data infrastructure** for physics-aware machine learning and simulation workflows.
+MatterGraph is an open-source SDK and workbench for physics-aware materials workflows.
 
-MatterGraph helps researchers and engineers **ingest, normalize, search, compare, and benchmark** materials data from public sources such as [Materials Project](https://materialsproject.org), [OQMD](https://oqmd.org), [JARVIS](https://jarvis.nist.gov), and [NOMAD](https://nomad-lab.eu).
+It helps researchers and developers turn standardized materials datasets into graph-ready, benchmark-ready, and candidate-screening artifacts. MatterGraph is dataset-agnostic and supports multi-source workflows across public materials resources.
+
+LeMaterial is a flagship upstream companion: LeMaterial provides standardized materials datasets; MatterGraph provides the downstream workflow surface for inspection, filtering, graph export, slicing, and evaluation.
 
 It is designed for teams building:
 
@@ -35,6 +37,8 @@ Materials data is fragmented across repositories, schemas, units, structures, an
 ## Scope
 
 The public repository focuses on transparent, reusable infrastructure for open materials workflows. Production-specific orchestration, hosting, and organization-specific workflows are out of scope for this demo.
+
+MatterGraph Core focuses on transparent workflow primitives and guardrails. Proprietary ranking, active learning, orchestration, model routing, and customer-specific decision workflows remain private.
 
 ## Quickstart
 
@@ -70,22 +74,43 @@ df = scorecard.rank(store.materials)
 print(df.head(10))
 ```
 
+Example: turn LeMaterial-style records into a reproducible candidate slice.
+
+```python
+import json
+from pathlib import Path
+
+from mattergraph_connectors import LeMatBulk
+
+records = json.loads(Path("data/demo/lemat_bulk_sample.json").read_text())
+dataset = LeMatBulk.from_records(records, subset="compatible_pbesol")
+
+candidate_slice = (
+    dataset
+    .filter_elements(include=["Ti", "Al", "N"])
+    .filter_complexity(max_nsites=4, max_nelements=3)
+    .create_slice("marine_pressure_candidates_v0", target="bulk_modulus")
+)
+
+print(candidate_slice.report())
+```
+
 ## Architecture (conceptual)
 
 ```text
-Raw dataset → normalized Material → crystal graph / features → scorecard or benchmarks → simulation job
+Raw dataset → MatterGraphDataset / Material → candidate slice / crystal graph / benchmark frame → scorecard or simulation job
 ```
 
 ## Roadmap
 
-High-level [ROADMAP.md](ROADMAP.md) covers connectors, the unified schema, graph building, benchmark adapters, simulation job specs, and uncertainty. Open issues label components as `[core]`, `[connector]`, `[graph]`, and so on.
+High-level [ROADMAP.md](ROADMAP.md) covers connectors, the unified schema, workflow slicing, graph building, benchmark adapters, simulation job specs, and uncertainty. For the LeMaterial companion layer, see [docs/integrations/lematerial.md](docs/integrations/lematerial.md).
 
 ## Packages
 
 | Package | Role |
 |--------|------|
-| `mattergraph-core` | Schema, normalization, crystal graphs, toy `Scorecard`, `MaterialStore` |
-| `mattergraph-connectors` | MP, JARVIS, local CSV, stubs for NOMAD/OQMD |
+| `mattergraph-core` | Schema, normalization, `MatterGraphDataset`, `CandidateSlice`, crystal graphs, toy `Scorecard`, `MaterialStore` |
+| `mattergraph-connectors` | MP, JARVIS, LeMat-Bulk companion adapter, local CSV, stubs for NOMAD/OQMD |
 | `mattergraph-benchmarks` | Metrics, Matbench-style adapter (optional `matbench` install) |
 | `mattergraph-sim` | ASE / stub LAMMPS+QE around job specs |
 | `mattergraph-api` | FastAPI demo for `/materials`, `/search`, `/scores/rank`, `/simulations/ase/relax` |
