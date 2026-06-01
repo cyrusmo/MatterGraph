@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from app.main import app
 from httpx import ASGITransport, AsyncClient
@@ -21,6 +23,46 @@ async def test_materials_list() -> None:
   data = r.json()
   assert isinstance(data, list)
   assert len(data) >= 1
+
+
+async def test_lematerial_demo_workflow_contract() -> None:
+  transport = ASGITransport(app=app)
+  async with AsyncClient(transport=transport, base_url="http://test") as ac:
+    r = await ac.get("/workflows/lematerial/demo")
+  assert r.status_code == 200
+  data = r.json()
+
+  assert data["workflow_id"] == "lematerial_bulk_demo"
+  assert data["source_dataset"] == "LeMaterial/LeMat-Bulk"
+  assert data["source_subset"] == "compatible_pbesol"
+  assert data["schema_report"]["row_count"] == 4
+
+  candidate_slice = data["candidate_slice"]
+  assert candidate_slice["slice_id"].startswith("mg_slice_")
+  assert candidate_slice["slice_name"] == "marine_pressure_candidates_v0"
+  assert candidate_slice["target"] == "bulk_modulus"
+  assert candidate_slice["input_count"] == 4
+  assert candidate_slice["output_count"] == 4
+  assert candidate_slice["removed_count"] == 0
+  assert [step["name"] for step in candidate_slice["filter_steps"]] == [
+    "filter_elements",
+    "filter_complexity",
+  ]
+
+  assert data["graph_export"] == {"included_count": 3, "excluded_count": 1}
+  assert 1 <= len(data["benchmark_preview"]) <= 3
+  assert {"material_id", "formula", "target"} <= set(data["benchmark_preview"][0])
+  assert data["provenance"] == {
+    "fixture_path": "data/demo/lemat_bulk_sample.json",
+    "loader": "LeMatBulk.from_records",
+    "workflow_version": "v0.1",
+    "run_id": "lematerial_bulk_demo_static_v0_1",
+  }
+
+  serialized = json.dumps(data)
+  assert "graphs" not in data
+  assert "node_features" not in serialized
+  assert "edge_index" not in serialized
 
 
 async def test_simulation_relax_succeeds_for_supported_demo_material() -> None:

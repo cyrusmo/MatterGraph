@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
         "/search": { target: env.VITE_API_URL || "http://127.0.0.1:8000", changeOrigin: true },
         "/scores": { target: env.VITE_API_URL || "http://127.0.0.1:8000", changeOrigin: true },
         "/simulations": { target: env.VITE_API_URL || "http://127.0.0.1:8000", changeOrigin: true },
+        "/workflows": { target: env.VITE_API_URL || "http://127.0.0.1:8000", changeOrigin: true },
       },
     },
   };

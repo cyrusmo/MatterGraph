@@ -54,6 +54,29 @@ print(graphs.excluded_count)
 print(benchmark_frame[["material_id", "target"]].head())
 ```
 
+## Demo API and workbench
+
+The public demo API exposes a fixed LeMaterial workflow summary for local smoke tests and the web
+workbench.
+
+```bash
+curl http://localhost:8000/workflows/lematerial/demo
+```
+
+Run the API and web UI locally:
+
+```bash
+export MATTERGRAPH_DEMO_DATA=data/demo/materials_sample.jsonl
+.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --app-dir packages/mattergraph-api
+cd apps/web
+npm run dev
+```
+
+In the web demo, inspect the fixture-backed materials, compute the toy scorecard rank, review the
+LeMaterial demo workflow summary, and run the ASE demo relaxation for a selected material. The
+workflow summary intentionally returns graph export counts and benchmark preview rows, not full graph
+payloads.
+
 ## Guardrail notes
 
 - Repeated reduced formulas are not automatically treated as duplicates. Different structures and valid polymorphs can share the same formula.

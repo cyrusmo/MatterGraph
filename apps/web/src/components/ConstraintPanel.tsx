@@ -5,13 +5,14 @@ type Props = {
   onEah: (v: number) => void;
   dMax: number;
   onD: (v: number) => void;
+  loading: boolean;
   onRank: (objectives: Record<string, "minimize" | "maximize">) => void;
 };
 
-export function ConstraintPanel({ eahMax, onEah, dMax, onD, onRank }: Props) {
+export function ConstraintPanel({ eahMax, onEah, dMax, onD, loading, onRank }: Props) {
   const [minD, setMinD] = useState(true);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 400 }}>
+    <div className="control-panel">
       <label>
         Energy above hull max (eV/atom){" "}
         <input
@@ -22,7 +23,7 @@ export function ConstraintPanel({ eahMax, onEah, dMax, onD, onRank }: Props) {
         />
       </label>
       <label>
-        Density max (g/cm³){" "}
+        Density max (g/cm^3){" "}
         <input type="number" step="0.1" value={dMax} onChange={(e) => onD(Number(e.target.value))} />
       </label>
       <label>
@@ -36,8 +37,9 @@ export function ConstraintPanel({ eahMax, onEah, dMax, onD, onRank }: Props) {
             bulk_modulus: "maximize",
           })
         }
+        disabled={loading}
       >
-        Compute rank
+        {loading ? "Computing..." : "Compute toy rank"}
       </button>
     </div>
   );
