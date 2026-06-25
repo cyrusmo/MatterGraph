@@ -110,7 +110,7 @@ High-level [ROADMAP.md](ROADMAP.md) covers connectors, the unified schema, workf
 | Package | Role |
 |--------|------|
 | `mattergraph-core` | Schema, normalization, `MatterGraphDataset`, `CandidateSlice`, crystal graphs, toy `Scorecard`, `MaterialStore` |
-| `mattergraph-connectors` | MP, JARVIS, LeMat-Bulk companion adapter, local CSV, stubs for NOMAD/OQMD |
+| `mattergraph-connectors` | MP, JARVIS, NOMAD public metadata, LeMat-Bulk companion adapter, local CSV, OQMD stub |
 | `mattergraph-benchmarks` | Metrics, Matbench-style adapter (optional `matbench` install) |
 | `mattergraph-sim` | ASE / stub LAMMPS+QE around job specs |
 | `mattergraph-api` | FastAPI demo for `/materials`, `/search`, `/scores/rank`, `/simulations/ase/relax` |

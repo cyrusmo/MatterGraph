@@ -2,6 +2,14 @@ import importlib
 
 import mattergraph_connectors
 import pytest
+from mattergraph_connectors import (
+  NOMADConnector,
+  NOMADConnectorError,
+  NOMADHTTPError,
+  NOMADMappingError,
+  NOMADPayloadError,
+  NOMADStubConnector,
+)
 from mattergraph_connectors.lematerial import LeMatBulk
 
 
@@ -37,3 +45,11 @@ def test_lemat_bulk_from_hf_has_helpful_optional_dependency_error(
 
   with pytest.raises(ImportError, match="optional `datasets` dependency"):
     LeMatBulk.from_hf()
+
+
+def test_nomad_connector_exports_primary_and_compatibility_names() -> None:
+  assert NOMADConnector.__name__ == "NOMADConnector"
+  assert issubclass(NOMADHTTPError, NOMADConnectorError)
+  assert issubclass(NOMADMappingError, NOMADConnectorError)
+  assert issubclass(NOMADPayloadError, NOMADConnectorError)
+  assert issubclass(NOMADStubConnector, NOMADConnector)

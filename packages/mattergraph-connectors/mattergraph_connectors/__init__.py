@@ -8,7 +8,14 @@ if TYPE_CHECKING:
   from mattergraph_connectors.lematerial import LeMatBulk
   from mattergraph_connectors.local_csv import load_materials_from_csv
   from mattergraph_connectors.materials_project import MaterialsProjectConnector
-  from mattergraph_connectors.nomad import NOMADStubConnector
+  from mattergraph_connectors.nomad import (
+    NOMADConnector,
+    NOMADConnectorError,
+    NOMADHTTPError,
+    NOMADMappingError,
+    NOMADPayloadError,
+    NOMADStubConnector,
+  )
   from mattergraph_connectors.oqmd import OQMDStubConnector
 
 _EXPORTS: dict[str, tuple[str, str, str | None]] = {
@@ -43,6 +50,31 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
     "OQMDStubConnector",
     None,
   ),
+  "NOMADConnector": (
+    "mattergraph_connectors.nomad",
+    "NOMADConnector",
+    None,
+  ),
+  "NOMADConnectorError": (
+    "mattergraph_connectors.nomad",
+    "NOMADConnectorError",
+    None,
+  ),
+  "NOMADHTTPError": (
+    "mattergraph_connectors.nomad",
+    "NOMADHTTPError",
+    None,
+  ),
+  "NOMADMappingError": (
+    "mattergraph_connectors.nomad",
+    "NOMADMappingError",
+    None,
+  ),
+  "NOMADPayloadError": (
+    "mattergraph_connectors.nomad",
+    "NOMADPayloadError",
+    None,
+  ),
   "NOMADStubConnector": (
     "mattergraph_connectors.nomad",
     "NOMADStubConnector",
@@ -56,6 +88,11 @@ __all__ = [
   "LeMatBulk",
   "load_materials_from_csv",
   "OQMDStubConnector",
+  "NOMADConnector",
+  "NOMADConnectorError",
+  "NOMADHTTPError",
+  "NOMADMappingError",
+  "NOMADPayloadError",
   "NOMADStubConnector",
 ]
 
