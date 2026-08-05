@@ -1,8 +1,10 @@
 # MatterGraph
 
+[![PyPI](https://img.shields.io/pypi/v/mattergraph)](https://pypi.org/project/mattergraph/)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![CI](https://github.com/cyrusmo/MatterGraph/actions/workflows/ci.yml/badge.svg)
+[![Docs](https://github.com/cyrusmo/MatterGraph/actions/workflows/docs.yml/badge.svg)](https://cyrusmo.github.io/MatterGraph/)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
 MatterGraph is an open-source SDK and workbench for physics-aware materials workflows.
@@ -40,7 +42,23 @@ The public repository focuses on transparent, reusable infrastructure for open m
 
 MatterGraph Core focuses on transparent workflow primitives and guardrails. Proprietary ranking, active learning, orchestration, model routing, and customer-specific decision workflows remain private.
 
-## Quickstart
+## Install
+
+```bash
+pip install mattergraph
+```
+
+That pulls the full workspace. Install only what you need instead:
+
+```bash
+pip install mattergraph-core         # schema, normalization, graphs, scoring
+pip install mattergraph-connectors   # Materials Project, JARVIS, NOMAD, LeMat-Bulk
+pip install mattergraph-sim          # ASE job specs and runners
+pip install mattergraph-benchmarks   # metrics and Matbench adapter
+pip install mattergraph-api          # FastAPI demo service
+```
+
+## Quickstart (from source)
 
 ```bash
 git clone https://github.com/cyrusmo/MatterGraph.git
@@ -51,7 +69,7 @@ pip install uv
 uv sync --all-packages --group dev
 # Optional: copy .env.example to .env and set MP_API_KEY for Materials Project
 export MATTERGRAPH_DEMO_DATA=data/demo/materials_sample.jsonl
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn mattergraph_api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Example: rank candidates with a **toy scorecard** (min–max normalized objectives, hard constraints).

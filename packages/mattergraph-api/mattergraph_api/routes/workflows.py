@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.services.workflow_service import (
+from mattergraph_api.services.workflow_service import (
   LeMaterialDemoWorkflowResponse,
   build_lematerial_demo_workflow,
 )

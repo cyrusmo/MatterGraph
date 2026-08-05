@@ -24,8 +24,8 @@ uv run pytest
 
 ## Workspace packaging note
 
-The root [`pyproject.toml`](pyproject.toml) builds a tiny metapackage that pins workspace dependencies.
-[`_workspace_meta.py`](_workspace_meta.py) exists only for that setuptools metapackage shim.
+The root [`pyproject.toml`](https://github.com/cyrusmo/MatterGraph/blob/main/pyproject.toml) builds a tiny metapackage that pins workspace dependencies.
+[`_workspace_meta.py`](https://github.com/cyrusmo/MatterGraph/blob/main/_workspace_meta.py) exists only for that setuptools metapackage shim.
 
 ## Pull requests
 
@@ -41,4 +41,4 @@ The root [`pyproject.toml`](pyproject.toml) builds a tiny metapackage that pins 
 
 ## Code of conduct
 
-See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+See [CODE_OF_CONDUCT.md](https://github.com/cyrusmo/MatterGraph/blob/main/CODE_OF_CONDUCT.md).

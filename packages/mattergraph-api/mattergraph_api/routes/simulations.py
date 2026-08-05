@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from mattergraph_sim.job_spec import AseJobSpec, SimulationJob
 from pydantic import BaseModel, Field
 
-from app.services import store_service
+from mattergraph_api.services import store_service
 
 router = APIRouter()
 

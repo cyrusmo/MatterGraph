@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from mattergraph import Scorecard
 from pydantic import BaseModel, Field
 
-from app.services import store_service
+from mattergraph_api.services import store_service
 
 router = APIRouter()
 

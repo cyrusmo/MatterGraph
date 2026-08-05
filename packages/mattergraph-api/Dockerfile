@@ -11,4 +11,4 @@ RUN cd /app && uv sync --all-packages
 ENV PYTHONPATH=/app/packages/mattergraph-api
 EXPOSE 8000
 WORKDIR /app
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "mattergraph_api.main:app", "--host", "0.0.0.0", "--port", "8000"]

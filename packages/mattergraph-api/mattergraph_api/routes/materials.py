@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from mattergraph import Material
 
-from app.services import store_service
+from mattergraph_api.services import store_service
 
 router = APIRouter()
 

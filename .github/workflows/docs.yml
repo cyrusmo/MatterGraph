@@ -1,16 +1,64 @@
 name: Docs
 
+# Builds the documentation site on every relevant change, and publishes it to
+# GitHub Pages from `main`. The build runs with `strict: true`, so a broken
+# internal link fails the pull request instead of shipping.
 on:
   push:
+    branches: [main]
     paths:
       - "docs/**"
+      - "mkdocs.yml"
       - "README.md"
       - "ROADMAP.md"
+      - "CHANGELOG.md"
+      - "CONTRIBUTING.md"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+      - "ROADMAP.md"
+      - "CHANGELOG.md"
+      - "CONTRIBUTING.md"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Key docs present
-        run: test -f docs/index.md && test -f README.md
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      - name: Build site
+        run: uv run --group docs mkdocs build --strict
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy:
+    # Only `main` publishes; pull requests stop at the build gate above.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

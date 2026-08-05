@@ -1,0 +1,147 @@
+name: Release
+
+# Publishes the MatterGraph workspace to PyPI when a `v*` tag is pushed.
+#
+# Authentication uses PyPI Trusted Publishing (OIDC) — there is no API token to
+# store or rotate. Before the first release, register this workflow as a trusted
+# publisher for each of the six project names on PyPI:
+#   mattergraph, mattergraph-core, mattergraph-connectors,
+#   mattergraph-benchmarks, mattergraph-sim, mattergraph-api
+# using owner `cyrusmo`, repository `MatterGraph`, workflow `release.yml`.
+#
+# Run the workflow manually (workflow_dispatch) to publish to TestPyPI instead,
+# which is the safe way to rehearse a release.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Publish target"
+        required: true
+        default: testpypi
+        type: choice
+        options:
+          - testpypi
+          - pypi
+
+jobs:
+  # Never publish something that does not pass its own test suite.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      - run: uv sync --all-packages --group dev
+      - run: uv run ruff check .
+      - run: uv run pytest
+
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+
+      # Guard against tagging v1.2.3 while pyproject still says 0.1.0.
+      - name: Check tag matches project version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          project_version="$(uv version --short)"
+          if [ "$tag_version" != "$project_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match project version $project_version"
+            exit 1
+          fi
+          echo "Tag and project version agree: $project_version"
+
+      - name: Build all workspace packages
+        run: uv build --all-packages --out-dir dist
+
+      - name: Check package metadata
+        run: uvx twine check dist/*
+
+      # The metapackage depends on the member packages, so they are published
+      # first. Splitting the artifacts here keeps that ordering explicit.
+      - name: Split members from metapackage
+        run: |
+          mkdir -p dist-members dist-meta
+          mv dist/mattergraph_* dist-members/
+          mv dist/mattergraph-* dist-meta/
+          echo "members:"; ls dist-members
+          echo "metapackage:"; ls dist-meta
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-members
+          path: dist-members/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-meta
+          path: dist-meta/
+
+  publish-members:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write # required for Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-members
+          path: dist/
+      - name: Publish member packages
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: ${{ (github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi') && 'https://test.pypi.org/legacy/' || '' }}
+
+  publish-metapackage:
+    needs: publish-members
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-meta
+          path: dist/
+      - name: Publish metapackage
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: ${{ (github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi') && 'https://test.pypi.org/legacy/' || '' }}
+
+  github-release:
+    needs: publish-metapackage
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-members
+          path: dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-meta
+          path: dist/
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import materials, scores, search, simulations, workflows
+from mattergraph_api.routes import materials, scores, search, simulations, workflows
 
 app = FastAPI(
   title="MatterGraph API",

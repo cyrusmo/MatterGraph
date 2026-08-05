@@ -67,7 +67,7 @@ Run the API and web UI locally:
 
 ```bash
 export MATTERGRAPH_DEMO_DATA=data/demo/materials_sample.jsonl
-.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --app-dir packages/mattergraph-api
+.venv/bin/uvicorn mattergraph_api.main:app --reload --host 0.0.0.0 --port 8000 --app-dir packages/mattergraph-api
 cd apps/web
 npm run dev
 ```
@@ -85,5 +85,5 @@ payloads.
 
 ## Related assets
 
-- [`examples/lematerial/`](../../examples/lematerial/)
-- [`cookbooks/sql/lematerial/`](../../cookbooks/sql/lematerial/)
+- [`examples/lematerial/`](https://github.com/cyrusmo/MatterGraph/tree/main/examples/lematerial/)
+- [`cookbooks/sql/lematerial/`](https://github.com/cyrusmo/MatterGraph/tree/main/cookbooks/sql/lematerial/)

@@ -11,7 +11,7 @@ npm run dev
 Start the API from the monorepo root in another shell:
 
 ```bash
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn mattergraph_api.main:app --reload --port 8000
 ```
 
 `VITE_API_URL` can be set to an empty string for the proxy, or a full base URL in production (and adjust CORS on the API).

@@ -11,6 +11,6 @@ _DEMO = _ROOT / "data" / "demo" / "materials_sample.jsonl"
 @pytest.fixture(scope="module", autouse=True)
 def _set_demo_data() -> None:
   os.environ["MATTERGRAPH_DEMO_DATA"] = str(_DEMO)
-  from app.services import store_service
+  from mattergraph_api.services import store_service
 
   store_service.reset_store(MaterialStore.from_jsonl(_DEMO))

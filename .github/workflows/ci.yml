@@ -1,13 +1,18 @@
 name: CI
 
+# Single source of truth for pull-request and push checks. Runs on every branch
+# so feature work gets feedback before it reaches a pull request.
 on:
   push:
-    branches: [main]
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +26,49 @@ jobs:
         run: uv sync --all-packages --group dev
       - name: Ruff
         run: uv run ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # `requires-python = ">=3.10"` is a promise; test it on every version
+        # the packages claim to support.
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      - name: Sync
+        run: uv sync --all-packages --group dev --python ${{ matrix.python-version }}
       - name: Pytest
-        run: uv run pytest
-      - name: Web build
-        uses: actions/setup-node@v4
+        run: uv run pytest --cov --cov-report=term-missing --cov-report=xml
+
+  build-wheels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      # Catches packaging breakage on the pull request rather than at tag time.
+      - name: Build all packages
+        run: uv build --all-packages --out-dir dist
+      - name: Check metadata
+        run: uvx twine check dist/*
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"

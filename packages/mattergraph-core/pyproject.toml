@@ -2,14 +2,34 @@
 name = "mattergraph-core"
 version = "0.1.0"
 description = "Core schema, normalization, and crystal graphs for MatterGraph."
+readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
+authors = [{ name = "MatterGraph contributors" }]
+keywords = ["materials-science", "materials-informatics", "crystal-structure", "dft", "pymatgen"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
   "pydantic>=2.5",
   "numpy>=1.24",
   "pandas>=2.0",
   "pymatgen>=2024.1.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/cyrusmo/MatterGraph"
+Repository = "https://github.com/cyrusmo/MatterGraph"
+Issues = "https://github.com/cyrusmo/MatterGraph/issues"
+Changelog = "https://github.com/cyrusmo/MatterGraph/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling"]
