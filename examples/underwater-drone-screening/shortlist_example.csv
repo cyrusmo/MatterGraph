@@ -1,4 +1,3 @@
-rank,material_id,score,density,bulk_modulus
-1,demo-ti-bcc-1,0.65,4.5,110
-2,demo-al-fcc-1,0.55,2.7,72
-3,demo-fe-bcc-1,0.45,7.8,170
+rank,material_id,score,density,bulk_modulus,energy_above_hull
+1,demo-al-fcc-1,0.5833,2.699,72.0,0.0
+2,demo-ti-bcc-1,0.4167,4.398,110.0,0.01

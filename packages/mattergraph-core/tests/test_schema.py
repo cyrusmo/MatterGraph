@@ -5,6 +5,7 @@ from mattergraph import Material, MaterialProperty, MaterialStore
 from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.simulation import SimulationJobRef
 from mattergraph.graph.crystal_graph import CrystalGraphBuilder
+from mattergraph.normalization.structures import check_density
 from mattergraph.schema.structure import CrystalStructure
 
 
@@ -77,6 +78,50 @@ def test_from_demo() -> None:
     if not sample.is_file():
       pytest.skip("no demo data")
   assert len(store.materials) > 0
+
+
+def test_check_density_diagnoses_incomplete_basis() -> None:
+  # bcc iron written with only the corner atom: the cell holds half its basis, so the
+  # real density is ~2x what the cell implies. This is the defect the guardrail exists
+  # for, and the ratio should name it.
+  incomplete = CrystalStructure(
+    lattice=[[2.8665, 0.0, 0.0], [0.0, 2.8665, 0.0], [0.0, 0.0, 2.8665]],
+    species=["Fe"],
+    coords=[[0.0, 0.0, 0.0]],
+  )
+  bad = check_density(incomplete, 7.874)
+  assert not bad.consistent
+  assert bad.ratio == pytest.approx(2.0, abs=0.05)
+  assert bad.diagnosis is not None
+  assert "1/2" in bad.diagnosis
+
+  complete = incomplete.model_copy(
+    update={"species": ["Fe", "Fe"], "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]]}
+  )
+  good = check_density(complete, 7.874)
+  assert good.consistent
+  assert good.computed == pytest.approx(7.874, rel=1e-3)
+
+
+def test_demo_structures_match_stated_density() -> None:
+  """Every demo record's structure must agree with the density it reports.
+
+  Guards the whole `data/demo` fixture set: removing a basis atom from any record makes
+  this fail, which is how the previous simple-cubic placeholders shipped unnoticed.
+  """
+  store = MaterialStore.from_demo()
+  if not store.materials:
+    pytest.skip("no demo data")
+
+  checked = 0
+  for material in store.materials:
+    stated = material.get_numeric("density")
+    if material.structure is None or stated is None:
+      continue
+    result = check_density(material.structure, stated)
+    assert result.consistent, f"{material.material_id}: {result.diagnosis}"
+    checked += 1
+  assert checked > 0, "no demo record carried both a structure and a density"
 
 
 def test_store_jsonl_roundtrip(tmp_path: Path) -> None:

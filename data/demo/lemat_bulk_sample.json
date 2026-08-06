@@ -2,64 +2,191 @@
   {
     "material_id": "lemat-tin-alpha",
     "formula": "TiN",
-    "elements": ["Ti", "N"],
+    "elements": [
+      "Ti",
+      "N"
+    ],
     "nelements": 2,
     "nsites": 2,
     "structure": {
-      "lattice": [[4.24, 0.0, 0.0], [0.0, 4.24, 0.0], [0.0, 0.0, 4.24]],
-      "species": ["Ti", "N"],
-      "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]],
+      "lattice": [
+        [
+          0.0,
+          2.12,
+          2.12
+        ],
+        [
+          2.12,
+          0.0,
+          2.12
+        ],
+        [
+          2.12,
+          2.12,
+          0.0
+        ]
+      ],
+      "species": [
+        "Ti",
+        "N"
+      ],
+      "coords": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
       "site_properties": null
     },
     "immutable_id": "lemat-imm-001",
     "structure_fingerprint": "lemat-fp-001",
     "functional": "PBEsol",
-    "density": 5.4,
+    "density": 5.392,
     "bulk_modulus": 285.0,
     "energy_above_hull": 0.01
   },
   {
     "material_id": "lemat-tin-beta",
     "formula": "TiN",
-    "elements": ["Ti", "N"],
+    "elements": [
+      "Ti",
+      "N"
+    ],
     "nelements": 2,
     "nsites": 4,
     "structure": {
-      "lattice": [[2.99, 0.0, 0.0], [0.0, 2.99, 0.0], [0.0, 0.0, 4.85]],
-      "species": ["Ti", "Ti", "N", "N"],
-      "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5], [0.25, 0.25, 0.25], [0.75, 0.75, 0.75]],
+      "lattice": [
+        [
+          2.99,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.99,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          4.85
+        ]
+      ],
+      "species": [
+        "Ti",
+        "Ti",
+        "N",
+        "N"
+      ],
+      "coords": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ],
+        [
+          0.25,
+          0.25,
+          0.25
+        ],
+        [
+          0.75,
+          0.75,
+          0.75
+        ]
+      ],
       "site_properties": null
     },
     "immutable_id": "lemat-imm-002",
     "structure_fingerprint": "lemat-fp-002",
     "functional": "PBEsol",
-    "density": 5.5,
+    "density": 4.739,
     "bulk_modulus": 278.0,
     "energy_above_hull": 0.02
   },
   {
     "material_id": "lemat-aln",
     "formula": "AlN",
-    "elements": ["Al", "N"],
+    "elements": [
+      "Al",
+      "N"
+    ],
     "nelements": 2,
-    "nsites": 2,
+    "nsites": 4,
     "structure": {
-      "lattice": [[3.11, 0.0, 0.0], [0.0, 3.11, 0.0], [0.0, 0.0, 4.98]],
-      "species": ["Al", "N"],
-      "coords": [[0.0, 0.0, 0.0], [0.5, 0.5, 0.38]],
+      "lattice": [
+        [
+          3.11,
+          0.0,
+          0.0
+        ],
+        [
+          -1.555,
+          2.693339005769604,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          4.98
+        ]
+      ],
+      "species": [
+        "Al",
+        "Al",
+        "N",
+        "N"
+      ],
+      "coords": [
+        [
+          0.3333333333333333,
+          0.6666666666666666,
+          0.0
+        ],
+        [
+          0.6666666666666666,
+          0.3333333333333333,
+          0.5
+        ],
+        [
+          0.3333333333333333,
+          0.6666666666666666,
+          0.382
+        ],
+        [
+          0.6666666666666666,
+          0.3333333333333333,
+          0.882
+        ]
+      ],
       "site_properties": null
     },
     "immutable_id": "lemat-imm-003",
     "structure_fingerprint": "lemat-fp-003",
     "functional": "PBEsol",
-    "density": 3.2,
+    "density": 3.263,
     "bulk_modulus": 205.0,
     "energy_above_hull": 0.0
   },
   {
     "material_id": "lemat-tialn-screen",
     "formula": "TiAlN",
-    "elements": ["Ti", "Al", "N"],
+    "elements": [
+      "Ti",
+      "Al",
+      "N"
+    ],
     "nelements": 3,
     "nsites": 3,
     "structure": null,

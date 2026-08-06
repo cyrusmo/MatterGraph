@@ -1,4 +1,16 @@
+import pytest
 from mattergraph import Material, MaterialProperty, Scorecard
+
+
+def _material(mid: str, **props: float) -> Material:
+  return Material(
+    material_id=mid,
+    formula="H",
+    properties=[
+      MaterialProperty(name=name, value=value, source="t", method="dft")
+      for name, value in props.items()
+    ],
+  )
 
 
 def test_scorecard_min_max_and_constraints() -> None:

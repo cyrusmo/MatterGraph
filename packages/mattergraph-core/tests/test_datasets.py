@@ -24,7 +24,10 @@ def test_dataset_filters_are_immutable_and_report_steps() -> None:
   second_slice = filtered.create_slice("fixture_slice")
 
   assert len(dataset) == 4
-  assert len(filtered) == 3
+  # Two survive max_nsites=3: primitive rocksalt TiN (2 sites) and the TiAlN screening
+  # record (3). Wurtzite AlN needs 4 sites and the beta TiN polymorph has 4, so both are
+  # correctly filtered out.
+  assert len(filtered) == 2
   assert first_slice.slice_id == second_slice.slice_id
   report = first_slice.report()
   assert report["columns_used"] == ["elements", "nsites"]
@@ -33,7 +36,7 @@ def test_dataset_filters_are_immutable_and_report_steps() -> None:
     "filter_complexity",
   ]
   assert report["filter_steps"][0]["input_count"] == 4
-  assert report["filter_steps"][1]["output_count"] == 3
+  assert report["filter_steps"][1]["output_count"] == 2
 
 
 def test_dataset_schema_report_and_element_counts() -> None:

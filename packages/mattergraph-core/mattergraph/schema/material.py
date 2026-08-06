@@ -4,6 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from mattergraph.normalization.properties import canonical_property_name
 from mattergraph.schema.property import MaterialProperty
 from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.structure import CrystalStructure
@@ -76,9 +77,14 @@ class Material(BaseModel):
     return self
 
   def get_property(self, name: str) -> MaterialProperty | None:
-    n = name.lower()
+    """Look up a property by canonical name or by any documented alias.
+
+    ``MaterialProperty`` canonicalizes ``name`` on write, so the lookup canonicalizes too:
+    ``get_property("k_vrh")`` finds a property stored as ``bulk_modulus``.
+    """
+    n = canonical_property_name(name)
     for p in self.properties:
-      if p.name.lower() == n:
+      if canonical_property_name(p.name) == n:
         return p
     return None
 

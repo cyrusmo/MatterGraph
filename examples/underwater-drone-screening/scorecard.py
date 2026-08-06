@@ -23,10 +23,21 @@ def main() -> None:
     weights[k] = float(v.get("weight", 1.0))
   store = MaterialStore.from_jsonl(REPO / "data" / "demo" / "materials_sample.jsonl")
   sc = Scorecard(objectives=obj_dirs, constraints=con, weights=weights)
+
+  # Read the audit before the ranking: it names any objective that was ignored for having
+  # no coverage or no spread, and how many candidates the hard constraints removed.
+  report = sc.report(store.materials)
+  print(json.dumps(report, indent=2))
+  print()
+
   df = sc.rank(store.materials)
   print(df.to_string(index=False))
-  (ROOT / "shortlist_out.json").write_text(json.dumps(df.to_dict(orient="records"), indent=2))
-  print("Wrote shortlist_out.json")
+
+  out = df.copy().round(4)
+  out.insert(0, "rank", range(1, len(out) + 1))
+  out.to_csv(ROOT / "shortlist_example.csv", index=False)
+  (ROOT / "shortlist_report.json").write_text(json.dumps(report, indent=2) + "\n")
+  print("\nWrote shortlist_example.csv and shortlist_report.json")
 
 
 if __name__ == "__main__":

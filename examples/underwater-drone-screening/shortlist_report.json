@@ -1,0 +1,32 @@
+{
+  "pool_size": 3,
+  "ranked_count": 2,
+  "excluded_by_constraints": 1,
+  "objectives": [
+    "density",
+    "bulk_modulus",
+    "energy_above_hull"
+  ],
+  "weights": {
+    "density": 0.25,
+    "bulk_modulus": 0.25,
+    "energy_above_hull": 0.1
+  },
+  "missing_policy": "worst",
+  "coverage": {
+    "density": 2,
+    "bulk_modulus": 2,
+    "energy_above_hull": 2
+  },
+  "zero_coverage_objectives": [],
+  "degenerate_objectives": [],
+  "ignored_objectives": [],
+  "effective_objectives": [
+    "density",
+    "bulk_modulus",
+    "energy_above_hull"
+  ],
+  "mixed_methods": {},
+  "binary_normalization": true,
+  "scores_are_pool_relative": true
+}
