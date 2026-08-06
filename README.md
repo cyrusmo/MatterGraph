@@ -3,7 +3,6 @@
 [![PyPI](https://img.shields.io/pypi/v/mattergraph)](https://pypi.org/project/mattergraph/)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![CI](https://github.com/cyrusmo/MatterGraph/actions/workflows/ci.yml/badge.svg)
 [![Docs](https://github.com/cyrusmo/MatterGraph/actions/workflows/docs.yml/badge.svg)](https://cyrusmo.github.io/MatterGraph/)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
