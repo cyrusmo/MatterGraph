@@ -23,7 +23,6 @@ dependencies = [
   "pymatgen>=2024.1.1",
   "pydantic>=2.5",
   "ase>=3.22",
-  "h5py",
 ]
 
 [project.urls]

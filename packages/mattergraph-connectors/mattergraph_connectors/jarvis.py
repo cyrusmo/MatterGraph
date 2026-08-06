@@ -7,6 +7,25 @@ from mattergraph.schema.material import Material, MaterialProperty
 from mattergraph.schema.structure import CrystalStructure
 from pymatgen.core import Composition, Structure
 
+from mattergraph_connectors.base import (
+  ConnectorQuery,
+  apply_property_filter,
+  coerce_query,
+  connector_provenance,
+)
+
+SOURCE_NAME = "jarvis"
+
+# The property names _row_to_material actually maps out of a dft_3d row.
+SUPPORTED_PROPERTIES = frozenset(
+  {
+    "optb88vdw_total_energy",
+    "band_gap",
+    "bulk_modulus",
+    "shear_modulus",
+  }
+)
+
 
 class JarvisConnector:
   """
@@ -14,6 +33,8 @@ class JarvisConnector:
 
   The full dataset is large; this connector is for MVP experimentation.
   """
+
+  source_name = SOURCE_NAME
 
   def __init__(self) -> None:
     self._dft3d: list[dict] | None = None
@@ -25,17 +46,19 @@ class JarvisConnector:
       self._dft3d = data("dft_3d")
     return self._dft3d
 
-  def fetch(
-    self,
-    elements: list[str] | None = None,
-    *,
-    max_records: int = 50,
-  ) -> list[Material]:
+  def fetch(self, query: ConnectorQuery | None = None, **legacy: Any) -> list[Material]:
+    q = coerce_query(query, legacy, source_name=SOURCE_NAME)
+    return self._fetch(q)
+
+  def _fetch(self, query: ConnectorQuery) -> list[Material]:
+    if query.source_ids:
+      msg = "JarvisConnector cannot fetch by source_ids; filter by elements instead"
+      raise ValueError(msg)
     rows = self._load()
     out: list[Material] = []
-    want = {e.strip() for e in elements} if elements else set()
+    want = set(query.elements) if query.elements else set()
     for row in rows:
-      if len(out) >= max_records:
+      if len(out) >= query.max_records:
         break
       f = str(row.get("formula", ""))
       if want:
@@ -49,7 +72,9 @@ class JarvisConnector:
       mat = _row_to_material(str(row.get("jid", "unknown")), row)
       if mat is not None:
         out.append(mat)
-    return out
+    return apply_property_filter(
+      out, query, supported=SUPPORTED_PROPERTIES, source_name=SOURCE_NAME
+    )
 
 
 def _jarvis_float(value: Any) -> float | None:
@@ -132,6 +157,14 @@ def _row_to_material(jid: str, row: dict) -> Material | None:
     formula=f,
     properties=props,
     structure=st,
+    provenance=[
+      connector_provenance(
+        SOURCE_NAME,
+        source_id=jid,
+        notes="JARVIS-DFT 3D (dft_3d) figshare release",
+        parameters={"dataset": "dft_3d", "functional": "OptB88vdW"},
+      )
+    ],
     source_id=jid,
     metadata={"jid": jid, "source": "jarvis_dft_3d"},
   )

@@ -6,8 +6,13 @@ from typing import Any
 
 import httpx
 from mattergraph.schema.material import Material
+from mattergraph.schema.property import PropertyMethod
+
+from mattergraph_connectors.base import ConnectorQuery, coerce_query, connector_provenance
 
 NOMAD_BASE_URL = "https://nomad-lab.eu/prod/v1/api/v1"
+
+SOURCE_NAME = "nomad"
 
 _REQUIRED_FIELDS = [
   "entry_id",
@@ -39,6 +44,8 @@ class NOMADMappingError(NOMADConnectorError):
 class NOMADConnector:
   """Read public NOMAD entry metadata and normalize it to MatterGraph materials."""
 
+  source_name = SOURCE_NAME
+
   def __init__(
     self,
     *,
@@ -65,22 +72,30 @@ class NOMADConnector:
     if self._owns_client:
       self._client.close()
 
-  def fetch(
-    self,
-    elements: list[str] | None = None,
-    *,
-    max_records: int = 50,
-    page_size: int = 25,
-  ) -> list[Material]:
-    if max_records <= 0:
+  def fetch(self, query: ConnectorQuery | None = None, **legacy: Any) -> list[Material]:
+    # max_records <= 0 used to mean "return nothing"; ConnectorQuery rejects it as invalid,
+    # so keep the old behaviour only on the deprecated keyword path.
+    if query is None and legacy.get("max_records") is not None and legacy["max_records"] <= 0:
       return []
-    if page_size <= 0:
-      msg = "page_size must be positive"
+    q = coerce_query(query, legacy, source_name=SOURCE_NAME)
+    return self._fetch(q)
+
+  def _fetch(self, query: ConnectorQuery) -> list[Material]:
+    if query.source_ids:
+      msg = "NOMADConnector cannot fetch by source_ids; filter by elements instead"
+      raise ValueError(msg)
+    if query.properties:
+      msg = (
+        "NOMADConnector returns entry metadata only and carries no properties; "
+        "drop the properties filter or use a connector that supplies them"
+      )
       raise ValueError(msg)
 
+    max_records = query.max_records
+    page_size = query.page_size
     out: list[Material] = []
     page_after_value: str | None = None
-    normalized_elements = _normalize_elements(elements)
+    normalized_elements = _normalize_elements(query.elements)
 
     while len(out) < max_records:
       payload = _query_payload(
@@ -212,6 +227,17 @@ def _row_to_material(row: Any) -> Material:
       formula=formula,
       elements=element_list,
       properties=[],
+      # These entries carry no computed values, so the method behind them is genuinely
+      # unknown at ingest — the parser name is the only hint at what produced the upload.
+      provenance=[
+        connector_provenance(
+          SOURCE_NAME,
+          source_id=entry_id,
+          method=PropertyMethod.UNKNOWN,
+          notes="NOMAD public entry metadata; no properties fetched",
+          parameters={"parser_name": row.get("parser_name")},
+        )
+      ],
       metadata={
         "source": "nomad",
         "entry_id": entry_id,

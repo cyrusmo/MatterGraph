@@ -27,12 +27,14 @@ classifiers = [
 ]
 dependencies = [
   "mattergraph-core",
-  "mattergraph-connectors",
+  "mattergraph-connectors[all]",
   "mattergraph-benchmarks",
   "mattergraph-sim",
   "mattergraph-api",
 ]
 # `mattergraph-api` pulls optional simulation routes; all listed for local dev and CI.
+# The `[all]` extra keeps mp-api and jarvis-tools in the dev and CI environment even though
+# they are optional for downstream installs of mattergraph-connectors on its own.
 
 [dependency-groups]
 dev = [

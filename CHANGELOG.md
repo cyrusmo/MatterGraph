@@ -12,6 +12,22 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
 
 ### Added
 
+- A connector contract in `mattergraph_connectors.base`: the `Connector` protocol,
+  a `ConnectorQuery` model covering `elements` / `source_ids` / `properties` /
+  `max_records` / `page_size`, and shared `connector_provenance()` and
+  `apply_property_filter()` helpers. Every connector previously had its own `fetch`
+  signature — four had already diverged — with nothing able to enforce or even
+  enumerate the contract.
+- Every ingested `Material` now carries a `ProvenanceRecord`. Materials Project,
+  JARVIS, and NOMAD all left `Material.provenance` empty and put lineage in the
+  untyped `metadata` dict, so nothing reasoning about provenance could see it.
+- `ProvenanceRecord.parameters` records the settings behind a value (functional,
+  dataset, calculator). Without it the schema could not express what produced a
+  number, only that something had.
+- `PropertyMethod.DERIVED` distinguishes a value MatterGraph computed from other
+  fields on the same record from one whose method is genuinely unknown.
+- `mattergraph-connectors` declares `[mp]`, `[jarvis]`, and `[all]` extras.
+
 - `mattergraph.derived.elastic` derives Young's modulus, Poisson's ratio, Pugh's
   ratio, a ductility indicator, and specific stiffness from bulk and shear moduli.
   `elastic_frame()` returns a DataFrame shaped like `Scorecard.rank` output;
@@ -86,6 +102,23 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
 
 ### Changed
 
+- **Breaking:** `OQMDStubConnector.fetch()` raises `NotImplementedError` instead of
+  returning `[]`. An unimplemented connector answering every query with an empty
+  list is indistinguishable from a real one whose filter matched nothing — the
+  precise failure mode that left the JARVIS connector silently dead for an unknown
+  period. Query OQMD through its OPTIMADE endpoint instead.
+- **Breaking:** `mp-api` and `jarvis-tools` moved from hard dependencies of
+  `mattergraph-connectors` to the `[mp]` and `[jarvis]` extras. The package already
+  told users these were optional while requiring them at install time. Installing
+  `mattergraph` itself is unaffected; it pulls `mattergraph-connectors[all]`.
+- Connector `fetch()` takes a `ConnectorQuery`. The previous keyword form still
+  works and warns; `material_ids` and `chunk_size` map to `source_ids` and
+  `page_size`.
+- `MaterialsProjectConnector.fetch()` honors `properties` by filtering the result,
+  and raises for a property it cannot supply. It previously accepted the argument
+  and discarded it, so callers had no way to tell the filter did nothing.
+- `mattergraph-sim` no longer depends on `h5py`, and `mattergraph-connectors` no
+  longer depends on `tqdm` or `aioitertools`; none were imported anywhere.
 - **Breaking:** the API package's importable module was renamed from `app` to
   `mattergraph_api`. A top-level `app` module is far too generic to publish to
   PyPI, where it would collide with unrelated projects. Update

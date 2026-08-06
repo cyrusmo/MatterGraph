@@ -6,7 +6,7 @@ import httpx
 import pytest
 from mattergraph.schema.material import Material
 from mattergraph_connectors import NOMADConnector, NOMADStubConnector
-from mattergraph_connectors.nomad import NOMADHTTPError, NOMADPayloadError
+from mattergraph_connectors.nomad import NOMADHTTPError, NOMADPayloadError, _row_to_material
 
 
 class FakeResponse:
@@ -70,6 +70,18 @@ def _page(rows: list[dict[str, Any]], *, next_value: str | None = None) -> dict[
   if next_value:
     pagination["next_page_after_value"] = next_value
   return {"data": rows, "pagination": pagination}
+
+
+def test_ingested_material_carries_provenance() -> None:
+  """NOMAD entries carry no computed values, so the method must stay UNKNOWN, not DFT."""
+  material = _row_to_material(_row("a"))
+
+  assert len(material.provenance) == 1
+  record = material.provenance[0]
+  assert record.source == "nomad"
+  assert record.source_id == "a"
+  assert record.method == "unknown"
+  assert record.parameters == {"parser_name": "parsers/vasp"}
 
 
 def test_nomad_connector_builds_public_element_query_payload() -> None:

@@ -12,6 +12,10 @@ class PropertyMethod(str, Enum):
   DFT = "dft"
   EXPERIMENTAL = "experimental"
   MODEL_PREDICTED = "model_predicted"
+  # Computed by MatterGraph from other fields on the same record, e.g. density from the cell
+  # and composition. Distinct from UNKNOWN, which means the provenance is genuinely unknown:
+  # conflating the two would let a value we derived pass as one a source vouched for.
+  DERIVED = "derived"
   UNKNOWN = "unknown"
 
 

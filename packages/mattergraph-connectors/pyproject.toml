@@ -24,11 +24,16 @@ dependencies = [
   "pandas>=2.0",
   "pymatgen>=2024.1.1",
   "pydantic>=2.5",
-  "tqdm>=4.66",
-  "mp-api>=0.40.0",
-  "jarvis-tools>=2024.1.1",
-  "aioitertools",
 ]
+
+# mp-api and jarvis-tools are per-source SDKs, not needed to import this package or to use
+# the NOMAD, OPTIMADE, or CSV paths. They are extras so the ImportError hints in
+# __init__.py are true statements rather than instructions for an install that already
+# happened. `all` exists for `uv sync --all-packages`-style full environments.
+[project.optional-dependencies]
+mp = ["mp-api>=0.40.0"]
+jarvis = ["jarvis-tools>=2024.1.1"]
+all = ["mp-api>=0.40.0", "jarvis-tools>=2024.1.1"]
 
 [project.urls]
 Homepage = "https://github.com/cyrusmo/MatterGraph"

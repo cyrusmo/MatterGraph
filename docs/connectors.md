@@ -1,17 +1,59 @@
 # Connectors
 
-| Connector | Status |
-|-----------|--------|
-| LeMaterial bulk companion | `mattergraph_connectors.lematerial.LeMatBulk` |
-| Materials Project | `MaterialsProjectConnector` (requires `MP_API_KEY`) |
-| JARVIS | `JarvisConnector` (loads a subset of JARVIS-DFT 3D) |
-| NOMAD | `NOMADConnector` (read-only public metadata; no API key for public reads) |
-| Local CSV | `load_materials_from_csv` |
-| OQMD | Stub; extend when your workflow needs its full query surface |
+| Connector | Status | Extra |
+|-----------|--------|-------|
+| LeMaterial bulk companion | `mattergraph_connectors.lematerial.LeMatBulk` | — |
+| Materials Project | `MaterialsProjectConnector` (requires `MP_API_KEY`) | `[mp]` |
+| JARVIS | `JarvisConnector` (loads a subset of JARVIS-DFT 3D) | `[jarvis]` |
+| NOMAD | `NOMADConnector` (read-only public metadata; no API key for public reads) | — |
+| Local CSV | `load_materials_from_csv` | — |
+| OQMD | Not implemented; **raises `NotImplementedError`**. Reach OQMD via OPTIMADE | — |
 
-The LeMaterial companion adapter returns a **`MatterGraphDataset`** so users can inspect schema coverage, create candidate slices, export graphs, and prepare benchmark frames before converting rows into `Material` instances.
+`mp-api` and `jarvis-tools` are optional extras, not hard dependencies:
 
-The other connectors currently output **`Material` instances** so downstream code stays database-agnostic.
+```bash
+pip install 'mattergraph-connectors[mp]'      # Materials Project
+pip install 'mattergraph-connectors[jarvis]'  # JARVIS
+pip install 'mattergraph-connectors[all]'     # both
+```
+
+The LeMaterial companion adapter returns a **`MatterGraphDataset`** so users can inspect schema coverage, create candidate slices, export graphs, and prepare benchmark frames before converting rows into `Material` instances. It is a dataset adapter rather than a `Connector`.
+
+The other connectors output **`Material` instances** so downstream code stays database-agnostic.
+
+## The connector contract
+
+Every connector implements the `Connector` protocol and takes a single `ConnectorQuery`:
+
+```python
+from mattergraph_connectors import ConnectorQuery, NOMADConnector
+
+with NOMADConnector() as nomad:
+    materials = nomad.fetch(ConnectorQuery(elements=["Ti", "O"], max_records=5))
+```
+
+`ConnectorQuery` carries `elements`, `source_ids`, `properties`, `max_records`, and `page_size`.
+The older keyword form (`fetch(elements=[...], max_records=5)`) still works and emits a
+`DeprecationWarning`.
+
+Two rules matter more than the shape:
+
+- **A connector that cannot honor a field raises rather than ignoring it.** Asking NOMAD for
+  `properties` raises, because NOMAD entries carry none; asking Materials Project for a property
+  it does not map raises and names what it does supply. Silently returning everything would leave
+  the caller unable to tell the filter did nothing.
+- **A connector that cannot answer raises rather than returning `[]`.** `OQMDStubConnector` is
+  unimplemented, so it raises. An empty list is indistinguishable from a query that legitimately
+  matched nothing — which is exactly how the JARVIS connector stayed silently dead for an
+  unknown period.
+
+Every ingested `Material` now carries a `ProvenanceRecord` naming its source, upstream id, and —
+where the source is specific about it — the parameters behind the numbers:
+
+```python
+material.provenance[0].source      # "jarvis"
+material.provenance[0].parameters  # {"dataset": "dft_3d", "functional": "OptB88vdW"}
+```
 
 ## Elastic properties and averaging schemes
 
@@ -43,14 +85,17 @@ MatterGraph `Material` objects. It is intentionally metadata-only in v0.1: it do
 archives, raw files, or derived scalar properties.
 
 ```python
-from mattergraph_connectors import NOMADConnector
+from mattergraph_connectors import ConnectorQuery, NOMADConnector
 
 with NOMADConnector() as nomad:
-    materials = nomad.fetch(elements=["Ti", "O"], max_records=5)
+    materials = nomad.fetch(ConnectorQuery(elements=["Ti", "O"], max_records=5))
 
 for material in materials:
     print(material.material_id, material.formula)
 ```
+
+Because these entries carry no computed values, their provenance records `method="unknown"`
+rather than `"dft"` — the parser name is the only hint at what produced the upload.
 
 The connector uses public reads by default, deterministic entry-id ordering, and after-value
 pagination. Public NOMAD metadata reads do not require an API key.

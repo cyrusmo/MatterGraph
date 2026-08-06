@@ -43,3 +43,4 @@ data/cache/
 *.sqlite3
 
 .claude
+apps/private-platform-ui/

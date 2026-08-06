@@ -4,6 +4,13 @@ from importlib import import_module
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+  from mattergraph_connectors.base import (
+    Connector,
+    ConnectorQuery,
+    apply_property_filter,
+    coerce_query,
+    connector_provenance,
+  )
   from mattergraph_connectors.jarvis import JarvisConnector
   from mattergraph_connectors.lematerial import LeMatBulk
   from mattergraph_connectors.local_csv import load_materials_from_csv
@@ -19,20 +26,27 @@ if TYPE_CHECKING:
   from mattergraph_connectors.oqmd import OQMDStubConnector
 
 _EXPORTS: dict[str, tuple[str, str, str | None]] = {
+  "Connector": ("mattergraph_connectors.base", "Connector", None),
+  "ConnectorQuery": ("mattergraph_connectors.base", "ConnectorQuery", None),
+  "apply_property_filter": ("mattergraph_connectors.base", "apply_property_filter", None),
+  "coerce_query": ("mattergraph_connectors.base", "coerce_query", None),
+  "connector_provenance": ("mattergraph_connectors.base", "connector_provenance", None),
   "MaterialsProjectConnector": (
     "mattergraph_connectors.materials_project",
     "MaterialsProjectConnector",
     (
-      "Install the optional `mp-api` dependency or run "
-      "`uv sync --all-packages --group dev` to use MaterialsProjectConnector."
+      "MaterialsProjectConnector needs the optional `mp-api` dependency: install the extra "
+      "with `pip install 'mattergraph-connectors[mp]'`, or run "
+      "`uv sync --all-packages --group dev` for a full workspace environment."
     ),
   ),
   "JarvisConnector": (
     "mattergraph_connectors.jarvis",
     "JarvisConnector",
     (
-      "Install the optional `jarvis-tools` dependency or run "
-      "`uv sync --all-packages --group dev` to use JarvisConnector."
+      "JarvisConnector needs the optional `jarvis-tools` dependency: install the extra "
+      "with `pip install 'mattergraph-connectors[jarvis]'`, or run "
+      "`uv sync --all-packages --group dev` for a full workspace environment."
     ),
   ),
   "load_materials_from_csv": (
@@ -83,6 +97,11 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
 }
 
 __all__ = [
+  "Connector",
+  "ConnectorQuery",
+  "apply_property_filter",
+  "coerce_query",
+  "connector_provenance",
   "MaterialsProjectConnector",
   "JarvisConnector",
   "LeMatBulk",

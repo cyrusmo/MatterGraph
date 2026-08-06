@@ -17,6 +17,10 @@ def test_materials_project_connector_has_helpful_optional_dependency_error(
   monkeypatch: pytest.MonkeyPatch,
 ) -> None:
   module = importlib.reload(mattergraph_connectors)
+  # `__getattr__` memoizes resolved names into the module globals, and `reload` re-executes
+  # into the *existing* dict rather than a fresh one. So any earlier test that touched this
+  # attribute leaves it cached and the lazy-import hook never fires again. Evict it.
+  monkeypatch.delitem(module.__dict__, "MaterialsProjectConnector", raising=False)
   real_import_module = module.import_module
 
   def fake_import_module(name: str, package: str | None = None) -> object:

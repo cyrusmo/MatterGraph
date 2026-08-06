@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from mattergraph.schema.property import PropertyMethod
@@ -22,6 +26,13 @@ class ProvenanceRecord(BaseModel):
   source_id: str | None = Field(
     default=None,
     description="Optional upstream record identifier, task ID, DOI, or dataset row ID",
+  )
+  parameters: dict[str, Any] | None = Field(
+    default=None,
+    description=(
+      "Settings that produced the value, e.g. functional, k-point mesh, cutoff, calculator. "
+      "Without these a computed number cannot be reproduced, only repeated."
+    ),
   )
 
   @field_validator("source")
