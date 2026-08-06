@@ -10,7 +10,38 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
 
 ## [Unreleased]
 
+### Added
+
+- `mattergraph.derived.elastic` derives Young's modulus, Poisson's ratio, Pugh's
+  ratio, a ductility indicator, and specific stiffness from bulk and shear moduli.
+  `elastic_frame()` returns a DataFrame shaped like `Scorecard.rank` output;
+  `with_derived_properties()` returns a copy carrying the results as canonical
+  properties so a `Scorecard` can rank on them. Nonphysical input (a non-positive
+  modulus violates Born stability) is rejected rather than returned, since the
+  negative Young's modulus it produces would rank as a legitimate candidate.
+- The Materials Project connector now emits `bulk_modulus` and `shear_modulus`, and
+  carries `homogeneous_poisson` and `universal_anisotropy` into `Material.metadata`.
+  All four were already arriving on every fetch — the connector requests the full
+  summary document — and were being discarded.
+- The JARVIS connector now emits `bulk_modulus_kv` / `shear_modulus_gv` as canonical
+  moduli, skipping the non-positive values it reports for unconverged tensors.
+- Elastic averaging schemes are recorded in `MaterialProperty.extra`: Materials
+  Project reports Voigt–Reuss–Hill, JARVIS reports Voigt, and Voigt is an upper
+  bound. `Scorecard.report()` now flags any objective mixing the two under
+  `mixed_averaging_schemes`.
+- Three canonical property names — `youngs_modulus`, `poisson_ratio`, and
+  `specific_stiffness` — plus `bulk_modulus_kv` / `shear_modulus_gv` as aliases.
+
 ### Fixed
+
+- **The JARVIS connector returned nothing at all.** `jarvis-tools` renamed
+  `Atoms.to_pymatgen` to `pymatgen_converter`, and a `hasattr` guard turned the
+  missing method into a silent `None` — so every row failed to convert and
+  `fetch()` returned an empty list for every query, with no error raised. The
+  conversion now tries both names and raises if neither exists.
+- The JARVIS connector no longer crashes on missing values. dft_3d marks them with
+  the string `"na"`, which the previous NaN-only guard did not catch and which
+  `float()` cannot parse.
 
 - `Material.get_property` now canonicalizes the lookup name, so documented aliases
   resolve. Previously the write path canonicalized and the read path did not, so

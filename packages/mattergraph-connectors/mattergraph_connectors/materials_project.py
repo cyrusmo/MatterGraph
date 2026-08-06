@@ -19,6 +19,24 @@ def _struct_from_mp(doc: Any) -> CrystalStructure | None:
   return CrystalStructure.from_pymatgen(s)
 
 
+def _vrh(raw: Any) -> float | None:
+  """Pull the Voigt-Reuss-Hill average out of an MP modulus field.
+
+  ``SummaryDoc.bulk_modulus`` and ``.shear_modulus`` are ``dict[str, float] | None``
+  holding ``voigt``/``reuss``/``vrh``, not plain floats. Most MP entries have no elastic
+  tensor at all, so ``None`` is the common path rather than an error case.
+  """
+  if not isinstance(raw, dict):
+    return None
+  value = raw.get("vrh")
+  if value is None:
+    return None
+  try:
+    return float(value)
+  except (TypeError, ValueError):
+    return None
+
+
 def _get_rester(api_key: str) -> Any:
   try:
     from mp_api.client import MPRester  # type: ignore[import-untyped]
@@ -66,14 +84,41 @@ def _mp_doc_to_material(doc: Any) -> Material:
         method="dft",
       )
     )
+  for name, raw in (
+    ("bulk_modulus", getattr(doc, "bulk_modulus", None)),
+    ("shear_modulus", getattr(doc, "shear_modulus", None)),
+  ):
+    value = _vrh(raw)
+    if value is not None:
+      props.append(
+        MaterialProperty(
+          name=name,
+          value=value,
+          unit="GPa",
+          source="materials_project",
+          method="dft",
+          extra={"averaging_scheme": "vrh"},
+        )
+      )
+
   st = _struct_from_mp(doc)
+  # Poisson ratio and elastic anisotropy summarize the whole tensor rather than describing
+  # one property, so they live in metadata. Scorecard constraints can still match them via
+  # the `equals` branch, and MP's own Poisson ratio cross-checks the derived one.
+  metadata: dict[str, Any] = {"mp_id": mid}
+  for key in ("homogeneous_poisson", "universal_anisotropy"):
+    raw = getattr(doc, key, None)
+    if raw is not None:
+      metadata[key] = float(raw)
+
   return Material(
     material_id=mid,
     formula=formula,
     reduced_formula=c.reduced_formula,
     structure=st,
     properties=props,
-    metadata={"mp_id": mid},
+    source_id=mid,
+    metadata=metadata,
   )
 
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-import numpy as np
+import math
+from typing import Any
+
 from mattergraph.schema.material import Material, MaterialProperty
 from mattergraph.schema.structure import CrystalStructure
 from pymatgen.core import Composition, Structure
@@ -50,6 +52,43 @@ class JarvisConnector:
     return out
 
 
+def _jarvis_float(value: Any) -> float | None:
+  """Coerce a dft_3d cell to a float, or ``None`` when it carries no value.
+
+  dft_3d marks missing entries with the **string** ``"na"``, not NaN, so a plain
+  ``isnan`` guard misses them and ``float("na")`` raises.
+  """
+  if value is None:
+    return None
+  if isinstance(value, str):
+    if value.strip().lower() in {"na", "n/a", "", "none"}:
+      return None
+  try:
+    out = float(value)
+  except (TypeError, ValueError):
+    return None
+  return None if math.isnan(out) else out
+
+
+def _to_pymatgen(atoms: Any) -> Structure | None:
+  """Convert a JARVIS ``Atoms`` to a pymatgen ``Structure`` across library versions.
+
+  jarvis-tools names this ``pymatgen_converter``; older releases exposed ``to_pymatgen``.
+  Missing *both* is a real failure and must not be swallowed into "no data" — that is
+  precisely how this connector silently returned an empty list for every query.
+  """
+  for method_name in ("pymatgen_converter", "to_pymatgen"):
+    method = getattr(atoms, method_name, None)
+    if callable(method):
+      converted = method()
+      return converted if isinstance(converted, Structure) else None
+  msg = (
+    "JARVIS Atoms exposes neither pymatgen_converter() nor to_pymatgen(); "
+    "the installed jarvis-tools version is not supported."
+  )
+  raise AttributeError(msg)
+
+
 def _row_to_material(jid: str, row: dict) -> Material | None:
   from jarvis.core.atoms import Atoms  # type: ignore[import-untyped]
 
@@ -57,38 +96,42 @@ def _row_to_material(jid: str, row: dict) -> Material | None:
     a = Atoms.from_dict(row["atoms"])
   except Exception:  # noqa: BLE001
     return None
-  s = a.to_pymatgen() if hasattr(a, "to_pymatgen") else None
-  if s is None or not isinstance(s, Structure):
+  s = _to_pymatgen(a)
+  if s is None:
     return None
   st = CrystalStructure.from_pymatgen(s)
+
   props: list[MaterialProperty] = []
-  d = row.get("optb88vdw_total_energy")
-  if d is not None and not (isinstance(d, float) and np.isnan(d)):
-    props.append(
-      MaterialProperty(
-        name="optb88vdw_total_energy",
-        value=float(d),
-        unit="eV",
-        source="jarvis",
-        method="dft",
+  for name, unit in (("optb88vdw_total_energy", "eV"), ("optb88vdw_bandgap", "eV")):
+    value = _jarvis_float(row.get(name))
+    if value is not None:
+      props.append(
+        MaterialProperty(name=name, value=value, unit=unit, source="jarvis", method="dft")
       )
-    )
-  eg = row.get("optb88vdw_bandgap")
-  if eg is not None and not (isinstance(eg, float) and np.isnan(eg)):
-    props.append(
-      MaterialProperty(
-        name="optb88vdw_bandgap",
-        value=float(eg),
-        unit="eV",
-        source="jarvis",
-        method="dft",
+
+  # dft_3d reports Voigt averages, an upper bound, where Materials Project reports VRH.
+  # Record the scheme so a ranking column mixing the two can be flagged rather than
+  # silently biasing JARVIS candidates high. Non-positive values mark unconverged entries.
+  for column, name in (("bulk_modulus_kv", "bulk_modulus"), ("shear_modulus_gv", "shear_modulus")):
+    value = _jarvis_float(row.get(column))
+    if value is not None and value > 0:
+      props.append(
+        MaterialProperty(
+          name=name,
+          value=value,
+          unit="GPa",
+          source="jarvis",
+          method="dft",
+          extra={"averaging_scheme": "voigt"},
+        )
       )
-    )
+
   f = str(row.get("formula", "UNK"))
   return Material(
     material_id=f"jarvis:{jid}",
     formula=f,
     properties=props,
     structure=st,
+    source_id=jid,
     metadata={"jid": jid, "source": "jarvis_dft_3d"},
   )

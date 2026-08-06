@@ -36,6 +36,50 @@ An objective is dropped from the weighted sum — and from its denominator — w
 
 Without this, a zero-spread column would normalize to all-ones under `minimize` and all-zeros under `maximize`, letting the direction label alone move scores on identical data.
 
+### Mixed sources are reported, not blocked
+
+`report()` lists any objective whose values come from more than one `method` (DFT vs
+experiment) under `mixed_methods`, and any that mixes elastic averaging conventions under
+`mixed_averaging_schemes`. The second matters when pooling sources: Materials Project reports
+Voigt–Reuss–Hill averages while JARVIS reports Voigt, an upper bound, so a mixed column ranks
+JARVIS candidates high for a reason that has nothing to do with the material.
+
+## Derived elastic quantities
+
+`mattergraph.derived.elastic` computes Young's modulus, Poisson's ratio, Pugh's ratio, and
+specific stiffness from bulk and shear moduli — transparent arithmetic on properties already
+present, with nothing fitted and nothing imputed.
+
+```python
+from mattergraph import MaterialStore, Scorecard
+from mattergraph.derived import elastic_frame, with_derived_properties
+
+store = MaterialStore.from_demo()
+print(elastic_frame(store.materials))          # inspect, with warnings per row
+
+pool = [with_derived_properties(m) for m in store.materials]
+Scorecard(objectives={"specific_stiffness": "maximize"}).rank(pool)
+```
+
+`with_derived_properties` returns a copy carrying `youngs_modulus`, `poisson_ratio`, and
+`specific_stiffness` as canonical properties, so a `Scorecard` can rank on them. Materials
+missing either modulus come back unchanged rather than gaining imputed values.
+
+Three things to know before screening on these:
+
+- **They are stiffness, not strength.** Yield strength, hardness, and fracture toughness are
+  governed by microstructure, which this schema does not hold. Two heat treatments of one alloy
+  differ fivefold in yield strength while E, K, and G barely move.
+- **Pugh's ratio and Poisson's ratio are the same information.** They are an exact 1:1 monotone
+  map of each other when computed from one K and G pair, so they cannot disagree and are not
+  independent confirmation.
+- **Specific stiffness barely separates metals.** E/ρ is ~26 MN·m/kg for aluminium, titanium,
+  and steel alike. If a shortlist is ranking on it, it is close to ranking on noise.
+
+Nonphysical input is rejected rather than returned: a non-positive modulus violates Born
+stability, and the negative Young's modulus it produces would enter a `maximize` objective as
+the worst candidate and look like a real result.
+
 ### Constraints can match metadata
 
 Besides `min` and `max`, a constraint supports `equals`, which matches a property value **or** a key in `Material.metadata`. This is how you pin a ranking to a single level of theory:

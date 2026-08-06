@@ -172,6 +172,7 @@ class Scorecard:
       "ignored_objectives": ignored,
       "effective_objectives": [k for k in keys if k not in ignored],
       "mixed_methods": self._mixed_methods(materials, keys),
+      "mixed_averaging_schemes": self._mixed_averaging_schemes(materials, keys),
       "binary_normalization": len(kept_i) <= 2,
       "scores_are_pool_relative": True,
     }
@@ -188,6 +189,28 @@ class Scorecard:
       }
       if len(methods) > 1:
         out[k] = sorted(methods)
+    return out
+
+  @staticmethod
+  def _mixed_averaging_schemes(
+    materials: list[Material],
+    keys: list[str],
+  ) -> dict[str, list[str]]:
+    """Objectives pooling more than one elastic averaging convention.
+
+    Materials Project reports Voigt-Reuss-Hill averages; JARVIS reports Voigt, which is an
+    upper bound. Ranking both in one column biases the Voigt-sourced candidates high.
+    """
+    out: dict[str, list[str]] = {}
+    for k in keys:
+      schemes = {
+        str(scheme)
+        for m in materials
+        if (p := m.get_property(k)) is not None
+        and (scheme := p.extra.get("averaging_scheme")) is not None
+      }
+      if len(schemes) > 1:
+        out[k] = sorted(schemes)
     return out
 
   def rank(

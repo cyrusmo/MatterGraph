@@ -22,9 +22,26 @@ PROPERTY_DEFINITIONS: dict[str, PropertyDefinition] = {
     "eV/atom",
     ("e_above_hull", "e_hull", "ehull", "energy_above_hull_per_atom"),
   ),
-  "bulk_modulus": PropertyDefinition("bulk_modulus", "GPa", ("k_vrh", "kvrh")),
-  "shear_modulus": PropertyDefinition("shear_modulus", "GPa", ("g_vrh", "gvrh")),
+  # JARVIS dft_3d names its moduli *_kv / *_gv; both are Voigt averages rather than VRH, so
+  # ingesting connectors record the averaging scheme in MaterialProperty.extra.
+  "bulk_modulus": PropertyDefinition(
+    "bulk_modulus", "GPa", ("k_vrh", "kvrh", "bulk_modulus_kv")
+  ),
+  "shear_modulus": PropertyDefinition(
+    "shear_modulus", "GPa", ("g_vrh", "gvrh", "shear_modulus_gv")
+  ),
   "band_gap": PropertyDefinition("band_gap", "eV", ("bandgap", "gap", "optb88vdw_bandgap")),
+  # Derived from bulk and shear moduli by mattergraph.derived.elastic. Canonical so that
+  # Scorecard can rank on them rather than leaving them stranded in a dataclass.
+  "youngs_modulus": PropertyDefinition(
+    "youngs_modulus", "GPa", ("young_modulus", "youngs", "e_modulus")
+  ),
+  "poisson_ratio": PropertyDefinition(
+    "poisson_ratio", None, ("poisson", "nu", "homogeneous_poisson")
+  ),
+  "specific_stiffness": PropertyDefinition(
+    "specific_stiffness", "MN*m/kg", ("specific_modulus",)
+  ),
 }
 
 _ALIASES: dict[str, str] = {}

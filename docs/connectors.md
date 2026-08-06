@@ -13,6 +13,29 @@ The LeMaterial companion adapter returns a **`MatterGraphDataset`** so users can
 
 The other connectors currently output **`Material` instances** so downstream code stays database-agnostic.
 
+## Elastic properties and averaging schemes
+
+Materials Project and JARVIS both supply bulk and shear moduli, and both are ingested as the
+canonical `bulk_modulus` / `shear_modulus` in GPa — but **they do not report the same average**:
+
+| Source | Upstream field | Average | Recorded as |
+|--------|----------------|---------|-------------|
+| Materials Project | `bulk_modulus["vrh"]`, `shear_modulus["vrh"]` | Voigt–Reuss–Hill | `extra["averaging_scheme"] = "vrh"` |
+| JARVIS dft_3d | `bulk_modulus_kv`, `shear_modulus_gv` | Voigt | `extra["averaging_scheme"] = "voigt"` |
+
+Voigt is an upper bound; VRH is not. Ranking both in one column biases the Voigt-sourced
+candidates high, so `Scorecard.report()` reports any objective that mixes schemes under
+`mixed_averaging_schemes`. Check it before trusting a cross-source shortlist.
+
+Most Materials Project entries have no elastic tensor at all, so expect elastic coverage to be
+sparse and read `Scorecard.report()["coverage"]` rather than assuming a full column. The MP
+connector also carries `homogeneous_poisson` and `universal_anisotropy` into `Material.metadata`:
+the first cross-checks the derived Poisson ratio, and the second flags records where a single
+isotropic average misrepresents an anisotropic crystal.
+
+From there, `mattergraph.derived.elastic` turns the two moduli into Young's modulus, Poisson's
+ratio, a ductility indicator, and specific stiffness — see [Scoring](scoring.md).
+
 ## NOMAD public metadata
 
 `NOMADConnector` queries NOMAD's public `entries/query` API and maps entry metadata into
