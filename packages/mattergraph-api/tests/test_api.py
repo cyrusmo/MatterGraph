@@ -39,7 +39,7 @@ async def test_lematerial_demo_workflow_contract() -> None:
 
   candidate_slice = data["candidate_slice"]
   assert candidate_slice["slice_id"].startswith("mg_slice_")
-  assert candidate_slice["slice_name"] == "marine_pressure_candidates_v0"
+  assert candidate_slice["slice_name"] == "bulk_modulus_candidates_v0"
   assert candidate_slice["target"] == "bulk_modulus"
   assert candidate_slice["input_count"] == 4
   assert candidate_slice["output_count"] == 4

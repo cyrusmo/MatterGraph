@@ -18,7 +18,7 @@ def _load_records() -> list[dict[str, object]]:
 def test_lemat_bulk_from_records_report_and_graph_guardrail_surface() -> None:
   dataset = LeMatBulk.from_records(_load_records(), subset="compatible_pbesol")
   filtered = dataset.candidate_pool(include=["Al", "N", "Ti"], max_nsites=4, max_nelements=3)
-  candidate_slice = filtered.create_slice("marine_pressure_candidates_v0", target="bulk_modulus")
+  candidate_slice = filtered.create_slice("bulk_modulus_candidates_v0", target="bulk_modulus")
 
   report = candidate_slice.report()
 

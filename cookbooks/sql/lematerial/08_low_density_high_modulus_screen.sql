@@ -1,6 +1,7 @@
--- Public screening template for marine robotics, subsea housings,
--- and other underwater systems that need pressure tolerance,
--- low density, and corrosion-aware candidate selection.
+-- Transparent screen for high volumetric stiffness at bounded density.
+-- Ranks a restricted element pool by bulk modulus first, mass second.
+-- Bulk modulus is stiffness under uniform compression, not strength:
+-- it says nothing about yield, toughness, fatigue, or environment.
 SELECT
   material_id,
   reduced_formula,

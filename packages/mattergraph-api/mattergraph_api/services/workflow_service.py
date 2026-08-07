@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 _FIXTURE_RELATIVE_PATH = "data/demo/lemat_bulk_sample.json"
 _SOURCE_DATASET = "LeMaterial/LeMat-Bulk"
 _SOURCE_SUBSET = "compatible_pbesol"
-_SLICE_NAME = "marine_pressure_candidates_v0"
+_SLICE_NAME = "bulk_modulus_candidates_v0"
 _TARGET = "bulk_modulus"
 
 

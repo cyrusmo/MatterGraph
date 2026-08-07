@@ -1,4 +1,4 @@
--- Lightweight structural candidate screen for transparent aerospace studies.
+-- Transparent lightweight structural candidate screen: mass first, stiffness second.
 SELECT
   material_id,
   reduced_formula,

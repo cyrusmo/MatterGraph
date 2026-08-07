@@ -16,7 +16,7 @@ def main() -> None:
     dataset
     .filter_elements(include=["Ti", "Al", "N"])
     .filter_complexity(max_nsites=4, max_nelements=3)
-    .create_slice("marine_pressure_candidates_v0", target="bulk_modulus")
+    .create_slice("bulk_modulus_candidates_v0", target="bulk_modulus")
   )
   print(json.dumps(candidate_slice.report(), indent=2, sort_keys=True))
 

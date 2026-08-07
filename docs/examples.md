@@ -10,6 +10,6 @@ For the new workflow companion layer, the [`examples/lematerial/`](https://githu
 
 The [`cookbooks/sql/lematerial/`](https://github.com/cyrusmo/MatterGraph/tree/main/cookbooks/sql/lematerial/) folder complements those examples with DuckDB-flavored SQL / EDA recipes for working with LeMaterial-style bulk tables.
 
-The `underwater-drone-screening` folder remains a **template** for YAML-driven objectives and a toy score path, not a productized workflow.
+The `template-screening` folder remains a **template** for YAML-driven objectives and a toy score path, not a productized workflow.
 
 For interactive work, add Jupyter where your environment allows. The repository stays lightweight and CI-friendly with runnable `.py` examples first.

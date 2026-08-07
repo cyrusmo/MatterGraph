@@ -27,6 +27,8 @@
     "energy_above_hull"
   ],
   "mixed_methods": {},
+  "mixed_averaging_schemes": {},
+  "mixed_hull_conventions": {},
   "binary_normalization": true,
   "scores_are_pool_relative": true
 }
