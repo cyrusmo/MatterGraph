@@ -2,6 +2,13 @@ import type { LeMaterialWorkflowSummary, Material, RankedRow, SimulationJob } fr
 
 const API = import.meta.env.VITE_API_URL || "";
 
+/**
+ * The dependency is genuinely absent rather than broken — e.g. a fresh clone without
+ * the optional `ase` extra. Callers should present this as an expected limitation,
+ * not as a failure.
+ */
+export class ServiceUnavailableError extends Error {}
+
 export async function fetchMaterials(): Promise<Material[]> {
   const response = await fetch(`${API}/materials`);
   if (!response.ok) {
@@ -49,7 +56,7 @@ export async function runAseRelax(materialId: string): Promise<SimulationJob> {
   if (!response.ok) {
     const message = await responseMessage(response, "ASE relaxation request failed");
     if (response.status === 503) {
-      throw new Error(`ASE relaxation unavailable in this environment: ${message}`);
+      throw new ServiceUnavailableError(`ASE relaxation unavailable in this environment: ${message}`);
     }
     throw new Error(message);
   }

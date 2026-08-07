@@ -1,3 +1,4 @@
+import { formatUnknown } from "../lib/format";
 import type { LeMaterialWorkflowSummary } from "../types/material";
 
 type Props = {
@@ -16,65 +17,90 @@ const pipelineSteps = [
 
 export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
   if (loading) {
-    return <div className="empty-note">Loading LeMaterial demo workflow...</div>;
+    return (
+      <div className="panel">
+        <p className="empty-note">Loading LeMaterial demo workflow...</p>
+      </div>
+    );
   }
   if (error) {
-    return <div className="error-note">{error}</div>;
+    return (
+      <div className="eval-output fail">
+        <span className="eval-label">Workflow failed</span>
+        <span>{error}</span>
+      </div>
+    );
   }
   if (!workflow) {
-    return <div className="empty-note">Workflow summary unavailable.</div>;
+    return (
+      <div className="panel">
+        <p className="empty-note">Workflow summary unavailable.</p>
+      </div>
+    );
   }
 
-  const schema = workflow.schema_report;
-
   return (
-    <div className="workflow-summary">
-      <div className="pipeline">
-        {pipelineSteps.map((step, index) => (
-          <div className="pipeline-step" key={step}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <strong>{step}</strong>
-          </div>
-        ))}
-      </div>
-
-      <div className="summary-grid">
-        <Metric label="Rows" value={schema.row_count} />
-        <Metric label="Missing structures" value={schema.missing_structure_count} />
-        <Metric label="Graph included" value={workflow.graph_export.included_count} />
-        <Metric label="Graph excluded" value={workflow.graph_export.excluded_count} />
+    <>
+      <div className="panel">
+        <div className="panel-heading">
+          <span>Pipeline</span>
+          <span>A1</span>
+        </div>
+        <div className="pipeline">
+          {pipelineSteps.map((step, index) => (
+            <div className="pipeline-step" key={step}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{step}</strong>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="layout-two">
-        <section>
-          <h3>Candidate slice</h3>
+        <div className="panel">
+          <div className="panel-heading">
+            <span>Candidate slice</span>
+            <span>B1</span>
+          </div>
+          <div className="property-grid">
+            <div className="property-box wide">
+              <span>Name</span>
+              <strong>{workflow.candidate_slice.slice_name}</strong>
+            </div>
+            <div className="property-box">
+              <span>Target</span>
+              <strong>{workflow.candidate_slice.target}</strong>
+            </div>
+            <div className="property-box">
+              <span>Rows kept</span>
+              <strong>
+                {workflow.candidate_slice.output_count} / {workflow.candidate_slice.input_count}
+              </strong>
+            </div>
+          </div>
+          <h3 className="subheading">Filter steps</h3>
+          <div className="stack-list">
+            {workflow.candidate_slice.filter_steps.map((step, index) => (
+              <div className="stack-item" key={`${String(step.name)}-${index}`}>
+                <strong>{String(step.name)}</strong>
+                <p>
+                  {String(step.input_count)} in, {String(step.output_count)} kept
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-heading">
+            <span>Provenance</span>
+            <span>C1</span>
+          </div>
+          {/* kv-grid rather than property boxes: fixture_path and run_id are long
+              free-text values that wrap badly in a fixed two-column grid. */}
           <div className="kv-grid">
             <span>Slice ID</span>
             <strong>{workflow.candidate_slice.slice_id}</strong>
-            <span>Name</span>
-            <strong>{workflow.candidate_slice.slice_name}</strong>
-            <span>Target</span>
-            <strong>{workflow.candidate_slice.target}</strong>
-            <span>Rows</span>
-            <strong>
-              {workflow.candidate_slice.output_count} / {workflow.candidate_slice.input_count}
-            </strong>
-          </div>
-          <ol className="step-list">
-            {workflow.candidate_slice.filter_steps.map((step, index) => (
-              <li key={`${String(step.name)}-${index}`}>
-                <strong>{String(step.name)}</strong>{" "}
-                <span>
-                  {String(step.input_count)} -&gt; {String(step.output_count)}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section>
-          <h3>Provenance</h3>
-          <div className="kv-grid">
             <span>Fixture</span>
             <strong>{workflow.provenance.fixture_path}</strong>
             <span>Loader</span>
@@ -84,51 +110,37 @@ export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
             <span>Run ID</span>
             <strong>{workflow.provenance.run_id}</strong>
           </div>
-        </section>
+        </div>
       </div>
 
-      <h3>Benchmark preview</h3>
-      <table className="data-table compact-table">
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Formula</th>
-            <th>Target</th>
-            <th>Density</th>
-            <th>Energy above hull</th>
-          </tr>
-        </thead>
-        <tbody>
-          {workflow.benchmark_preview.map((row) => (
-            <tr key={row.material_id}>
-              <td>{row.material_id}</td>
-              <td>{row.formula}</td>
-              <td>{formatUnknown(row.target)}</td>
-              <td>{formatUnknown(row.density)}</td>
-              <td>{formatUnknown(row.energy_above_hull)}</td>
+      <div className="panel">
+        <div className="panel-heading">
+          <span>Benchmark preview</span>
+          <span>D1</span>
+        </div>
+        <table className="data-table compact-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Formula</th>
+              <th>Target</th>
+              <th>Density</th>
+              <th>Energy above hull</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {workflow.benchmark_preview.map((row) => (
+              <tr key={row.material_id}>
+                <td>{row.material_id}</td>
+                <td>{row.formula}</td>
+                <td>{formatUnknown(row.target)}</td>
+                <td>{formatUnknown(row.density)}</td>
+                <td>{formatUnknown(row.energy_above_hull)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
-}
-
-function Metric({ label, value }: { label: string; value: unknown }) {
-  return (
-    <div>
-      <span className="metric-label">{label}</span>
-      <strong>{formatUnknown(value)}</strong>
-    </div>
-  );
-}
-
-function formatUnknown(value: unknown): string {
-  if (value === null || value === undefined) {
-    return "n/a";
-  }
-  if (typeof value === "number") {
-    return Number.isInteger(value) ? String(value) : value.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
-  }
-  return String(value);
 }

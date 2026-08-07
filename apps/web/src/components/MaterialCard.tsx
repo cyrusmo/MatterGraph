@@ -1,103 +1,68 @@
-import { Fragment } from "react";
-
+import { formatValue } from "../lib/format";
 import type { Material } from "../types/material";
 
 export function MaterialCard({ m }: { m: Material | undefined }) {
   if (!m) {
-    return <div className="empty-note">Select a material first.</div>;
+    return <p className="empty-note">Select a material first.</p>;
   }
   const properties = m.properties ?? [];
-  const provenance = m.provenance ?? [];
-  const metadata = Object.entries(m.metadata ?? {});
 
   return (
-    <div className="detail-card">
-      <div className="identity-block">
-        <div>
-          <span className="metric-label">Material</span>
+    <div className="detail-panel">
+      <h3>Identity</h3>
+      <div className="property-grid">
+        <div className="property-box">
+          <span>Material</span>
           <strong>{String(m.material_id)}</strong>
         </div>
-        <div>
-          <span className="metric-label">Formula</span>
+        <div className="property-box">
+          <span>Formula</span>
           <strong>{String(m.formula)}</strong>
         </div>
+        <div className="property-box">
+          <span>Reduced formula</span>
+          <strong>{m.reduced_formula ?? "unknown"}</strong>
+        </div>
+        <div className="property-box">
+          <span>Structure</span>
+          <strong>{m.structure ? "present" : "missing"}</strong>
+        </div>
       </div>
-      <div className="kv-grid">
-        <span>Elements</span>
-        <strong>{(m.elements ?? []).join(", ") || "unknown"}</strong>
-        <span>Reduced formula</span>
-        <strong>{m.reduced_formula ?? "unknown"}</strong>
-        <span>Structure</span>
-        <strong>{m.structure ? "present" : "missing"}</strong>
+
+      <h3>Elements</h3>
+      <div className="status-pill-row">
+        {(m.elements ?? []).length ? (
+          (m.elements ?? []).map((element) => (
+            <span className="chip" key={element}>
+              {element}
+            </span>
+          ))
+        ) : (
+          <span className="empty-note">unknown</span>
+        )}
       </div>
+
       <h3>Properties</h3>
       {properties.length ? (
-        <table className="data-table compact-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Value</th>
-              <th>Source</th>
-              <th>Method</th>
-            </tr>
-          </thead>
-          <tbody>
-            {properties.map((property) => (
-              <tr key={`${property.name}-${property.source ?? "source"}-${property.method ?? "method"}`}>
-                <td>{property.name}</td>
-                <td>{formatValue(property.value, property.unit)}</td>
-                <td>{property.source ?? "unknown"}</td>
-                <td>{property.method ?? "unknown"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div className="empty-note">No properties attached.</div>
-      )}
-      <h3>Provenance</h3>
-      {provenance.length ? (
-        <ul className="plain-list">
-          {provenance.map((record, index) => (
-            <li key={`${record.source ?? "source"}-${index}`}>
-              {record.source ?? "unknown"} / {record.method ?? "unknown"}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="empty-note">Property rows carry source and method metadata.</div>
-      )}
-      <h3>Metadata</h3>
-      {metadata.length ? (
-        <div className="kv-grid">
-          {metadata.map(([key, value]) => (
-            <Fragment key={key}>
-              <span>{key}</span>
-              <strong>{formatUnknown(value)}</strong>
-            </Fragment>
+        <div className="property-grid">
+          {properties.map((property) => (
+            <div
+              className="property-box"
+              key={`${property.name}-${property.source ?? ""}-${property.method ?? ""}`}
+            >
+              <span>{property.name}</span>
+              <strong>{formatValue(property.value, property.unit)}</strong>
+              {/* Provenance is a first-class field here, not tooltip material: every
+                  number states where it came from and how it was produced. */}
+              <span className="property-source">
+                {property.source ?? "unknown"} · {property.method ?? "unknown"}
+              </span>
+            </div>
           ))}
         </div>
       ) : (
-        <div className="empty-note">No extra metadata.</div>
+        <p className="empty-note">No properties attached.</p>
       )}
     </div>
   );
-}
-
-function formatValue(value: unknown, unit?: string | null): string {
-  const formatted = formatUnknown(value);
-  return unit ? `${formatted} ${unit}` : formatted;
-}
-
-function formatUnknown(value: unknown): string {
-  if (value === null || value === undefined) {
-    return "unknown";
-  }
-  if (typeof value === "number") {
-    return Number.isInteger(value) ? String(value) : value.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  return JSON.stringify(value);
 }

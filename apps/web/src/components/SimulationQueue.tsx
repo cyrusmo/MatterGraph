@@ -1,67 +1,106 @@
 import { useEffect, useState } from "react";
 
-import { runAseRelax } from "../lib/api";
+import { ServiceUnavailableError, runAseRelax } from "../lib/api";
+import { formatNumber } from "../lib/format";
 import type { SimulationJob } from "../types/material";
 
 export function SimulationQueue({ materialId, formula }: { materialId: string; formula?: string }) {
   const [job, setJob] = useState<SimulationJob | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setJob(null);
     setError(null);
+    setUnavailable(false);
     setLoading(false);
   }, [materialId]);
 
   if (!materialId) {
-    return <div className="empty-note">Select a material first.</div>;
+    return <p className="empty-note">Select a material first.</p>;
   }
 
   async function handleRun() {
     setLoading(true);
     setError(null);
+    setUnavailable(false);
     setJob(null);
     try {
       setJob(await runAseRelax(materialId));
     } catch (e) {
+      setUnavailable(e instanceof ServiceUnavailableError);
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }
   }
 
+  const result = job?.status === "completed" ? job.result : null;
+
   return (
-    <div className="simulation-panel">
+    <div>
       <div className="panel-row">
         <div>
-          <span className="metric-label">ASE demo relaxation</span>
+          <span className="metric-label">Target</span>
           <strong>{formula ? `${materialId} / ${formula}` : materialId}</strong>
         </div>
-        <button type="button" onClick={handleRun} disabled={loading}>
+        <button className="ghost-button" type="button" onClick={handleRun} disabled={loading} aria-busy={loading}>
           {loading ? "Running..." : "Run relax"}
         </button>
       </div>
-      {error && <div className="error-note">{error}</div>}
-      {job?.status === "failed" && <div className="error-note">{job.error ?? "Simulation failed."}</div>}
-      {job?.status === "completed" && job.result && (
-        <div className="kv-grid">
-          <span>Calculator</span>
-          <strong>{job.result.calculator ?? "unknown"}</strong>
-          <span>Energy</span>
-          <strong>{formatNumber(job.result.energy)}</strong>
-          <span>Max force</span>
-          <strong>{formatNumber(job.result.max_force)}</strong>
-          <span>Steps</span>
-          <strong>{job.result.steps ?? "n/a"}</strong>
-          <span>Converged</span>
-          <strong>{job.result.converged === null ? "n/a" : String(Boolean(job.result.converged))}</strong>
+
+      {error && (
+        <div className={`eval-output ${unavailable ? "warn" : "fail"}`}>
+          <span className="eval-label">{unavailable ? "Unavailable" : "ASE failed"}</span>
+          <span>{error}</span>
         </div>
       )}
+
+      {job?.status === "failed" && (
+        <div className="eval-output fail">
+          <span className="eval-label">ASE failed</span>
+          <span>{job.error ?? "Simulation failed."}</span>
+        </div>
+      )}
+
+      {result && (
+        <div className="property-grid">
+          <div className="property-box">
+            <span>Calculator</span>
+            <strong>{result.calculator ?? "unknown"}</strong>
+          </div>
+          <div className="property-box">
+            <span>Energy</span>
+            <strong>{formatNumber(result.energy, 5)}</strong>
+          </div>
+          <div className="property-box">
+            <span>Max force</span>
+            <strong>{formatNumber(result.max_force, 5)}</strong>
+          </div>
+          <div className="property-box">
+            <span>Steps</span>
+            <strong>{result.steps ?? "n/a"}</strong>
+          </div>
+          <div className="property-box">
+            <span>Converged</span>
+            <strong>
+              {result.converged === null || result.converged === undefined ? (
+                "n/a"
+              ) : (
+                <span className={`tag ${result.converged ? "pass" : "fail"}`}>
+                  {result.converged ? "yes" : "no"}
+                </span>
+              )}
+            </strong>
+          </div>
+        </div>
+      )}
+
+      <p className="boundary-note">
+        Toy EMT relaxation, wired to demonstrate the simulation hook. It is not a production DFT
+        workflow and its energies carry no physical claim.
+      </p>
     </div>
   );
-}
-
-function formatNumber(value: unknown): string {
-  return typeof value === "number" ? value.toFixed(5).replace(/0+$/, "").replace(/\.$/, "") : "n/a";
 }

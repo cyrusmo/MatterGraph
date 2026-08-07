@@ -1,0 +1,43 @@
+/* Docs palette, matched to the demo workbench so the site and the app read as one
+   product. Palette only — no layout or component overrides. */
+
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: #0b1118;
+  --md-primary-fg-color--light: #10131a;
+  --md-primary-fg-color--dark: #070c12;
+  --md-primary-bg-color: #e8edf2;
+  --md-primary-bg-color--light: #96a6b8;
+}
+
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: #e88745;
+  --md-accent-fg-color--transparent: rgba(232, 135, 69, 0.1);
+  --md-accent-bg-color: #0b1118;
+  --md-accent-bg-color--light: #10131a;
+}
+
+/* Dark is the default scheme. Surfaces mirror the app's --bg / --panel / --text. */
+[data-md-color-scheme="slate"] {
+  --md-hue: 213;
+  --md-default-bg-color: #0b1118;
+  --md-default-fg-color: #e8edf2;
+  --md-default-fg-color--light: #96a6b8;
+  --md-default-fg-color--lighter: #607286;
+  --md-default-fg-color--lightest: rgba(112, 146, 184, 0.2);
+  --md-code-bg-color: rgba(13, 19, 27, 0.92);
+  --md-code-fg-color: #e8edf2;
+  --md-typeset-a-color: #74c7d3;
+}
+
+[data-md-color-scheme="default"] {
+  --md-typeset-a-color: #b45c1a;
+}
+
+/* Section headings pick up the app's orange micro-label treatment. */
+.md-typeset h2 {
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset h1 {
+  font-weight: 400;
+}

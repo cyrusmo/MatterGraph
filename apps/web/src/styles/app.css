@@ -1,0 +1,806 @@
+/* Application styles, grouped: chrome → rail → workspace header → status strip →
+   section headers → panels → data → detail → controls → status families → utility. */
+
+/* ---------- chrome ---------- */
+
+.shell {
+  min-height: 100vh;
+  padding: var(--gutter);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  border: 1px solid var(--line-soft);
+  border-bottom: 0;
+  background: var(--surface-chrome);
+  color: var(--muted);
+  padding: 0 var(--gutter);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+}
+
+.brand-lockup {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand {
+  color: var(--text);
+}
+
+.mode {
+  border-left: 1px solid var(--line);
+  color: var(--cyan);
+  padding-left: 12px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--orange);
+  flex: 0 0 auto;
+}
+
+/* ---------- shell grid ---------- */
+
+.os-grid {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: calc(100vh - 70px);
+  border: 1px solid var(--line-soft);
+  background: var(--grid-bg);
+}
+
+/* ---------- rail ----------
+   The aside spans the full grid height so its surface never stops mid-page; the
+   sticky behaviour lives on the inner wrapper instead. */
+
+.rail {
+  border-right: 1px solid var(--line-soft);
+  background: var(--rail-bg);
+}
+
+.rail-inner {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow: auto;
+  padding: var(--gutter);
+}
+
+.rail-section + .rail-section {
+  margin-top: 26px;
+}
+
+.rail-title {
+  color: var(--orange);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.rail-kv {
+  display: block;
+  margin-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+
+.rail-kv span {
+  display: block;
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rail-kv strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rail-nav {
+  display: grid;
+}
+
+.nav-item {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  margin: 8px 0;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  padding: 0 12px;
+  font-size: 13px;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.nav-item:hover,
+.nav-item[aria-current="true"] {
+  color: var(--text);
+  border-color: var(--orange);
+  background: var(--accent-wash);
+}
+
+.nav-item[aria-current="true"] {
+  box-shadow: inset 3px 0 0 var(--orange);
+}
+
+/* ---------- workspace header ---------- */
+
+.workspace {
+  min-width: 0;
+  padding: 26px 30px 34px;
+}
+
+.workspace-header {
+  margin-bottom: var(--gutter);
+}
+
+.workspace-header h1 {
+  margin: 4px 0 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 1.04;
+}
+
+.subhead {
+  max-width: 840px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.eyebrow,
+.metric-label {
+  display: block;
+  color: var(--orange);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+}
+
+/* ---------- status strip ---------- */
+
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  background: var(--surface-3);
+  margin-bottom: 22px;
+}
+
+/* Labels wrap to two lines at some widths; align the values to the bottom so the
+   numbers stay on one baseline across the strip. */
+.status-strip div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 70px;
+  padding: 13px 15px;
+  border-right: 1px solid var(--line);
+}
+
+.status-strip div:last-child {
+  border-right: 0;
+}
+
+.status-strip strong {
+  display: block;
+  margin-top: 9px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- sections ---------- */
+
+.section-block + .section-block {
+  margin-top: 26px;
+}
+
+/* Sections compose panels and grids as flat siblings; space them uniformly rather
+   than having each component carry its own margin. */
+.section-block > * + * {
+  margin-top: var(--gutter);
+}
+
+.subheading {
+  margin: 16px 0 8px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.section-block:focus {
+  outline: none;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  padding: 16px;
+  min-width: 0;
+}
+
+.panel + .panel {
+  margin-top: var(--gutter);
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--orange);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+}
+
+.panel-heading span:last-child {
+  color: var(--faint);
+}
+
+/* Panels stretch to the tallest in the row. Against a 3-record fixture the columns
+   have wildly different natural heights, and a short panel beside a tall one leaves a
+   ragged void; an equal-height pair frames that space instead. */
+.layout-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: var(--gutter);
+  align-items: stretch;
+}
+
+.panel-stack {
+  min-width: 0;
+}
+
+/* ---------- pipeline ---------- */
+
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pipeline-step {
+  min-height: 74px;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  padding: 10px;
+}
+
+.pipeline-step span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--cyan);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.pipeline-step strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+/* ---------- data tables ---------- */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid var(--line-soft);
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+/* Only cell values may break mid-token. Letterspaced uppercase headers wrap into
+   nonsense ("RAN K") in a narrow panel, so they never wrap — the table scrolls instead. */
+.data-table td {
+  overflow-wrap: anywhere;
+}
+
+.data-table th {
+  color: var(--orange);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.compact-table th,
+.compact-table td {
+  padding: 7px 6px;
+  font-size: 12px;
+}
+
+.selectable-row {
+  cursor: pointer;
+  transition: background var(--motion-fast) ease;
+}
+
+.selectable-row:hover {
+  background: var(--surface-1);
+}
+
+.selected-row,
+.selected-row:hover {
+  background: var(--select-wash);
+}
+
+.row-select {
+  border: 0;
+  background: transparent;
+  color: var(--cyan);
+  padding: 0;
+  text-align: left;
+}
+
+.row-select:hover {
+  color: var(--text);
+}
+
+/* ---------- detail + property readouts ---------- */
+
+.detail-panel h3 {
+  margin: 18px 0 8px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.detail-panel h3:first-child {
+  margin-top: 0;
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.property-box {
+  border: 1px solid var(--line-soft);
+  background: var(--surface-1);
+  padding: 11px;
+  min-width: 0;
+}
+
+/* The label, and only the label — scoped to the first child so it does not blockify
+   tags or captions nested deeper in the box. Property names are long snake_case tokens
+   (formation_energy_per_atom) with no natural break opportunity, hence overflow-wrap. */
+.property-box > span:first-child {
+  display: block;
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.property-box strong {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Where a value came from, stated under every number rather than hidden in a tooltip.
+   A caption rather than tags: two chips per property made the inspector twice as tall
+   as the table beside it. */
+.property-source {
+  display: block;
+  margin-top: 6px;
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+}
+
+/* Long identifiers (slice names, run ids) need the full row to avoid breaking mid-word. */
+.property-box.wide {
+  grid-column: 1 / -1;
+}
+
+.stack-list {
+  display: grid;
+  gap: 8px;
+}
+
+.stack-item {
+  border: 1px solid var(--line-soft);
+  background: var(--surface-1);
+  padding: 10px 11px;
+}
+
+.stack-item strong {
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.stack-item p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* long free-text pairs that wrap badly in a property box */
+.kv-grid {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.4fr) minmax(0, 1fr);
+  gap: 8px 12px;
+  align-items: baseline;
+}
+
+.kv-grid span {
+  color: var(--faint);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kv-grid strong {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- controls ---------- */
+
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0 12px;
+}
+
+.control-panel label,
+.control-grid label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.control-panel input,
+.control-grid input {
+  width: 100%;
+  min-height: 38px;
+  margin: 7px 0 14px;
+  border: 1px solid var(--line);
+  background: var(--field);
+  color: var(--text);
+  padding: 9px 10px;
+}
+
+.toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.toggle-button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 11px;
+  font-size: 12px;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.toggle-button[aria-pressed="true"] {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  color: var(--text);
+}
+
+.primary-button,
+.ghost-button {
+  min-height: 38px;
+  padding: 9px 14px;
+  color: var(--text);
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+
+.primary-button {
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: rgba(232, 135, 69, 0.16);
+}
+
+.ghost-button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+
+.ghost-button:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.panel-row strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- status families ---------- */
+
+.chip {
+  display: inline-block;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 4px 9px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.status-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag {
+  display: inline-block;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 3px 8px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tag.pass {
+  border-color: var(--pass-line);
+  background: var(--pass-wash);
+  color: var(--green);
+}
+
+.tag.warn {
+  border-color: var(--warn-line);
+  background: var(--warn-wash);
+  color: var(--amber);
+}
+
+.tag.fail {
+  border-color: var(--fail-line);
+  background: var(--fail-wash);
+  color: var(--red);
+}
+
+.eval-output {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.eval-label {
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.eval-output.pass {
+  border-color: var(--pass-line);
+}
+
+.eval-output.warn {
+  border-color: var(--warn-line);
+}
+
+.eval-output.fail {
+  border-color: var(--fail-line);
+}
+
+.eval-output.pass .eval-label {
+  color: var(--green);
+}
+
+.eval-output.warn .eval-label {
+  color: var(--amber);
+}
+
+.eval-output.fail .eval-label {
+  color: var(--red);
+}
+
+.boundary-note {
+  border-left: 2px solid var(--cyan);
+  background: var(--surface-1);
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* ---------- utility ---------- */
+
+.empty-note {
+  color: var(--faint);
+  font-size: 13px;
+}
+
+/* ---------- responsive ----------
+   Two breakpoints, each written once. 1120: the rail unsticks and becomes a
+   horizontal nav bar above the workspace. 620: everything to one column. */
+
+@media (max-width: 1120px) {
+  .os-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .rail-inner {
+    position: static;
+    max-height: none;
+  }
+
+  .rail-section + .rail-section {
+    margin-top: 18px;
+  }
+
+  .rail-nav {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .rail-nav .nav-item {
+    margin: 0;
+  }
+
+  .workspace {
+    padding: 22px var(--gutter) 28px;
+  }
+
+  .layout-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .status-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .status-strip div:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .status-strip div:nth-child(-n + 3) {
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 620px) {
+  .shell {
+    padding: 10px;
+  }
+
+  .workspace {
+    padding: 18px 12px 24px;
+  }
+
+  .workspace-header h1 {
+    font-size: 32px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px var(--gutter);
+  }
+
+  .mode {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .pipeline,
+  .status-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .status-strip div,
+  .status-strip div:nth-child(3n) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .status-strip div:last-child {
+    border-bottom: 0;
+  }
+
+  .kv-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px 0;
+  }
+
+  .eval-output {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .data-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

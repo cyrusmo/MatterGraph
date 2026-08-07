@@ -1,0 +1,51 @@
+/* Reset, document surface, and interaction defaults. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
+    linear-gradient(135deg, #0a1017 0%, #0c121a 48%, #111720 100%);
+  background-size: 88px 88px, 88px 88px, 100% 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Every interactive surface gets a visible keyboard affordance. The design source
+   ships almost none of these; a public repo is read as reference code, so this app
+   is deliberately stricter than the internal one it borrows from. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 1px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
