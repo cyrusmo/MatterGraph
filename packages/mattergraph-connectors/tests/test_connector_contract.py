@@ -24,6 +24,7 @@ from mattergraph_connectors.base import (
 )
 from mattergraph_connectors.jarvis import JarvisConnector
 from mattergraph_connectors.nomad import NOMADConnector
+from mattergraph_connectors.optimade import OptimadeConnector
 from mattergraph_connectors.oqmd import OQMDStubConnector
 
 # Every class-shaped connector in the package. MaterialsProjectConnector is constructed with
@@ -31,6 +32,7 @@ from mattergraph_connectors.oqmd import OQMDStubConnector
 _CONNECTOR_FACTORIES = {
   "jarvis": JarvisConnector,
   "nomad": NOMADConnector,
+  "optimade": OptimadeConnector,
   "oqmd": OQMDStubConnector,
 }
 

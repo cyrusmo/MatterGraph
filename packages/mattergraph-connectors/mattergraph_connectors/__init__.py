@@ -23,6 +23,14 @@ if TYPE_CHECKING:
     NOMADPayloadError,
     NOMADStubConnector,
   )
+  from mattergraph_connectors.optimade import (
+    PROVIDERS,
+    OptimadeConnector,
+    OptimadeConnectorError,
+    OptimadeHTTPError,
+    OptimadeMappingError,
+    OptimadePayloadError,
+  )
   from mattergraph_connectors.oqmd import OQMDStubConnector
 
 _EXPORTS: dict[str, tuple[str, str, str | None]] = {
@@ -94,6 +102,16 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
     "NOMADStubConnector",
     None,
   ),
+  "OptimadeConnector": ("mattergraph_connectors.optimade", "OptimadeConnector", None),
+  "OptimadeConnectorError": (
+    "mattergraph_connectors.optimade",
+    "OptimadeConnectorError",
+    None,
+  ),
+  "OptimadeHTTPError": ("mattergraph_connectors.optimade", "OptimadeHTTPError", None),
+  "OptimadeMappingError": ("mattergraph_connectors.optimade", "OptimadeMappingError", None),
+  "OptimadePayloadError": ("mattergraph_connectors.optimade", "OptimadePayloadError", None),
+  "PROVIDERS": ("mattergraph_connectors.optimade", "PROVIDERS", None),
 }
 
 __all__ = [
@@ -113,6 +131,12 @@ __all__ = [
   "NOMADMappingError",
   "NOMADPayloadError",
   "NOMADStubConnector",
+  "OptimadeConnector",
+  "OptimadeConnectorError",
+  "OptimadeHTTPError",
+  "OptimadeMappingError",
+  "OptimadePayloadError",
+  "PROVIDERS",
 ]
 
 

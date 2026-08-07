@@ -12,6 +12,23 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
 
 ### Added
 
+- `OptimadeConnector` reads any OPTIMADE provider, closing COD and OQMD and reaching
+  AFLOW, Materials Project, NOMAD and ~18 others through one client with no new
+  dependency. It handles four upstream behaviours verified against the live APIs:
+  `response_fields` is mandatory (COD's default response omits all site data),
+  `links.next` is a bare string on OQMD and a `{"href": ...}` object on COD,
+  `species[].name` is a site label rather than an element symbol, and
+  `cartesian_site_positions` must be converted to the fractional coordinates
+  `CrystalStructure` stores.
+- OPTIMADE records carry a density derived from the cell, labelled
+  `method="derived"` — OPTIMADE standardizes no physical property, so without this
+  the records would be unrankable. OQMD additionally supplies `band_gap`,
+  `formation_energy_per_atom`, and `energy_above_hull`.
+- `Material.dimensionality` records the number of periodic dimensions. When it is
+  not 3, no density is derived: a vacuum-padded slab's bulk density is a function of
+  the padding, not a material property, and a `Scorecard` would rank it against real
+  crystals without complaint.
+
 - A connector contract in `mattergraph_connectors.base`: the `Connector` protocol,
   a `ConnectorQuery` model covering `elements` / `source_ids` / `properties` /
   `max_records` / `page_size`, and shared `connector_provenance()` and
@@ -102,6 +119,8 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
 
 ### Changed
 
+- `scripts/ingest_oqmd.py` fetches real OQMD records through OPTIMADE. It previously
+  printed "OQMD stub returned 0 materials." and exited 0.
 - **Breaking:** `OQMDStubConnector.fetch()` raises `NotImplementedError` instead of
   returning `[]`. An unimplemented connector answering every query with an empty
   list is indistinguishable from a real one whose filter matched nothing — the
