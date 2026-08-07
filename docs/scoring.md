@@ -39,10 +39,24 @@ Without this, a zero-spread column would normalize to all-ones under `minimize` 
 ### Mixed sources are reported, not blocked
 
 `report()` lists any objective whose values come from more than one `method` (DFT vs
-experiment) under `mixed_methods`, and any that mixes elastic averaging conventions under
-`mixed_averaging_schemes`. The second matters when pooling sources: Materials Project reports
-Voigt–Reuss–Hill averages while JARVIS reports Voigt, an upper bound, so a mixed column ranks
-JARVIS candidates high for a reason that has nothing to do with the material.
+experiment) under `mixed_methods`, any that mixes elastic averaging conventions under
+`mixed_averaging_schemes`, and any that mixes hull conventions under `mixed_hull_conventions`.
+
+These matter when pooling sources:
+
+- **Averaging schemes.** Materials Project reports Voigt–Reuss–Hill averages while JARVIS
+  reports Voigt, an upper bound, so a mixed column ranks JARVIS candidates high for a reason
+  that has nothing to do with the material.
+- **Hull conventions.** OQMD reports a hull *distance*, which is negative for a phase below the
+  current hull; Materials Project's `energy_above_hull` is `>= 0` by construction. A mixed
+  column ranks OQMD candidates low, and a constraint like `energy_above_hull <= 0.05` admits
+  OQMD records that MP would have reported as `0.0`.
+
+**A property carrying no convention marker counts as its own convention, `"unspecified"`.**
+That is deliberate: the dangerous mix is usually between a source that labels its convention
+and one that does not — Materials Project attaches no hull marker at all — and skipping the
+unlabelled side would leave one distinct value and report no mixing. A pool where nothing is
+marked is not flagged, so this never becomes constant noise.
 
 ## Derived elastic quantities
 

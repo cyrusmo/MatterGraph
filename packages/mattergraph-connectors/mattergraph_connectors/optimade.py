@@ -51,9 +51,10 @@ SOURCE_NAME = "optimade"
 PROVIDERS: dict[str, str] = {
   "cod": "https://www.crystallography.net/cod/optimade",
   "oqmd": "https://oqmd.org/optimade",
-  # AFLOW's endpoint is failing upstream: the OPTIMADE providers dashboard reports 7/13
-  # validator checks passing and /v1/structures returns HTTP 500 for any request carrying
-  # response_fields. Kept here so it works the moment AFLOW repairs it; see docs/connectors.md.
+  # AFLOW's structures endpoint is down, not merely fussy: /v1/info answers 200 but
+  # /v1/structures and /v1/info/structures both return HTTP 500 for every query shape tried,
+  # including a bare request with no parameters. There is no client-side workaround. Kept here
+  # so it works the moment AFLOW repairs it; see docs/connectors.md.
   "aflow": "https://aflow.org/API/optimade",
   "mp": "https://optimade.materialsproject.org",
   "nmd": "https://nomad-lab.eu/prod/v1/optimade",

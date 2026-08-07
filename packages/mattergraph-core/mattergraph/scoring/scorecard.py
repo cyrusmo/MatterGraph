@@ -173,6 +173,7 @@ class Scorecard:
       "effective_objectives": [k for k in keys if k not in ignored],
       "mixed_methods": self._mixed_methods(materials, keys),
       "mixed_averaging_schemes": self._mixed_averaging_schemes(materials, keys),
+      "mixed_hull_conventions": self._mixed_hull_conventions(materials, keys),
       "binary_normalization": len(kept_i) <= 2,
       "scores_are_pool_relative": True,
     }
@@ -192,7 +193,35 @@ class Scorecard:
     return out
 
   @staticmethod
+  def _mixed_conventions(
+    materials: list[Material],
+    keys: list[str],
+    *,
+    marker: str,
+  ) -> dict[str, list[str]]:
+    """Objectives pooling more than one convention under ``MaterialProperty.extra[marker]``.
+
+    A property carrying no marker counts as its own convention, ``"unspecified"``, rather than
+    being skipped. That distinction is the whole point: the dangerous mix is usually between a
+    source that labels its convention and one that does not, and skipping the unlabelled side
+    leaves exactly one distinct value and reports no mixing at all.
+    """
+    out: dict[str, list[str]] = {}
+    for k in keys:
+      conventions: set[str] = set()
+      for m in materials:
+        p = m.get_property(k)
+        if p is None:
+          continue
+        value = p.extra.get(marker)
+        conventions.add(str(value) if value is not None else "unspecified")
+      if len(conventions) > 1:
+        out[k] = sorted(conventions)
+    return out
+
+  @classmethod
   def _mixed_averaging_schemes(
+    cls,
     materials: list[Material],
     keys: list[str],
   ) -> dict[str, list[str]]:
@@ -201,17 +230,22 @@ class Scorecard:
     Materials Project reports Voigt-Reuss-Hill averages; JARVIS reports Voigt, which is an
     upper bound. Ranking both in one column biases the Voigt-sourced candidates high.
     """
-    out: dict[str, list[str]] = {}
-    for k in keys:
-      schemes = {
-        str(scheme)
-        for m in materials
-        if (p := m.get_property(k)) is not None
-        and (scheme := p.extra.get("averaging_scheme")) is not None
-      }
-      if len(schemes) > 1:
-        out[k] = sorted(schemes)
-    return out
+    return cls._mixed_conventions(materials, keys, marker="averaging_scheme")
+
+  @classmethod
+  def _mixed_hull_conventions(
+    cls,
+    materials: list[Material],
+    keys: list[str],
+  ) -> dict[str, list[str]]:
+    """Objectives pooling more than one convention for distance from the convex hull.
+
+    OQMD reports a hull *distance*, which is negative for a phase below the current hull;
+    Materials Project reports ``energy_above_hull``, which is ``>= 0`` by construction. Ranking
+    both in one column biases the OQMD-sourced candidates low, and a constraint such as
+    ``energy_above_hull <= 0.05`` admits OQMD records that MP would have reported as ``0.0``.
+    """
+    return cls._mixed_conventions(materials, keys, marker="hull_convention")
 
   def rank(
     self,

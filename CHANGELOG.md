@@ -24,6 +24,9 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
   `method="derived"` — OPTIMADE standardizes no physical property, so without this
   the records would be unrankable. OQMD additionally supplies `band_gap`,
   `formation_energy_per_atom`, and `energy_above_hull`.
+- `Scorecard.report()` reports `mixed_hull_conventions`, so a ranking column pooling
+  OQMD hull distances with Materials Project `energy_above_hull` is detectable rather
+  than silently biased.
 - `Material.dimensionality` records the number of periodic dimensions. When it is
   not 3, no density is derived: a vacuum-padded slab's bulk density is a function of
   the padding, not a material property, and a `Scorecard` would rank it against real
@@ -121,6 +124,11 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
 
 - `scripts/ingest_oqmd.py` fetches real OQMD records through OPTIMADE. It previously
   printed "OQMD stub returned 0 materials." and exited 0.
+- `Scorecard.report()`'s `mixed_averaging_schemes` now counts a property with no
+  `averaging_scheme` marker as `"unspecified"` rather than skipping it. It previously
+  looked only at non-null markers, so the most common dangerous case — one source
+  labelling its convention and another not — left a single distinct value and was
+  reported as unmixed. A pool where nothing is marked is still not flagged.
 - **Breaking:** `OQMDStubConnector.fetch()` raises `NotImplementedError` instead of
   returning `[]`. An unimplemented connector answering every query with an empty
   list is indistinguishable from a real one whose filter matched nothing — the

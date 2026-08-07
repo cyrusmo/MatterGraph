@@ -119,7 +119,7 @@ with OptimadeConnector(provider="cod") as cod:
 | `oqmd` | Verified working; also supplies three canonical properties (below) |
 | `mp` | Listed; needs no key for OPTIMADE reads |
 | `nmd` | Listed |
-| `aflow` | **Failing upstream.** The OPTIMADE providers dashboard reports 7/13 validator checks passing, and `/v1/structures` returns HTTP 500 for any request carrying `response_fields`. Listed so it works when AFLOW repairs it. |
+| `aflow` | **Down upstream.** `/v1/info` answers, but `/v1/structures` returns HTTP 500 for every query shape — including a bare request with no parameters — so there is no client-side workaround. The OPTIMADE providers dashboard reports 7/13 validator checks passing. Listed so it works when AFLOW repairs it. |
 
 Any other OPTIMADE endpoint works via `base_url=`; the provider table is a convenience, not a
 limit.

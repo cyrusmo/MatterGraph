@@ -122,3 +122,87 @@ def test_report_flags_binary_normalization_and_constraint_exclusions() -> None:
   assert report["excluded_by_constraints"] == 1
   # Two survivors means min-max collapses every objective to {0, 1}.
   assert report["binary_normalization"] is True
+
+
+# --- convention mixing --------------------------------------------------------------------
+# A ranking column that pools two conventions changes a shortlist without changing any
+# material, which is exactly what report() exists to surface.
+
+
+def _with_hull(mid: str, value: float, extra: dict[str, object]) -> Material:
+  return Material(
+    material_id=mid,
+    formula="TiO2",
+    properties=[
+      MaterialProperty(
+        name="energy_above_hull", value=value, unit="eV/atom", source="test", extra=extra
+      )
+    ],
+  )
+
+
+def test_mixing_a_marked_and_an_unmarked_convention_is_flagged() -> None:
+  """The real OQMD/MP case: OQMD marks its hull convention and MP marks nothing.
+
+  Counting only non-null markers would see one distinct value here and report no mixing.
+  """
+  pool = [
+    _with_hull("oqmd", -0.037, {"hull_convention": "oqmd_hull_distance"}),
+    _with_hull("mp", 0.012, {}),
+  ]
+  report = Scorecard(objectives={"energy_above_hull": "minimize"}).report(pool)
+
+  assert report["mixed_hull_conventions"] == {
+    "energy_above_hull": ["oqmd_hull_distance", "unspecified"]
+  }
+
+
+def test_a_single_convention_is_not_flagged() -> None:
+  pool = [
+    _with_hull("a", 0.01, {"hull_convention": "oqmd_hull_distance"}),
+    _with_hull("b", 0.02, {"hull_convention": "oqmd_hull_distance"}),
+  ]
+  report = Scorecard(objectives={"energy_above_hull": "minimize"}).report(pool)
+
+  assert report["mixed_hull_conventions"] == {}
+
+
+def test_an_entirely_unmarked_pool_is_not_flagged() -> None:
+  """Every pre-OPTIMADE source is unmarked; that must not become a permanent warning."""
+  pool = [_with_hull("a", 0.01, {}), _with_hull("b", 0.02, {})]
+  report = Scorecard(objectives={"energy_above_hull": "minimize"}).report(pool)
+
+  assert report["mixed_hull_conventions"] == {}
+
+
+def _with_modulus(mid: str, value: float, extra: dict[str, object]) -> Material:
+  return Material(
+    material_id=mid,
+    formula="TiO2",
+    properties=[
+      MaterialProperty(
+        name="bulk_modulus", value=value, unit="GPa", source="test", extra=extra
+      )
+    ],
+  )
+
+
+def test_averaging_schemes_flag_a_marked_and_unmarked_mix_too() -> None:
+  """Same latent bug as the hull case: an unlabelled source used to be skipped."""
+  pool = [
+    _with_modulus("mp", 100.0, {"averaging_scheme": "vrh"}),
+    _with_modulus("csv", 120.0, {}),
+  ]
+  report = Scorecard(objectives={"bulk_modulus": "maximize"}).report(pool)
+
+  assert report["mixed_averaging_schemes"] == {"bulk_modulus": ["unspecified", "vrh"]}
+
+
+def test_averaging_schemes_still_flag_two_named_schemes() -> None:
+  pool = [
+    _with_modulus("mp", 100.0, {"averaging_scheme": "vrh"}),
+    _with_modulus("jarvis", 120.0, {"averaging_scheme": "voigt"}),
+  ]
+  report = Scorecard(objectives={"bulk_modulus": "maximize"}).report(pool)
+
+  assert report["mixed_averaging_schemes"] == {"bulk_modulus": ["voigt", "vrh"]}
