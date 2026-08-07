@@ -6,8 +6,9 @@
 | Materials Project | `MaterialsProjectConnector` (requires `MP_API_KEY`) | `[mp]` |
 | JARVIS | `JarvisConnector` (loads a subset of JARVIS-DFT 3D) | `[jarvis]` |
 | NOMAD | `NOMADConnector` (read-only public metadata; no API key for public reads) | — |
+| OPTIMADE | `OptimadeConnector` — COD, OQMD, AFLOW, MP, NOMAD and ~18 more through one client | — |
 | Local CSV | `load_materials_from_csv` | — |
-| OQMD | Not implemented; **raises `NotImplementedError`**. Reach OQMD via OPTIMADE | — |
+| OQMD | No native connector; `OQMDStubConnector` **raises**. Use `OptimadeConnector(provider="oqmd")` | — |
 
 `mp-api` and `jarvis-tools` are optional extras, not hard dependencies:
 
@@ -99,6 +100,77 @@ rather than `"dft"` — the parser name is the only hint at what produced the up
 
 The connector uses public reads by default, deterministic entry-id ordering, and after-value
 pagination. Public NOMAD metadata reads do not require an API key.
+
+## OPTIMADE
+
+[OPTIMADE](https://www.optimade.org/) is a common API across ~20 materials databases, so one
+connector reaches COD, OQMD, AFLOW, Materials Project and NOMAD without a per-source SDK.
+
+```python
+from mattergraph_connectors import ConnectorQuery, OptimadeConnector
+
+with OptimadeConnector(provider="cod") as cod:
+    materials = cod.fetch(ConnectorQuery(elements=["Ti", "O"], max_records=5))
+```
+
+| Provider | Status |
+|----------|--------|
+| `cod` | Verified working |
+| `oqmd` | Verified working; also supplies three canonical properties (below) |
+| `mp` | Listed; needs no key for OPTIMADE reads |
+| `nmd` | Listed |
+| `aflow` | **Failing upstream.** The OPTIMADE providers dashboard reports 7/13 validator checks passing, and `/v1/structures` returns HTTP 500 for any request carrying `response_fields`. Listed so it works when AFLOW repairs it. |
+
+Any other OPTIMADE endpoint works via `base_url=`; the provider table is a convenience, not a
+limit.
+
+### What OPTIMADE does and does not carry
+
+The only REQUIRED field on a structure entry is `structure_features`. The standard defines **no
+physical property at all** — no band gap, formation energy, hull energy, modulus, or density.
+Provider properties are namespaced (`_oqmd_stability`), so they vary per database.
+
+That makes two things true:
+
+- **Density is derived, not reported.** It is computed from the cell and composition and
+  labelled `method="derived"` with `extra["derived_from"]`, so it is never mistaken for a value
+  a source vouched for.
+- **Elastic moduli never come from OPTIMADE.** Materials Project and JARVIS remain the only
+  sources; after this connector their role is property enrichment rather than discovery.
+
+### Dimensionality
+
+Records carry `nperiodic_dimensions` into `Material.dimensionality`. **When it is not 3, no
+density is derived** — a vacuum-padded monolayer's bulk density measures how much vacuum the
+author added, not the material, and a `Scorecard` would otherwise rank that number against real
+crystals. The structure is still kept; only the meaningless property is withheld, and the
+provenance note says why.
+
+### OQMD hull convention
+
+`OptimadeConnector(provider="oqmd")` maps three namespaced fields onto canonical names:
+
+| OPTIMADE field | Canonical name | Unit |
+|---|---|---|
+| `_oqmd_band_gap` | `band_gap` | eV |
+| `_oqmd_delta_e` | `formation_energy_per_atom` | eV/atom |
+| `_oqmd_stability` | `energy_above_hull` | eV/atom |
+
+**The third is a convention mismatch, and it is recorded rather than smoothed over.** OQMD's
+`stability` is a hull *distance* and goes **negative** for a phase below the current hull;
+Materials Project's `energy_above_hull` is `>= 0` by construction. Ranking both in one column
+biases the OQMD-sourced candidates low — the same class of error as mixing Voigt with VRH
+moduli. The value is never clamped, and carries
+`extra["hull_convention"] = "oqmd_hull_distance"` so a mixed column can be spotted. A constraint
+like `energy_above_hull <= 0.05` will admit OQMD records that MP would have reported as `0.0`.
+
+### Partial occupancy
+
+COD reports `chemical_formula_reduced: null` for every partially-occupied record, because the
+spec requires integer proportions and such records have formulas like `H0.572O2Ti0.858`. The
+connector derives the formula from the cell it has already built instead of dropping the record.
+`chemical_formula_anonymous` is never used as a fallback: `"A2B"` parses without error and would
+silently write `elements=['A0+','B']`.
 
 ## Tripo3D boundary
 

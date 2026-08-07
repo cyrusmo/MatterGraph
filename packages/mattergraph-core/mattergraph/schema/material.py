@@ -25,6 +25,13 @@ class Material(BaseModel):
   reduced_formula: str = Field(default="", description="Formula reduced by pymatgen Composition")
   elements: list[str] = Field(default_factory=list, description="Sorted element symbols")
   structure: CrystalStructure | None = None
+  dimensionality: int | None = Field(
+    default=None,
+    description=(
+      "Number of periodic dimensions, 0-3. A vacuum-padded slab reports 2, and its bulk "
+      "density and moduli are artifacts of the padding rather than material properties."
+    ),
+  )
   properties: list[MaterialProperty] = Field(default_factory=list)
   provenance: list[ProvenanceRecord] = Field(default_factory=list)
   source_id: str | None = Field(
@@ -49,6 +56,16 @@ class Material(BaseModel):
       return None
     out = value.strip()
     return out or None
+
+  @field_validator("dimensionality")
+  @classmethod
+  def _dimensionality_range(cls, value: int | None) -> int | None:
+    if value is None:
+      return None
+    if not 0 <= value <= 3:
+      msg = "dimensionality must be between 0 and 3"
+      raise ValueError(msg)
+    return value
 
   @model_validator(mode="after")
   def _backfill(self) -> Material:
