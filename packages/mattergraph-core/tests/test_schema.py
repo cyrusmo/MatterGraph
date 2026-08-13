@@ -1,7 +1,9 @@
 from pathlib import Path
 
+import numpy as np
 import pytest
 from mattergraph import Material, MaterialProperty, MaterialStore
+from pymatgen.core import Lattice, Structure
 from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.simulation import SimulationJobRef
 from mattergraph.graph.crystal_graph import CrystalGraphBuilder
@@ -46,6 +48,92 @@ def test_crystal_graph_is_deterministic() -> None:
   assert g1.edge_index.tolist() == g2.edge_index.tolist()
   assert g1.image_offsets.tolist() == g2.image_offsets.tolist()
   assert g1.edge_features.tolist() == g2.edge_features.tolist()
+
+
+@pytest.mark.parametrize(
+  ("structure", "expected_first_shell"),
+  [
+    (
+      lambda: Structure.from_spacegroup(
+        "Fm-3m",
+        Lattice.cubic(4.24),
+        ["Ti", "N"],
+        [[0, 0, 0], [0.5, 0.5, 0.5]],
+      ),
+      6,
+    ),
+    (
+      lambda: Structure(
+        Lattice.hexagonal(3.11, 4.98),
+        ["Al", "Al", "N", "N"],
+        [[1 / 3, 2 / 3, 0], [2 / 3, 1 / 3, 0.5], [1 / 3, 2 / 3, 0.382], [2 / 3, 1 / 3, 0.882]],
+      ),
+      4,
+    ),
+  ],
+)
+def test_crystal_graph_first_shell_coordination_and_reciprocity(
+  structure: object,
+  expected_first_shell: int,
+) -> None:
+  s = structure()
+  graph = CrystalGraphBuilder(cutoff_radius=5.0, max_neighbors=12).build(
+    CrystalStructure.from_pymatgen(s)
+  )
+  edges = [
+    (
+      int(graph.edge_index[0, index]),
+      int(graph.edge_index[1, index]),
+      tuple(int(value) for value in graph.image_offsets[index]),
+      float(graph.edge_features[index, 0]),
+    )
+    for index in range(graph.edge_index.shape[1])
+  ]
+  edge_keys = {(source, target, image) for source, target, image, _distance in edges}
+  assert all((target, source, tuple(-value for value in image)) in edge_keys for source, target, image, _distance in edges)
+  assert all(distance > 0 for _source, _target, _image, distance in edges)
+  for atom in range(graph.num_atoms):
+    distances = [distance for source, _target, _image, distance in edges if source == atom]
+    first = min(distances)
+    assert sum(distance <= first + 0.1 for distance in distances) == expected_first_shell
+
+
+def test_crystal_graph_displacement_reconstructs_periodic_endpoint() -> None:
+  from pymatgen.core import Lattice, Structure
+
+  structure = Structure(Lattice.cubic(3.0), ["Na", "Cl"], [[0, 0, 0], [0.5, 0.5, 0.5]])
+  graph = CrystalGraphBuilder(cutoff_radius=4.0, max_neighbors=8).build(
+    CrystalStructure.from_pymatgen(structure)
+  )
+  for index in range(graph.edge_index.shape[1]):
+    source = graph.edge_index[0, index]
+    target = graph.edge_index[1, index]
+    image = graph.image_offsets[index]
+    expected = structure.lattice.get_cartesian_coords(
+      graph.fractional_coordinates[target] + image - graph.fractional_coordinates[source]
+    )
+    assert graph.displacement_vectors[index] == pytest.approx(expected)
+    assert graph.edge_features[index, 0] == pytest.approx(float(np.linalg.norm(expected)))
+
+
+def test_crystal_graph_rejects_disorder_explicitly() -> None:
+  from pymatgen.core import Lattice, Structure
+
+  disordered = Structure(Lattice.cubic(3.0), [{"Fe": 0.5, "Mn": 0.5}], [[0, 0, 0]])
+  with pytest.raises(ValueError, match="disordered"):
+    CrystalGraphBuilder().build(CrystalStructure.from_pymatgen(disordered))
+
+
+def test_crystal_graph_is_invariant_to_integer_periodic_wrapping() -> None:
+  structure = Structure(Lattice.cubic(4.2), ["Ti", "N"], [[0, 0, 0], [0.5, 0.5, 0.5]])
+  shifted = Structure(Lattice.cubic(4.2), ["Ti", "N"], [[1, -1, 0], [0.5, 1.5, -0.5]])
+  builder = CrystalGraphBuilder(cutoff_radius=5.0, max_neighbors=12)
+  original_graph = builder.build(CrystalStructure.from_pymatgen(structure))
+  shifted_graph = builder.build(CrystalStructure.from_pymatgen(shifted))
+  assert original_graph.edge_index.tolist() == shifted_graph.edge_index.tolist()
+  assert original_graph.edge_features[:, 0].tolist() == pytest.approx(
+    shifted_graph.edge_features[:, 0].tolist()
+  )
 
 
 def test_crystal_roundtrip_preserves_site_properties_and_disorder() -> None:

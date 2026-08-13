@@ -53,8 +53,16 @@ def rank(request: ScoreRequest) -> list[dict]:
 def rank_with_audit(request: ScoreRequest) -> dict[str, Any]:
   store = store_service.get_store()
   scorecard = _scorecard(request)
+  ranked = scorecard.rank(store.materials).to_dict(orient="records")
+  materials_by_id = {material.material_id: material for material in store.materials}
+  for row in ranked:
+    material = materials_by_id.get(str(row.get("material_id")))
+    if material is None:
+      continue
+    for property_name in request.constraints:
+      row.setdefault(property_name, material.get_numeric(property_name))
   return {
-    "ranked": scorecard.rank(store.materials).to_dict(orient="records"),
+    "ranked": ranked,
     "report": scorecard.report(store.materials),
     "request": request.model_dump(mode="json"),
   }

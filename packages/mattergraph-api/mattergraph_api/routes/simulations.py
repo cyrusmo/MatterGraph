@@ -5,8 +5,19 @@ from mattergraph_sim.job_spec import AseJobSpec, SimulationJob
 from pydantic import BaseModel, Field
 
 from mattergraph_api.services import store_service
+from mattergraph_api.services.demo_service import get_chgnet_reference_artifact
 
 router = APIRouter()
+
+
+@router.get("/simulations/chgnet/reference/{material_id}")
+def get_chgnet_reference(material_id: str) -> dict:
+  artifact = get_chgnet_reference_artifact()
+  if artifact is None:
+    raise HTTPException(status_code=503, detail="verified CHGNet reference is unavailable")
+  if artifact["material_id"] != material_id:
+    raise HTTPException(status_code=404, detail="no CHGNet reference for this material")
+  return artifact
 
 
 class RelaxRequest(BaseModel):

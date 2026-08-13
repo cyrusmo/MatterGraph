@@ -1,125 +1,99 @@
 import { useEffect, useState } from "react";
 
-import { ServiceUnavailableError, runAseRelax } from "../lib/api";
+import { fetchChgnetReference } from "../lib/api";
 import { formatNumber } from "../lib/format";
-import type { SimulationJob, SimulationReadiness } from "../types/material";
+import type { ChgnetReference, ChgnetState } from "../types/material";
 
 export function SimulationQueue({
   materialId,
   formula,
-  readiness,
+  chgnet,
 }: {
   materialId: string;
   formula?: string;
-  readiness?: SimulationReadiness;
+  chgnet?: ChgnetState;
 }) {
-  const [job, setJob] = useState<SimulationJob | null>(null);
+  const [reference, setReference] = useState<ChgnetReference | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [unavailable, setUnavailable] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setJob(null);
+    setReference(null);
     setError(null);
-    setUnavailable(false);
-    setLoading(false);
   }, [materialId]);
 
-  if (!materialId) {
-    return <p className="empty-note">Select a material first.</p>;
-  }
+  const referenceMatches = chgnet?.reference_material_id === materialId;
 
-  async function handleRun() {
+  async function showReference() {
     setLoading(true);
     setError(null);
-    setUnavailable(false);
-    setJob(null);
     try {
-      setJob(await runAseRelax(materialId));
-    } catch (e) {
-      setUnavailable(e instanceof ServiceUnavailableError);
-      setError(e instanceof Error ? e.message : String(e));
+      setReference(await fetchChgnetReference(materialId));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : String(reason));
     } finally {
       setLoading(false);
     }
   }
 
-  const result = job?.status === "completed" ? job.result : null;
-
   return (
     <div>
       <div className="panel-row">
         <div>
-          <span className="metric-label">Target</span>
+          <span className="metric-label">Selected leader</span>
           <strong>{formula ? `${materialId} / ${formula}` : materialId}</strong>
         </div>
         <button
-          className="ghost-button"
+          className="primary-button"
           type="button"
-          onClick={handleRun}
-          disabled={loading || !readiness?.ready}
+          onClick={showReference}
+          disabled={loading || !referenceMatches || !chgnet?.reference_available}
           aria-busy={loading}
         >
-          {loading ? "Running..." : "Run relax"}
+          {loading ? "Loading evidence…" : "Open cached reference"}
         </button>
       </div>
 
-      <div className={`eval-output ${readiness?.ready ? "pass" : "warn"}`}>
-        <span className="eval-label">Calculator check</span>
-        <span>{readiness?.reason ?? "Checking ASE/EMT compatibility…"}</span>
+      <div className={`eval-output ${chgnet?.state === "cached_only" ? "warn" : chgnet?.state === "live" ? "pass" : "fail"}`}>
+        <span className="eval-label">CHGNet state · {chgnet?.state ?? "checking"}</span>
+        <span>{chgnet?.detail ?? "Checking local model evidence…"}</span>
       </div>
 
-      {error && (
-        <div className={`eval-output ${unavailable ? "warn" : "fail"}`}>
-          <span className="eval-label">{unavailable ? "Unavailable" : "ASE failed"}</span>
-          <span>{error}</span>
-        </div>
-      )}
+      {!referenceMatches && chgnet?.reference_available ? (
+        <p className="boundary-note">The bundled result belongs to {chgnet.reference_material_id}. Run the scorecard to select that leader.</p>
+      ) : null}
+      {error ? <div className="eval-output fail"><span className="eval-label">Reference unavailable</span><span>{error}</span></div> : null}
 
-      {job?.status === "failed" && (
-        <div className="eval-output fail">
-          <span className="eval-label">ASE failed</span>
-          <span>{job.error ?? "Simulation failed."}</span>
+      {reference ? (
+        <div className="reference-result">
+          <div className="status-pill-row">
+            <span className="tag warn">cached reference</span>
+            <span className="chip">{reference.model.name} {reference.model.version}</span>
+            <span className="chip">{reference.result.steps} steps</span>
+          </div>
+          <div className="property-grid">
+            <Metric label="Converged" value={reference.result.converged ? "yes" : "no"} />
+            <Metric label="Energy / atom" value={`${formatNumber(reference.result.energy_per_atom, 5)} eV`} />
+            <Metric label="Max force" value={`${formatNumber(reference.result.max_force, 4)} eV/Å`} />
+            <Metric label="Volume Δ" value={`${formatNumber(reference.result.volume_change_percent, 3)}%`} />
+            <Metric label="Lattice Δ" value={`${formatNumber(reference.result.lattice_change_percent, 3)}%`} />
+            <Metric label="Weight checksum" value={reference.model.weight_checksum.slice(0, 16)} />
+            <Metric label="Input checksum" value={reference.input_checksum.slice(0, 16)} />
+          </div>
+          <details className="artifact-details">
+            <summary>Run parameters and compact trajectory</summary>
+            <pre>{JSON.stringify({ run: reference.run, trajectory: reference.result.trajectory }, null, 2)}</pre>
+          </details>
         </div>
-      )}
+      ) : null}
 
-      {result && (
-        <div className="property-grid">
-          <div className="property-box">
-            <span>Calculator</span>
-            <strong>{result.calculator ?? "unknown"}</strong>
-          </div>
-          <div className="property-box">
-            <span>Energy</span>
-            <strong>{formatNumber(result.energy, 5)}</strong>
-          </div>
-          <div className="property-box">
-            <span>Max force</span>
-            <strong>{formatNumber(result.max_force, 5)}</strong>
-          </div>
-          <div className="property-box">
-            <span>Steps</span>
-            <strong>{result.steps ?? "n/a"}</strong>
-          </div>
-          <div className="property-box">
-            <span>Converged</span>
-            <strong>
-              {result.converged === null || result.converged === undefined ? (
-                "n/a"
-              ) : (
-                <span className={`tag ${result.converged ? "pass" : "fail"}`}>
-                  {result.converged ? "yes" : "no"}
-                </span>
-              )}
-            </strong>
-          </div>
-        </div>
-      )}
-
-      <p className="boundary-note">
-        Toy EMT relaxation, wired to demonstrate the simulation hook. It is not a production DFT
-        workflow and its energies carry no physical claim.
+      <p className="ml-boundary">
+        {chgnet?.scientific_boundary ?? "CHGNet relaxation is ML-based proposal support, not a DFT or experimental measurement."}
       </p>
     </div>
   );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return <div className="property-box"><span>{label}</span><strong>{value}</strong></div>;
 }

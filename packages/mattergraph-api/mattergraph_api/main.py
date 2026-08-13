@@ -7,7 +7,10 @@ from mattergraph_api.routes import demo, materials, scores, search, simulations,
 
 app = FastAPI(
   title="MatterGraph API",
-  description="Open demo API for materials records, search, basic ranking, and ASE hooks.",
+  description=(
+    "Evidence-first demo API for provenanced materials records, reciprocal graph summaries, "
+    "audited ranking, and explicitly labeled simulation evidence."
+  ),
   version="0.1.0",
 )
 app.add_middleware(

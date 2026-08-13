@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import { formatValue } from "../lib/format";
 import type { Material } from "../types/material";
 
@@ -6,6 +8,10 @@ export function MaterialCard({ m }: { m: Material | undefined }) {
     return <p className="empty-note">Select a material first.</p>;
   }
   const properties = m.properties ?? [];
+  const fieldProvenance = m.metadata?.field_provenance;
+  const fieldEntries = fieldProvenance && typeof fieldProvenance === "object"
+    ? Object.entries(fieldProvenance as Record<string, unknown>)
+    : [];
 
   return (
     <div className="detail-panel">
@@ -77,6 +83,20 @@ export function MaterialCard({ m }: { m: Material | undefined }) {
         <span>Fingerprint</span>
         <strong>{String(m.metadata?.structure_fingerprint ?? "unknown")}</strong>
       </div>
+
+      {fieldEntries.length ? (
+        <>
+          <h3>Field sources</h3>
+          <div className="kv-grid">
+            {fieldEntries.map(([field, source]) => (
+              <Fragment key={field}>
+                <span>{field}</span>
+                <strong>{String(source)}</strong>
+              </Fragment>
+            ))}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

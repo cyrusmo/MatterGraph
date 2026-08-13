@@ -6,6 +6,8 @@ from typing import Any
 
 import pandas as pd
 from mattergraph.datasets import DeduplicationBasis, MatterGraphDataset
+from mattergraph.schema.structure import CrystalStructure
+from pymatgen.core import Lattice, Structure
 
 _ALIASES: dict[str, tuple[str, ...]] = {
   "material_id": ("material_id", "entry_id", "id", "record_id", "immutable_id"),
@@ -17,7 +19,12 @@ _ALIASES: dict[str, tuple[str, ...]] = {
   "structure": ("structure", "structure_json"),
   "immutable_id": ("immutable_id",),
   "functional": ("functional", "xc_functional", "dft_functional"),
-  "structure_fingerprint": ("structure_fingerprint", "bawl_id", "fingerprint"),
+  "structure_fingerprint": (
+    "structure_fingerprint",
+    "entalpic_fingerprint",
+    "bawl_id",
+    "fingerprint",
+  ),
 }
 
 _PROPERTY_UNITS = {
@@ -27,6 +34,8 @@ _PROPERTY_UNITS = {
   "band_gap": "eV",
   "formation_energy_per_atom": "eV/atom",
   "energy_above_hull": "eV/atom",
+  "max_force": "eV/Å",
+  "energy": "eV",
 }
 
 
@@ -109,6 +118,14 @@ class LeMatBulk:
     normalized = frame.copy(deep=True)
     for target, aliases in _ALIASES.items():
       cls._populate_standard_column(normalized, target, aliases)
+    if "structure" not in normalized.columns:
+      normalized["structure"] = normalized.apply(_reconstruct_structure, axis=1)
+    else:
+      missing = normalized["structure"].isna()
+      if missing.any():
+        normalized.loc[missing, "structure"] = normalized.loc[missing].apply(
+          _reconstruct_structure, axis=1
+        )
 
     if "material_id" not in normalized.columns or "formula" not in normalized.columns:
       msg = "LeMatBulk records must provide a material identifier and formula-compatible field"
@@ -179,6 +196,14 @@ class LeMatBulk:
       "functional",
       "structure_fingerprint",
       "provenance",
+      "field_provenance",
+      "forces",
+      "lattice_vectors",
+      "cartesian_site_positions",
+      "species_at_sites",
+      "entalpic_fingerprint",
+      "source_reduced_formula",
+      "last_modified",
     }
     columns: list[str] = []
     for column in frame.columns:
@@ -190,3 +215,26 @@ class LeMatBulk:
       if non_null.map(lambda value: isinstance(value, (int, float, str, bool))).all():
         columns.append(column)
     return columns
+
+
+def _reconstruct_structure(row: pd.Series) -> CrystalStructure | None:
+  lattice = row.get("lattice_vectors")
+  cartesian = row.get("cartesian_site_positions")
+  species = row.get("species_at_sites")
+  if not isinstance(lattice, (list, tuple)):
+    return None
+  if not isinstance(cartesian, (list, tuple)) or not isinstance(species, (list, tuple)):
+    return None
+  if len(cartesian) != len(species):
+    return None
+  try:
+    structure = Structure(
+      Lattice(lattice),
+      list(species),
+      list(cartesian),
+      coords_are_cartesian=True,
+      to_unit_cell=True,
+    )
+  except (TypeError, ValueError):
+    return None
+  return CrystalStructure.from_pymatgen(structure)

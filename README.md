@@ -31,7 +31,7 @@ Materials data is fragmented across repositories, schemas, units, structures, an
 - Normalize formulas, structures, units, and properties
 - Convert crystal structures into **crystal graph** representations
 - Track property provenance and basic confidence
-- Support **toy** scorecards and ranking (transparent baselines)
+- Support **transparent baseline** scorecards with auditable ranking behavior
 - Provide adapters for benchmarking and **simulation job specs** (e.g. ASE)
 - Expose a **small demo API** and **minimal web UI** for end-to-end exploration
 
@@ -77,23 +77,32 @@ For the deterministic public capability walkthrough, start the API and UI togeth
 ./scripts/run_public_demo.sh
 ```
 
-This runs a preflight-checked LeMaterial-schema fixture at `http://127.0.0.1:5173` without
-network calls or API credentials.
+This runs a preflight-checked, checksummed snapshot of 24 real LeMaterial records at
+`http://127.0.0.1:5173` without network calls or API credentials. The snapshot preserves the
+upstream revision, immutable IDs, license, citation, and field-level provenance.
 
-Example: rank candidates with a **toy scorecard** (min–max normalized objectives, hard constraints).
+Example: rank candidates with a **transparent baseline scorecard** (pool-relative min–max
+objectives plus hard constraints).
 
 ```python
-from mattergraph import MaterialStore, Scorecard
+import json
+from pathlib import Path
 
-store = MaterialStore.from_demo()
+from mattergraph import Scorecard
+from mattergraph_connectors import LeMatBulk
+
+artifact = json.loads(Path("data/demo/spc_real_snapshot.json").read_text())
+store = LeMatBulk.from_records(
+    artifact["records"], subset="compatible_pbe"
+).to_material_store()
 scorecard = Scorecard(
     objectives={
-        "density": "minimize",
-        "bulk_modulus": "maximize",
+        "density": {"direction": "minimize", "weight": 0.6},
+        "energy_above_hull": {"direction": "minimize", "weight": 0.4},
     },
     constraints={
         "energy_above_hull": {"max": 0.05},
-        "density": {"max": 6.0},
+        "max_force": {"max": 0.2},
     },
 )
 df = scorecard.rank(store.materials)
@@ -108,14 +117,14 @@ from pathlib import Path
 
 from mattergraph_connectors import LeMatBulk
 
-records = json.loads(Path("data/demo/lemat_bulk_sample.json").read_text())
-dataset = LeMatBulk.from_records(records, subset="compatible_pbesol")
+artifact = json.loads(Path("data/demo/spc_real_snapshot.json").read_text())
+dataset = LeMatBulk.from_records(artifact["records"], subset="compatible_pbe")
 
 candidate_slice = (
     dataset
     .filter_elements(include=["Ti", "Al", "N"])
-    .filter_complexity(max_nsites=4, max_nelements=3)
-    .create_slice("bulk_modulus_candidates_v0", target="bulk_modulus")
+    .filter_complexity(max_nsites=16, max_nelements=3)
+    .create_slice("spc_tialn_candidates_v1", target="energy_above_hull")
 )
 
 print(candidate_slice.report())
@@ -135,11 +144,11 @@ High-level [ROADMAP.md](ROADMAP.md) covers connectors, the unified schema, workf
 
 | Package | Role |
 |--------|------|
-| `mattergraph-core` | Schema, normalization, `MatterGraphDataset`, `CandidateSlice`, crystal graphs, toy `Scorecard`, `MaterialStore` |
+| `mattergraph-core` | Schema, normalization, `MatterGraphDataset`, `CandidateSlice`, crystal graphs, transparent `Scorecard`, `MaterialStore` |
 | `mattergraph-connectors` | MP, JARVIS, NOMAD public metadata, LeMat-Bulk companion adapter, local CSV, OQMD stub |
 | `mattergraph-benchmarks` | Metrics, Matbench-style adapter (optional `matbench` install) |
 | `mattergraph-sim` | ASE / stub LAMMPS+QE around job specs |
-| `mattergraph-api` | FastAPI demo for `/materials`, `/search`, `/scores/rank`, `/simulations/ase/relax` |
+| `mattergraph-api` | FastAPI demo for materials, graph summaries, audited ranking, and labeled CHGNet reference evidence |
 
 ## License
 

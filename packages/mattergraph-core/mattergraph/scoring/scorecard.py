@@ -16,7 +16,7 @@ _MISSING_FILL: dict[str, float | None] = {"worst": 0.0, "neutral": 0.5, "exclude
 
 class Scorecard:
   """
-  Toy scorecard: min–max–normalize each objective, apply optional weights,
+  Transparent baseline scorecard: min–max–normalize each objective, apply optional weights,
   filter by hard constraints, then return a ranked :class:`pandas.DataFrame`.
   This is a transparent baseline, not a production decision engine.
 

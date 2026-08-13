@@ -1,5 +1,6 @@
 import type {
   Capability,
+  ChgnetReference,
   DemoPreflight,
   GraphSummary,
   LeMaterialWorkflowSummary,
@@ -59,7 +60,7 @@ export async function rankMaterialsAudit(
     { direction: "minimize" | "maximize"; weight: number }
   >,
   eahMax: number,
-  densityMax: number,
+  forceMax: number,
   missing: "worst" | "neutral" | "exclude",
 ): Promise<ScoreAudit> {
   return requestJson<ScoreAudit>(
@@ -71,12 +72,20 @@ export async function rankMaterialsAudit(
         objectives,
         constraints: {
           energy_above_hull: { max: eahMax },
-          density: { max: densityMax },
+          max_force: { max: forceMax },
         },
         missing,
       }),
     },
     "rank request failed",
+  );
+}
+
+export async function fetchChgnetReference(materialId: string): Promise<ChgnetReference> {
+  return requestJson<ChgnetReference>(
+    `/simulations/chgnet/reference/${encodeURIComponent(materialId)}`,
+    {},
+    "CHGNet reference request failed",
   );
 }
 

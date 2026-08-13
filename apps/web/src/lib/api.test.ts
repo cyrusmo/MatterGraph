@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiUnavailableError, fetchPreflight, rankMaterialsAudit } from "./api";
 
 afterEach(() => {
-  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -12,8 +11,8 @@ describe("demo API client", () => {
     const payload = {
       status: "ready",
       fixture: { path: "fixture.json", kind: "fixture", disclaimer: "demo" },
-      record_count: 4,
-      graph: { included_count: 3, excluded_count: 1 },
+      record_count: 24,
+      graph: { included_count: 24, excluded_count: 0, invalid_count: 0, validation_state: "valid" },
       ranking: {
         ranked_count: 3,
         excluded_by_constraints: 1,
@@ -21,7 +20,8 @@ describe("demo API client", () => {
         objectives: {},
         constraints: {},
       },
-      default_material_id: "lemat-aln",
+      default_material_id: "agm003273599",
+      chgnet: { state: "cached_only", reference_available: true },
       simulation_targets: {},
       checks: [],
     };
@@ -41,7 +41,11 @@ describe("demo API client", () => {
   });
 
   it("stops waiting after five seconds and reports an offline API", async () => {
-    vi.useFakeTimers();
+    vi.stubGlobal("setTimeout", (callback: () => void) => {
+      queueMicrotask(callback);
+      return 1;
+    });
+    vi.stubGlobal("clearTimeout", vi.fn());
     const fetchMock = vi.fn((_url: string, init?: RequestInit) =>
       new Promise<Response>((_resolve, reject) => {
         init?.signal?.addEventListener("abort", () => {
@@ -52,10 +56,10 @@ describe("demo API client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const request = fetchPreflight();
-    const result = expect(request).rejects.toBeInstanceOf(ApiUnavailableError);
-    await vi.advanceTimersByTimeAsync(5_000);
-    await result;
-    await expect(request).rejects.toThrow("timed out after five seconds");
+    const result = request.catch((error: unknown) => error);
+    const error = await result;
+    expect(error).toBeInstanceOf(ApiUnavailableError);
+    expect(error).toHaveProperty("message", expect.stringContaining("timed out after five seconds"));
   });
 
   it("sends weights, directions, constraints, and missing policy to the audited route", async () => {
@@ -71,10 +75,10 @@ describe("demo API client", () => {
     await rankMaterialsAudit(
       {
         density: { direction: "minimize", weight: 0.6 },
-        bulk_modulus: { direction: "maximize", weight: 0.4 },
+        energy_above_hull: { direction: "minimize", weight: 0.4 },
       },
-      0.025,
-      6,
+      0.05,
+      0.2,
       "worst",
     );
 
@@ -83,11 +87,11 @@ describe("demo API client", () => {
     expect(JSON.parse(String(init?.body))).toEqual({
       objectives: {
         density: { direction: "minimize", weight: 0.6 },
-        bulk_modulus: { direction: "maximize", weight: 0.4 },
+        energy_above_hull: { direction: "minimize", weight: 0.4 },
       },
       constraints: {
-        energy_above_hull: { max: 0.025 },
-        density: { max: 6 },
+        energy_above_hull: { max: 0.05 },
+        max_force: { max: 0.2 },
       },
       missing: "worst",
     });

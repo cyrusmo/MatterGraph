@@ -417,6 +417,8 @@ class MatterGraphDataset:
   def _row_to_material(self, row: dict[str, Any]) -> Material:
     property_columns = list(self.metadata.get("property_columns", _infer_property_columns(self._frame)))
     property_units = dict(self.metadata.get("property_units", {}))
+    field_provenance = row.get("field_provenance")
+    field_provenance = field_provenance if isinstance(field_provenance, dict) else {}
     properties: list[MaterialProperty] = []
     for column in property_columns:
       value = row.get(column)
@@ -429,8 +431,21 @@ class MatterGraphDataset:
           name=column,
           value=_coerce_property_value(value),
           unit=property_units.get(column),
-          source=self.source_dataset,
-          method=_property_method_from_row(row),
+          source=(
+            "MatterGraph"
+            if column in {"density", "max_force"}
+            else str(field_provenance.get(column, self.source_dataset)).split("@")[0]
+          ),
+          method=(
+            "derived"
+            if column in {"density", "max_force"}
+            else _property_method_from_row(row)
+          ),
+          extra=(
+            {"field_source": str(field_provenance[column])}
+            if column in field_provenance
+            else {}
+          ),
         )
       )
     provenance = _coerce_provenance(row.get("provenance"))
@@ -446,9 +461,17 @@ class MatterGraphDataset:
       "source_dataset": self.source_dataset,
       "source_subset": self.source_subset,
     }
-    for key in ("functional", "immutable_id", "structure_fingerprint"):
+    for key in (
+      "functional",
+      "immutable_id",
+      "structure_fingerprint",
+      "last_modified",
+      "source_reduced_formula",
+    ):
       if not _is_missing(row.get(key)):
         metadata[key] = row[key]
+    if field_provenance:
+      metadata["field_provenance"] = field_provenance
     return Material(
       material_id=str(row["material_id"]),
       formula=str(row["formula"]),

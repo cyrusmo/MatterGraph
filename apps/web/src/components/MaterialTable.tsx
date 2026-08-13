@@ -6,10 +6,10 @@ type Props = {
   selectedId: string | null;
   onSelect: (materialId: string) => void;
   eahMax: number;
-  densityMax: number;
+  forceMax: number;
 };
 
-export function MaterialTable({ materials, selectedId, onSelect, eahMax, densityMax }: Props) {
+export function MaterialTable({ materials, selectedId, onSelect, eahMax, forceMax }: Props) {
   if (!materials.length) {
     return <p className="empty-note">No demo materials loaded.</p>;
   }
@@ -28,7 +28,7 @@ export function MaterialTable({ materials, selectedId, onSelect, eahMax, density
         {materials.map((m) => {
           const id = String(m.material_id);
           const selected = m.material_id === selectedId;
-          const verdict = constraintVerdict(m, eahMax, densityMax);
+          const verdict = constraintVerdict(m, eahMax, forceMax);
           return (
             <tr
               key={id}
@@ -63,15 +63,15 @@ export function MaterialTable({ materials, selectedId, onSelect, eahMax, density
 function constraintVerdict(
   material: Material,
   eahMax: number,
-  densityMax: number,
+  forceMax: number,
 ): { state: "pass" | "fail" | ""; label: string } {
-  const density = propertyNumber(material, "density");
+  const maxForce = propertyNumber(material, "max_force");
   const eah = propertyNumber(material, "energy_above_hull");
-  if (density === null && eah === null) {
+  if (maxForce === null && eah === null) {
     return { state: "", label: "no data" };
   }
-  if (density !== null && density > densityMax) {
-    return { state: "fail", label: "density" };
+  if (maxForce !== null && maxForce > forceMax) {
+    return { state: "fail", label: "force" };
   }
   if (eah !== null && eah > eahMax) {
     return { state: "fail", label: "hull" };

@@ -128,6 +128,16 @@ export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
             <strong>{workflow.provenance.workflow_version}</strong>
             <span>Run ID</span>
             <strong>{workflow.provenance.run_id}</strong>
+            <span>License</span>
+            <strong>{workflow.provenance.license}</strong>
+            <span>Citation DOI</span>
+            <strong>{workflow.provenance.citation_doi}</strong>
+            <span>Dataset revision</span>
+            <strong>{workflow.provenance.upstream_revision}</strong>
+            <span>Hull revision</span>
+            <strong>{workflow.provenance.hull_revision}</strong>
+            <span>Snapshot SHA-256</span>
+            <strong>{workflow.provenance.snapshot_sha256}</strong>
           </div>
         </div>
       </div>
@@ -145,6 +155,7 @@ export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
               <th>Target</th>
               <th>Density</th>
               <th>Energy above hull</th>
+              <th>Max force</th>
             </tr>
           </thead>
           <tbody>
@@ -155,6 +166,7 @@ export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
                 <td>{formatUnknown(row.target)}</td>
                 <td>{formatUnknown(row.density)}</td>
                 <td>{formatUnknown(row.energy_above_hull)}</td>
+                <td>{formatUnknown(row.max_force)}</td>
               </tr>
             ))}
           </tbody>

@@ -12,6 +12,7 @@ from mattergraph_api.services.demo_service import (
   TARGET,
   WORKFLOW_VERSION,
   get_demo_dataset,
+  get_demo_manifest,
   get_filtered_demo_dataset,
   graph_summary,
 )
@@ -55,8 +56,8 @@ class BenchmarkPreviewRow(BaseModel):
   formula: str
   target: float | str | None
   density: float | str | None = None
-  bulk_modulus: float | str | None = None
   energy_above_hull: float | str | None = None
+  max_force: float | str | None = None
   nsites: int | None = None
   nelements: int | None = None
 
@@ -66,8 +67,14 @@ class WorkflowProvenance(BaseModel):
   loader: str
   workflow_version: str
   run_id: str
-  fixture_kind: str = "illustrative_schema_fixture"
+  fixture_kind: str = "checksummed_real_snapshot"
   disclaimer: str
+  upstream_revision: str
+  hull_revision: str
+  license: str
+  citation_doi: str
+  snapshot_sha256: str
+  field_sources: dict[str, str]
 
 
 class LeMaterialDemoWorkflowResponse(BaseModel):
@@ -84,6 +91,7 @@ class LeMaterialDemoWorkflowResponse(BaseModel):
 
 def build_lematerial_demo_workflow() -> LeMaterialDemoWorkflowResponse:
   dataset = get_demo_dataset()
+  manifest = get_demo_manifest()
   filtered = get_filtered_demo_dataset()
   candidate_slice = filtered.create_slice(SLICE_NAME, target=TARGET)
   slice_report = candidate_slice.report()
@@ -139,6 +147,12 @@ def build_lematerial_demo_workflow() -> LeMaterialDemoWorkflowResponse:
       workflow_version=WORKFLOW_VERSION,
       run_id=RUN_ID,
       disclaimer=FIXTURE_DISCLAIMER,
+      upstream_revision=manifest["upstream_revision"],
+      hull_revision=manifest["hull_revision"],
+      license=manifest["license"],
+      citation_doi=manifest["citation_doi"],
+      snapshot_sha256=manifest["snapshot_sha256"],
+      field_sources=manifest["field_sources"],
     ),
   )
 
@@ -152,8 +166,8 @@ def _benchmark_preview(records: list[dict[str, Any]]) -> list[BenchmarkPreviewRo
         formula=str(row["formula"]),
         target=_json_scalar(row.get("target")),
         density=_json_scalar(row.get("density")),
-        bulk_modulus=_json_scalar(row.get("bulk_modulus")),
         energy_above_hull=_json_scalar(row.get("energy_above_hull")),
+        max_force=_json_scalar(row.get("max_force")),
         nsites=_json_int(row.get("nsites")),
         nelements=_json_int(row.get("nelements")),
       )

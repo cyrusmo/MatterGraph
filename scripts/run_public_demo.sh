@@ -59,7 +59,7 @@ cd "${DEMO_ROOT}"
 API_PID=$!
 
 READY=0
-for _attempt in {1..30}; do
+for _attempt in {1..15}; do
   if ! kill -0 "${API_PID}" 2>/dev/null; then
     echo "MatterGraph API exited during preflight:" >&2
     sed -n '1,160p' "${DEMO_TMP}/api.log" >&2
@@ -74,7 +74,7 @@ for _attempt in {1..30}; do
 done
 
 if [[ "${READY}" != "1" ]]; then
-  echo "MatterGraph API did not become ready within six seconds:" >&2
+  echo "MatterGraph API did not become ready within three seconds:" >&2
   sed -n '1,160p' "${DEMO_TMP}/api.log" >&2
   exit 1
 fi

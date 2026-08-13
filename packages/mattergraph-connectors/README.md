@@ -31,14 +31,14 @@ from pathlib import Path
 
 from mattergraph_connectors import LeMatBulk
 
-records = json.loads(Path("data/demo/lemat_bulk_sample.json").read_text())
-dataset = LeMatBulk.from_records(records, subset="compatible_pbesol")
+artifact = json.loads(Path("data/demo/spc_real_snapshot.json").read_text())
+dataset = LeMatBulk.from_records(artifact["records"], subset="compatible_pbe")
 
 candidates = (
     dataset
     .filter_elements(include=["Ti", "Al", "N"])
-    .filter_complexity(max_nsites=4, max_nelements=3)
-    .create_slice("bulk_modulus_candidates_v0", target="bulk_modulus")
+    .filter_complexity(max_nsites=16, max_nelements=3)
+    .create_slice("spc_tialn_candidates_v1", target="energy_above_hull")
 )
 print(candidates.report())
 ```

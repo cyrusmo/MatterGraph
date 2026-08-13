@@ -6,7 +6,7 @@ type Props = {
   loading: boolean;
   error: string | null;
   eahMax: number;
-  densityMax: number;
+  forceMax: number;
   onSelect: (materialId: string) => void;
 };
 
@@ -15,7 +15,7 @@ export function ComparisonView({
   loading,
   error,
   eahMax,
-  densityMax,
+  forceMax,
   onSelect,
 }: Props) {
   if (loading) return <p className="empty-note">Computing rank and audit report…</p>;
@@ -43,7 +43,7 @@ export function ComparisonView({
       </div>
       <div className="status-pill-row">
         <span className="chip">hull ≤ {eahMax}</span>
-        <span className="chip">density ≤ {densityMax}</span>
+        <span className="chip">max force ≤ {forceMax} eV/Å</span>
         <span className="chip">missing: {report.missing_policy}</span>
         <span className={`tag ${report.binary_normalization ? "warn" : "pass"}`}>
           {report.binary_normalization ? "binary normalization" : "multi-point normalization"}
@@ -58,7 +58,8 @@ export function ComparisonView({
               <th>Material</th>
               <th>Score</th>
               <th>Density</th>
-              <th>Bulk modulus</th>
+              <th>DFT hull</th>
+              <th>Max force</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +77,8 @@ export function ComparisonView({
                 </td>
                 <td>{formatNumber(row.score)}</td>
                 <td>{formatNumber(row.density)}</td>
-                <td>{formatNumber(row.bulk_modulus)}</td>
+                <td>{formatNumber(row.energy_above_hull)}</td>
+                <td>{formatNumber(row.max_force)}</td>
               </tr>
             ))}
           </tbody>

@@ -37,7 +37,8 @@ export type RankedRow = {
   material_id?: string;
   score?: number;
   density?: number | null;
-  bulk_modulus?: number | null;
+  energy_above_hull?: number | null;
+  max_force?: number | null;
   [key: string]: unknown;
 };
 
@@ -100,9 +101,28 @@ export type PreflightCheck = {
 
 export type DemoPreflight = {
   status: "ready" | "degraded";
-  fixture: { path: string; kind: string; disclaimer: string };
+  fixture: {
+    path: string;
+    kind: string;
+    disclaimer: string;
+    dataset: string;
+    subset: string;
+    upstream_revision: string;
+    hull_dataset: string;
+    hull_revision: string;
+    license: string;
+    citation_doi: string;
+    snapshot_sha256: string;
+    source_population: number;
+    field_sources: Record<string, string>;
+  };
   record_count: number;
-  graph: { included_count: number; excluded_count: number };
+  graph: {
+    included_count: number;
+    excluded_count: number;
+    invalid_count: number;
+    validation_state: "valid" | "invalid";
+  };
   ranking: {
     ranked_count: number;
     excluded_by_constraints: number;
@@ -111,6 +131,7 @@ export type DemoPreflight = {
     constraints: Record<string, Record<string, number>>;
   };
   default_material_id: string;
+  chgnet: ChgnetState;
   simulation_targets: Record<string, SimulationReadiness>;
   checks: PreflightCheck[];
 };
@@ -131,6 +152,7 @@ export type GraphNode = {
   index: number;
   species: string;
   fractional_coordinates: number[];
+  cartesian_coordinates: [number, number, number];
 };
 
 export type GraphEdge = {
@@ -138,6 +160,9 @@ export type GraphEdge = {
   target: number;
   distance: number;
   image: number[];
+  source_cartesian: [number, number, number];
+  target_cartesian: [number, number, number];
+  displacement_cartesian: [number, number, number];
 };
 
 export type GraphSummary = {
@@ -147,10 +172,31 @@ export type GraphSummary = {
   edges: GraphEdge[];
   edge_count: number;
   edges_truncated: boolean;
+  lattice_vectors: [number, number, number][];
+  distance_shells: Array<{ index: number; distance: number; directed_edge_count: number }>;
+  coordination_numbers: number[];
   node_feature_shape: number[];
   edge_feature_shape: number[];
   global_features: Record<string, number>;
-  builder: { cutoff: number; max_neighbors: number };
+  builder: {
+    cutoff: number;
+    max_neighbors: number;
+    neighbor_target_is_soft: boolean;
+    complete_tied_shells: boolean;
+    reciprocal: boolean;
+    truncated_sources: number[];
+  };
+  validation: {
+    state: "valid" | "invalid";
+    ordered_structure: boolean;
+    reciprocal: boolean;
+    zero_distance_edges: number;
+    displacement_consistent: boolean;
+    complete_tied_shells: boolean;
+    symmetry: { status: "determined" | "unknown"; spacegroup_number: number };
+    truncated: boolean;
+    warnings: string[];
+  };
 };
 
 export type CandidateSliceSummary = {
@@ -183,8 +229,8 @@ export type BenchmarkPreviewRow = {
   formula: string;
   target: number | string | null;
   density?: number | string | null;
-  bulk_modulus?: number | string | null;
   energy_above_hull?: number | string | null;
+  max_force?: number | string | null;
   nsites?: number | null;
   nelements?: number | null;
 };
@@ -196,6 +242,42 @@ export type WorkflowProvenance = {
   run_id: string;
   fixture_kind: string;
   disclaimer: string;
+  upstream_revision: string;
+  hull_revision: string;
+  license: string;
+  citation_doi: string;
+  snapshot_sha256: string;
+  field_sources: Record<string, string>;
+};
+
+export type ChgnetState = {
+  state: "live" | "warming" | "cached_only" | "unavailable";
+  live_available: boolean;
+  reference_available: boolean;
+  reference_material_id?: string;
+  model_version?: string;
+  detail: string;
+  scientific_boundary: string;
+};
+
+export type ChgnetReference = {
+  artifact_version: string;
+  material_id: string;
+  label: "cached_reference";
+  model: { name: string; version: string; weight_checksum: string };
+  input_checksum: string;
+  run: Record<string, unknown>;
+  result: {
+    converged: boolean;
+    steps: number;
+    energy_per_atom: number;
+    max_force: number;
+    volume_change_percent: number;
+    lattice_change_percent: number;
+    trajectory: Array<Record<string, number>>;
+    relaxed_structure: unknown;
+  };
+  scientific_boundary: string;
 };
 
 export type LeMaterialWorkflowSummary = {

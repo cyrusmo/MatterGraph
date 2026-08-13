@@ -1,6 +1,7 @@
 # MatterGraph web (demo)
 
-Vite + React + TypeScript. The presentation-safe path starts the deterministic API fixture,
+Vite + React + TypeScript + Three.js. The presentation-safe path starts the deterministic,
+checksummed real-record API snapshot,
 waits for its preflight checks, and then starts Vite:
 
 ```bash

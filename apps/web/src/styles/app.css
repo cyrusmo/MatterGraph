@@ -76,6 +76,91 @@
   background: var(--grid-bg);
 }
 
+.presentation-grid {
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr);
+  min-height: calc(100vh - 70px);
+  border: 1px solid var(--line-soft);
+  background: var(--grid-bg);
+}
+
+.presentation-workspace {
+  min-width: 0;
+  padding: 22px 26px 18px;
+}
+
+.presentation-header h1 {
+  font-size: clamp(30px, 3.2vw, 48px);
+}
+
+.presentation-screen {
+  animation: screen-in 180ms ease-out;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.presentation-content {
+  max-height: min(600px, calc(100vh - 290px));
+  overflow: auto;
+}
+
+.screen-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.screen-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  color: var(--faint);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+}
+
+.screen-pagination button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+.keyboard-hint {
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.evidence-drawer {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.evidence-drawer summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: var(--micro-track);
+  text-transform: uppercase;
+}
+
+.drawer-content {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding: 16px;
+}
+
 /* ---------- rail ----------
    The aside spans the full grid height so its surface never stops mid-page; the
    sticky behaviour lives on the inner wrapper instead. */
@@ -196,13 +281,15 @@
 }
 
 .nav-item:hover,
-.nav-item[aria-current="true"] {
+.nav-item[aria-current="true"],
+.nav-item[aria-current="step"] {
   color: var(--text);
   border-color: var(--orange);
   background: var(--accent-wash);
 }
 
-.nav-item[aria-current="true"] {
+.nav-item[aria-current="true"],
+.nav-item[aria-current="step"] {
   box-shadow: inset 3px 0 0 var(--orange);
 }
 
@@ -467,6 +554,117 @@
   display: grid;
   grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
   gap: 16px;
+}
+
+.viewer-shell {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  background:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px),
+    var(--surface-1);
+  background-size: 32px 32px;
+}
+
+.viewer-toolbar {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.viewer-toolbar button {
+  border: 1px solid var(--line);
+  background: rgba(10, 16, 23, 0.86);
+  color: var(--muted);
+  padding: 5px 8px;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.viewer-toolbar button[aria-pressed="true"] {
+  border-color: var(--cyan);
+  color: var(--text);
+}
+
+.crystal-viewport {
+  width: 100%;
+  height: 390px;
+}
+
+.crystal-viewport canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.edge-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 36px;
+  border-top: 1px solid var(--line);
+  padding: 9px 10px;
+  color: var(--faint);
+  font-size: 10px;
+}
+
+.edge-readout strong {
+  color: var(--text);
+}
+
+.webgl-fallback {
+  position: absolute;
+  inset: 54px 16px 48px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  text-align: center;
+}
+
+.graph-evidence {
+  min-width: 0;
+}
+
+.warning-list {
+  color: var(--amber);
+  font-size: 11px;
+}
+
+.ml-boundary {
+  border: 1px solid var(--warn-line);
+  background: var(--warn-wash);
+  padding: 12px 14px;
+  color: var(--amber);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.artifact-details {
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  padding: 10px;
+}
+
+.artifact-details summary {
+  cursor: pointer;
+  color: var(--cyan);
+  font-size: 11px;
+}
+
+.artifact-details pre {
+  max-height: 210px;
+  overflow: auto;
+  color: var(--muted);
+  font-size: 10px;
+  white-space: pre-wrap;
 }
 
 .graph-canvas {
@@ -969,7 +1167,8 @@
    horizontal nav bar above the workspace. 620: everything to one column. */
 
 @media (max-width: 1120px) {
-  .os-grid {
+  .os-grid,
+  .presentation-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -981,6 +1180,38 @@
   .rail-inner {
     position: static;
     max-height: none;
+  }
+
+  .presentation-rail .rail-inner {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 12px 16px;
+    padding: 12px 16px;
+  }
+
+  .presentation-rail .rail-section + .rail-section {
+    margin-top: 0;
+  }
+
+  .presentation-rail .rail-check,
+  .presentation-rail .keyboard-hint {
+    display: none;
+  }
+
+  .presentation-rail .rail-nav {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .presentation-rail .rail-nav .rail-title {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+
+  .presentation-rail .nav-item {
+    min-height: 42px;
+    padding: 5px 8px;
+    font-size: 11px;
   }
 
   .rail-section + .rail-section {
@@ -996,7 +1227,8 @@
     margin: 0;
   }
 
-  .workspace {
+  .workspace,
+  .presentation-workspace {
     padding: 22px var(--gutter) 28px;
   }
 
@@ -1013,6 +1245,22 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .presentation-workspace .status-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .presentation-workspace .status-strip div:nth-child(3n) {
+    border-right: 1px solid var(--line);
+  }
+
+  .presentation-workspace .status-strip div:nth-child(-n + 3) {
+    border-bottom: 0;
+  }
+
+  .presentation-workspace .status-strip div:last-child {
+    border-right: 0;
+  }
+
   .status-strip div:nth-child(3n) {
     border-right: 0;
   }
@@ -1027,12 +1275,33 @@
     padding: 10px;
   }
 
-  .workspace {
+  .workspace,
+  .presentation-workspace {
     padding: 18px 12px 24px;
   }
 
   .workspace-header h1 {
     font-size: 32px;
+  }
+
+  .presentation-content {
+    max-height: none;
+  }
+
+  .presentation-rail .rail-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .presentation-rail .rail-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .presentation-workspace .status-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crystal-viewport {
+    height: 320px;
   }
 
   .topbar {

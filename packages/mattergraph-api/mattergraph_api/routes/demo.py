@@ -7,12 +7,14 @@ from fastapi import APIRouter
 from mattergraph_api.services import store_service
 from mattergraph_api.services.demo_service import (
   DEFAULT_CONSTRAINTS,
-  DEFAULT_MATERIAL_ID,
   DEFAULT_OBJECTIVES,
   FIXTURE_DISCLAIMER,
   FIXTURE_RELATIVE_PATH,
   capability_catalog,
+  chgnet_state,
+  get_default_material_id,
   get_default_scorecard,
+  get_demo_manifest,
   graph_summary,
   simulation_readiness,
 )
@@ -30,10 +32,13 @@ def demo_preflight() -> dict[str, Any]:
   store = store_service.get_store()
   graph_ready = 0
   graph_excluded = 0
+  graph_invalid = 0
   for material in store.materials:
     try:
-      graph_summary(material, max_edges=0)
+      summary = graph_summary(material, max_edges=0)
       graph_ready += 1
+      if summary["validation"]["state"] != "valid":
+        graph_invalid += 1
     except ValueError:
       graph_excluded += 1
 
@@ -42,7 +47,9 @@ def demo_preflight() -> dict[str, Any]:
   simulation_targets = {
     material.material_id: simulation_readiness(material) for material in store.materials
   }
-  default_readiness = simulation_targets.get(DEFAULT_MATERIAL_ID, {"ready": False})
+  default_material_id = get_default_material_id()
+  manifest = get_demo_manifest()
+  ml_state = chgnet_state()
   checks = [
     {
       "id": "fixture",
@@ -51,8 +58,10 @@ def demo_preflight() -> dict[str, Any]:
     },
     {
       "id": "graphs",
-      "status": "pass" if graph_ready else "fail",
-      "detail": f"{graph_ready} graph-ready; {graph_excluded} explicitly excluded",
+      "status": "pass" if graph_ready and not graph_invalid else "fail",
+      "detail": (
+        f"{graph_ready} graph-ready; {graph_excluded} excluded; {graph_invalid} invalid"
+      ),
     },
     {
       "id": "ranking",
@@ -63,9 +72,9 @@ def demo_preflight() -> dict[str, Any]:
       ),
     },
     {
-      "id": "simulation",
-      "status": "pass" if default_readiness.get("ready") else "warn",
-      "detail": str(default_readiness.get("reason", "Default target unavailable.")),
+      "id": "ml_reference",
+      "status": "pass" if ml_state["reference_available"] else "warn",
+      "detail": str(ml_state["detail"]),
     },
   ]
   overall = "ready" if all(check["status"] == "pass" for check in checks) else "degraded"
@@ -73,11 +82,26 @@ def demo_preflight() -> dict[str, Any]:
     "status": overall,
     "fixture": {
       "path": FIXTURE_RELATIVE_PATH,
-      "kind": "illustrative_schema_fixture",
+      "kind": "checksummed_real_snapshot",
       "disclaimer": FIXTURE_DISCLAIMER,
+      "dataset": manifest["dataset"],
+      "subset": manifest["subset"],
+      "upstream_revision": manifest["upstream_revision"],
+      "hull_dataset": manifest["hull_dataset"],
+      "hull_revision": manifest["hull_revision"],
+      "license": manifest["license"],
+      "citation_doi": manifest["citation_doi"],
+      "snapshot_sha256": manifest["snapshot_sha256"],
+      "source_population": manifest["source_population"],
+      "field_sources": manifest["field_sources"],
     },
     "record_count": len(store.materials),
-    "graph": {"included_count": graph_ready, "excluded_count": graph_excluded},
+    "graph": {
+      "included_count": graph_ready,
+      "excluded_count": graph_excluded,
+      "invalid_count": graph_invalid,
+      "validation_state": "valid" if graph_ready and not graph_invalid else "invalid",
+    },
     "ranking": {
       "ranked_count": score_report["ranked_count"],
       "excluded_by_constraints": score_report["excluded_by_constraints"],
@@ -85,7 +109,8 @@ def demo_preflight() -> dict[str, Any]:
       "objectives": DEFAULT_OBJECTIVES,
       "constraints": DEFAULT_CONSTRAINTS,
     },
-    "default_material_id": DEFAULT_MATERIAL_ID,
+    "default_material_id": default_material_id,
+    "chgnet": ml_state,
     "simulation_targets": simulation_targets,
     "checks": checks,
   }
