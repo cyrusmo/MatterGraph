@@ -2,9 +2,17 @@ import { useEffect, useState } from "react";
 
 import { ServiceUnavailableError, runAseRelax } from "../lib/api";
 import { formatNumber } from "../lib/format";
-import type { SimulationJob } from "../types/material";
+import type { SimulationJob, SimulationReadiness } from "../types/material";
 
-export function SimulationQueue({ materialId, formula }: { materialId: string; formula?: string }) {
+export function SimulationQueue({
+  materialId,
+  formula,
+  readiness,
+}: {
+  materialId: string;
+  formula?: string;
+  readiness?: SimulationReadiness;
+}) {
   const [job, setJob] = useState<SimulationJob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
@@ -45,9 +53,20 @@ export function SimulationQueue({ materialId, formula }: { materialId: string; f
           <span className="metric-label">Target</span>
           <strong>{formula ? `${materialId} / ${formula}` : materialId}</strong>
         </div>
-        <button className="ghost-button" type="button" onClick={handleRun} disabled={loading} aria-busy={loading}>
+        <button
+          className="ghost-button"
+          type="button"
+          onClick={handleRun}
+          disabled={loading || !readiness?.ready}
+          aria-busy={loading}
+        >
           {loading ? "Running..." : "Run relax"}
         </button>
+      </div>
+
+      <div className={`eval-output ${readiness?.ready ? "pass" : "warn"}`}>
+        <span className="eval-label">Calculator check</span>
+        <span>{readiness?.reason ?? "Checking ASE/EMT compatibility…"}</span>
       </div>
 
       {error && (

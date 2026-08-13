@@ -63,6 +63,20 @@ export function MaterialCard({ m }: { m: Material | undefined }) {
       ) : (
         <p className="empty-note">No properties attached.</p>
       )}
+
+      <h3>Record provenance</h3>
+      <div className="kv-grid">
+        <span>Source dataset</span>
+        <strong>{String(m.metadata?.source_dataset ?? "unknown")}</strong>
+        <span>Subset</span>
+        <strong>{String(m.metadata?.source_subset ?? "unknown")}</strong>
+        <span>Functional</span>
+        <strong>{String(m.metadata?.functional ?? "unknown")}</strong>
+        <span>Immutable ID</span>
+        <strong>{String(m.metadata?.immutable_id ?? "unknown")}</strong>
+        <span>Fingerprint</span>
+        <strong>{String(m.metadata?.structure_fingerprint ?? "unknown")}</strong>
+      </div>
     </div>
   );
 }

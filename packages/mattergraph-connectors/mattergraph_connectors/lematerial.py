@@ -20,6 +20,15 @@ _ALIASES: dict[str, tuple[str, ...]] = {
   "structure_fingerprint": ("structure_fingerprint", "bawl_id", "fingerprint"),
 }
 
+_PROPERTY_UNITS = {
+  "density": "g/cm^3",
+  "bulk_modulus": "GPa",
+  "shear_modulus": "GPa",
+  "band_gap": "eV",
+  "formation_energy_per_atom": "eV/atom",
+  "energy_above_hull": "eV/atom",
+}
+
 
 class LeMatBulk:
   """Adapter for turning LeMaterial bulk-style records into MatterGraph workflows."""
@@ -117,6 +126,11 @@ class LeMatBulk:
         "structure_fingerprint",
       ],
       "property_columns": cls._property_columns(normalized),
+      "property_units": {
+        column: unit
+        for column, unit in _PROPERTY_UNITS.items()
+        if column in normalized.columns
+      },
     }
     return MatterGraphDataset(
       normalized,

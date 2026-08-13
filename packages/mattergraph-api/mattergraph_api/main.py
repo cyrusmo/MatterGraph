@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from mattergraph_api.routes import materials, scores, search, simulations, workflows
+from mattergraph_api.routes import demo, materials, scores, search, simulations, workflows
 
 app = FastAPI(
   title="MatterGraph API",
@@ -23,6 +23,7 @@ app.include_router(search.router, tags=["search"])
 app.include_router(scores.router, tags=["scores"])
 app.include_router(simulations.router, tags=["simulations"])
 app.include_router(workflows.router, tags=["workflows"])
+app.include_router(demo.router, tags=["demo"])
 
 
 @app.get("/health")

@@ -6,10 +6,31 @@ type Props = {
   dMax: number;
   onD: (v: number) => void;
   loading: boolean;
-  onRank: (objectives: Record<string, "minimize" | "maximize">) => void;
+  densityWeight: number;
+  onDensityWeight: (value: number) => void;
+  bulkWeight: number;
+  onBulkWeight: (value: number) => void;
+  missing: "worst" | "neutral" | "exclude";
+  onMissing: (value: "worst" | "neutral" | "exclude") => void;
+  onRank: (
+    objectives: Record<string, { direction: "minimize" | "maximize"; weight: number }>,
+  ) => void;
 };
 
-export function ConstraintPanel({ eahMax, onEah, dMax, onD, loading, onRank }: Props) {
+export function ConstraintPanel({
+  eahMax,
+  onEah,
+  dMax,
+  onD,
+  loading,
+  densityWeight,
+  onDensityWeight,
+  bulkWeight,
+  onBulkWeight,
+  missing,
+  onMissing,
+  onRank,
+}: Props) {
   const [minD, setMinD] = useState(true);
 
   return (
@@ -29,6 +50,43 @@ export function ConstraintPanel({ eahMax, onEah, dMax, onD, loading, onRank }: P
           <input type="number" step="0.1" value={dMax} onChange={(e) => onD(Number(e.target.value))} />
         </label>
       </div>
+
+      <div className="control-grid">
+        <label>
+          Density weight
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            value={densityWeight}
+            onChange={(event) => onDensityWeight(Number(event.target.value))}
+          />
+        </label>
+        <label>
+          Bulk modulus weight
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            value={bulkWeight}
+            onChange={(event) => onBulkWeight(Number(event.target.value))}
+          />
+        </label>
+      </div>
+
+      <label>
+        Missing objective policy
+        <select
+          value={missing}
+          onChange={(event) =>
+            onMissing(event.target.value as "worst" | "neutral" | "exclude")
+          }
+        >
+          <option value="worst">score as worst</option>
+          <option value="neutral">score as neutral</option>
+          <option value="exclude">exclude candidate</option>
+        </select>
+      </label>
 
       <div className="toggle-row">
         <button
@@ -55,13 +113,16 @@ export function ConstraintPanel({ eahMax, onEah, dMax, onD, loading, onRank }: P
         aria-busy={loading}
         onClick={() =>
           onRank({
-            density: minD ? "minimize" : "maximize",
-            bulk_modulus: "maximize",
+            density: {
+              direction: minD ? "minimize" : "maximize",
+              weight: densityWeight,
+            },
+            bulk_modulus: { direction: "maximize", weight: bulkWeight },
           })
         }
         disabled={loading}
       >
-        {loading ? "Computing..." : "Compute toy rank"}
+        {loading ? "Computing…" : "Run audited baseline"}
       </button>
     </div>
   );

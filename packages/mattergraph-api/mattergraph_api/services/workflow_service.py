@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any
 
-from mattergraph_connectors import LeMatBulk
 from pydantic import BaseModel, Field
 
-_FIXTURE_RELATIVE_PATH = "data/demo/lemat_bulk_sample.json"
-_SOURCE_DATASET = "LeMaterial/LeMat-Bulk"
-_SOURCE_SUBSET = "compatible_pbesol"
-_SLICE_NAME = "bulk_modulus_candidates_v0"
-_TARGET = "bulk_modulus"
+from mattergraph_api.services.demo_service import (
+  FIXTURE_DISCLAIMER,
+  FIXTURE_RELATIVE_PATH,
+  RUN_ID,
+  SLICE_NAME,
+  TARGET,
+  WORKFLOW_VERSION,
+  get_demo_dataset,
+  get_filtered_demo_dataset,
+  graph_summary,
+)
 
 
 class CandidateSliceSummary(BaseModel):
@@ -22,11 +25,29 @@ class CandidateSliceSummary(BaseModel):
   output_count: int
   removed_count: int
   filter_steps: list[dict[str, Any]] = Field(default_factory=list)
+  report: dict[str, Any] = Field(default_factory=dict)
+
+
+class GraphPreview(BaseModel):
+  material_id: str
+  formula: str
+  node_count: int
+  edge_count: int
+  node_feature_shape: list[int]
+  edge_feature_shape: list[int]
+  global_features: dict[str, float | int]
 
 
 class GraphExportSummary(BaseModel):
   included_count: int
   excluded_count: int
+  previews: list[GraphPreview] = Field(default_factory=list)
+
+
+class BenchmarkSummary(BaseModel):
+  target: str
+  row_count: int
+  columns: list[str]
 
 
 class BenchmarkPreviewRow(BaseModel):
@@ -45,6 +66,8 @@ class WorkflowProvenance(BaseModel):
   loader: str
   workflow_version: str
   run_id: str
+  fixture_kind: str = "illustrative_schema_fixture"
+  disclaimer: str
 
 
 class LeMaterialDemoWorkflowResponse(BaseModel):
@@ -54,26 +77,35 @@ class LeMaterialDemoWorkflowResponse(BaseModel):
   schema_report: dict[str, Any]
   candidate_slice: CandidateSliceSummary
   graph_export: GraphExportSummary
+  benchmark: BenchmarkSummary
   benchmark_preview: list[BenchmarkPreviewRow]
   provenance: WorkflowProvenance
 
 
 def build_lematerial_demo_workflow() -> LeMaterialDemoWorkflowResponse:
-  fixture_path = _repo_root() / _FIXTURE_RELATIVE_PATH
-  records = json.loads(fixture_path.read_text())
-  dataset = LeMatBulk.from_records(
-    records,
-    source_dataset=_SOURCE_DATASET,
-    subset=_SOURCE_SUBSET,
-  )
-  filtered = dataset.filter_elements(include=["Ti", "Al", "N"]).filter_complexity(
-    max_nsites=4,
-    max_nelements=3,
-  )
-  candidate_slice = filtered.create_slice(_SLICE_NAME, target=_TARGET)
+  dataset = get_demo_dataset()
+  filtered = get_filtered_demo_dataset()
+  candidate_slice = filtered.create_slice(SLICE_NAME, target=TARGET)
   slice_report = candidate_slice.report()
   graph_export = filtered.to_graphs()
-  benchmark_frame = filtered.to_benchmark_frame(target=_TARGET)
+  benchmark_frame = filtered.to_benchmark_frame(target=TARGET)
+  store = filtered.to_material_store()
+  graph_previews = []
+  for material in store.materials:
+    if material.structure is None:
+      continue
+    summary = graph_summary(material)
+    graph_previews.append(
+      GraphPreview(
+        material_id=material.material_id,
+        formula=material.formula,
+        node_count=len(summary["nodes"]),
+        edge_count=summary["edge_count"],
+        node_feature_shape=summary["node_feature_shape"],
+        edge_feature_shape=summary["edge_feature_shape"],
+        global_features=summary["global_features"],
+      )
+    )
 
   return LeMaterialDemoWorkflowResponse(
     workflow_id="lematerial_bulk_demo",
@@ -83,22 +115,30 @@ def build_lematerial_demo_workflow() -> LeMaterialDemoWorkflowResponse:
     candidate_slice=CandidateSliceSummary(
       slice_id=candidate_slice.slice_id,
       slice_name=candidate_slice.slice_name,
-      target=candidate_slice.target or _TARGET,
+      target=candidate_slice.target or TARGET,
       input_count=candidate_slice.input_count,
       output_count=candidate_slice.output_count,
       removed_count=slice_report["removed_count"],
       filter_steps=slice_report["filter_steps"],
+      report=slice_report,
     ),
     graph_export=GraphExportSummary(
       included_count=graph_export.included_count,
       excluded_count=graph_export.excluded_count,
+      previews=graph_previews,
+    ),
+    benchmark=BenchmarkSummary(
+      target=TARGET,
+      row_count=len(benchmark_frame),
+      columns=[str(column) for column in benchmark_frame.columns],
     ),
     benchmark_preview=_benchmark_preview(benchmark_frame.to_dict(orient="records")),
     provenance=WorkflowProvenance(
-      fixture_path=_FIXTURE_RELATIVE_PATH,
+      fixture_path=FIXTURE_RELATIVE_PATH,
       loader="LeMatBulk.from_records",
-      workflow_version="v0.1",
-      run_id="lematerial_bulk_demo_static_v0_1",
+      workflow_version=WORKFLOW_VERSION,
+      run_id=RUN_ID,
+      disclaimer=FIXTURE_DISCLAIMER,
     ),
   )
 
@@ -139,7 +179,3 @@ def _json_int(value: Any) -> int | None:
   if hasattr(value, "item") and callable(value.item):
     value = value.item()
   return int(value)
-
-
-def _repo_root() -> Path:
-  return Path(__file__).resolve().parents[4]

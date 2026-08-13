@@ -8,11 +8,11 @@ type Props = {
 };
 
 const pipelineSteps = [
-  "Fixture",
-  "LeMatBulk loader",
-  "Candidate slice",
+  "Ingest + normalize",
+  "Slice + guardrails",
   "Graph export",
-  "Benchmark preview",
+  "Benchmark frame",
+  "Audited rank",
 ];
 
 export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
@@ -89,6 +89,25 @@ export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
               </div>
             ))}
           </div>
+          <h3 className="subheading">Guardrail report</h3>
+          <div className="audit-grid">
+            <div>
+              <span>Deduplication</span>
+              <strong>{String(workflow.candidate_slice.report.deduplication_basis)}</strong>
+            </div>
+            <div>
+              <span>Mixed functionals</span>
+              <strong>{workflow.candidate_slice.report.mixed_functionals ? "detected" : "none"}</strong>
+            </div>
+            <div>
+              <span>Missing structures</span>
+              <strong>{String(workflow.candidate_slice.report.missing_structure_count)}</strong>
+            </div>
+            <div>
+              <span>Duplicate policy</span>
+              <strong>{String(workflow.candidate_slice.report.duplicate_policy)}</strong>
+            </div>
+          </div>
         </div>
 
         <div className="panel">
@@ -140,6 +159,10 @@ export function WorkflowSummaryPanel({ workflow, loading, error }: Props) {
             ))}
           </tbody>
         </table>
+        <p className="boundary-note">
+          {workflow.benchmark.row_count} rows are available in a benchmark-ready frame targeting{" "}
+          {workflow.benchmark.target}. This table is a bounded preview, not a model result.
+        </p>
       </div>
     </>
   );

@@ -1,19 +1,24 @@
 import { formatNumber } from "../lib/format";
-import type { RankedRow } from "../types/material";
+import type { ScoreAudit } from "../types/material";
 
 type Props = {
-  rows: RankedRow[] | null;
+  audit: ScoreAudit | null;
   loading: boolean;
   error: string | null;
   eahMax: number;
   densityMax: number;
-  poolSize: number;
+  onSelect: (materialId: string) => void;
 };
 
-export function ComparisonView({ rows, loading, error, eahMax, densityMax, poolSize }: Props) {
-  if (loading) {
-    return <p className="empty-note">Computing toy scorecard rank...</p>;
-  }
+export function ComparisonView({
+  audit,
+  loading,
+  error,
+  eahMax,
+  densityMax,
+  onSelect,
+}: Props) {
+  if (loading) return <p className="empty-note">Computing rank and audit report…</p>;
   if (error) {
     return (
       <div className="eval-output fail">
@@ -22,25 +27,30 @@ export function ComparisonView({ rows, loading, error, eahMax, densityMax, poolS
       </div>
     );
   }
-  if (rows === null) {
-    return <p className="empty-note">Run the toy scorecard to rank demo candidates.</p>;
+  if (!audit) {
+    return <p className="empty-note">Run the transparent baseline to rank this fixture.</p>;
   }
 
-  const verdict = rankVerdict(rows.length, poolSize);
-
+  const report = audit.report;
   return (
     <div>
-      <div className={`eval-output ${verdict.state}`}>
-        <span className="eval-label">{verdict.label}</span>
-        <span>{verdict.detail}</span>
+      <div className={`eval-output ${report.excluded_by_constraints ? "warn" : "pass"}`}>
+        <span className="eval-label">Audit result</span>
+        <span>
+          {report.ranked_count} of {report.pool_size} candidates ranked; {report.excluded_by_constraints}{" "}
+          removed by hard constraints.
+        </span>
       </div>
-
       <div className="status-pill-row">
-        <span className="chip">energy_above_hull &lt;= {eahMax}</span>
-        <span className="chip">density &lt;= {densityMax}</span>
+        <span className="chip">hull ≤ {eahMax}</span>
+        <span className="chip">density ≤ {densityMax}</span>
+        <span className="chip">missing: {report.missing_policy}</span>
+        <span className={`tag ${report.binary_normalization ? "warn" : "pass"}`}>
+          {report.binary_normalization ? "binary normalization" : "multi-point normalization"}
+        </span>
       </div>
 
-      {rows.length ? (
+      {audit.ranked.length ? (
         <table className="data-table">
           <thead>
             <tr>
@@ -52,10 +62,18 @@ export function ComparisonView({ rows, loading, error, eahMax, densityMax, poolS
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => (
-              <tr key={String(row.material_id)}>
+            {audit.ranked.map((row, index) => (
+              <tr key={String(row.material_id)} className="selectable-row">
                 <td>{index + 1}</td>
-                <td>{String(row.material_id)}</td>
+                <td>
+                  <button
+                    className="row-select"
+                    type="button"
+                    onClick={() => onSelect(String(row.material_id))}
+                  >
+                    {String(row.material_id)}
+                  </button>
+                </td>
                 <td>{formatNumber(row.score)}</td>
                 <td>{formatNumber(row.density)}</td>
                 <td>{formatNumber(row.bulk_modulus)}</td>
@@ -65,43 +83,32 @@ export function ComparisonView({ rows, loading, error, eahMax, densityMax, poolS
         </table>
       ) : null}
 
-      {rows.length > 0 && rows.length < 3 ? (
-        <p className="boundary-note">
-          Scores are pool-relative. With {rows.length} surviving candidate
-          {rows.length === 1 ? "" : "s"}, min-max normalization is close to binary and the raw
-          magnitudes stop separating them.
-        </p>
-      ) : null}
+      <div className="audit-grid">
+        <div>
+          <span>Coverage</span>
+          <strong>
+            {Object.entries(report.coverage)
+              .map(([key, count]) => `${key} ${count}/${report.ranked_count}`)
+              .join(" · ")}
+          </strong>
+        </div>
+        <div>
+          <span>Effective objectives</span>
+          <strong>{report.effective_objectives.join(" · ") || "none"}</strong>
+        </div>
+        <div>
+          <span>Mixed methods</span>
+          <strong>{Object.keys(report.mixed_methods).join(" · ") || "none detected"}</strong>
+        </div>
+        <div>
+          <span>Ignored objectives</span>
+          <strong>{report.ignored_objectives.join(" · ") || "none"}</strong>
+        </div>
+      </div>
+      <p className="boundary-note">
+        Scores are pool-relative min–max baselines. Read the rank, raw values, coverage, and
+        method checks together; the absolute score is not portable to another pool.
+      </p>
     </div>
   );
-}
-
-/**
- * The API applies the hard constraints before returning, so every row that arrives has
- * already passed. The honest signal is therefore how much of the pool survived, not a
- * per-row tag that would always read green.
- */
-function rankVerdict(
-  survivors: number,
-  poolSize: number,
-): { state: "pass" | "warn" | "fail"; label: string; detail: string } {
-  if (survivors === 0) {
-    return {
-      state: "fail",
-      label: "No candidates",
-      detail: "Every demo candidate was removed by the active constraints. Loosen a limit to see a ranking.",
-    };
-  }
-  if (poolSize > 0 && survivors < poolSize) {
-    return {
-      state: "warn",
-      label: "Partial pool",
-      detail: `${survivors} of ${poolSize} demo candidates satisfy the active constraints.`,
-    };
-  }
-  return {
-    state: "pass",
-    label: "Full pool",
-    detail: `All ${survivors} demo candidates satisfy the active constraints.`,
-  };
 }

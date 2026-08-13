@@ -30,6 +30,11 @@ def test_lemat_bulk_from_records_report_and_graph_guardrail_surface() -> None:
   assert report["missing_structure_count"] == 1
   assert report["graph_export_excluded_count"] == 0
 
+  materials = dataset.to_material_store().materials
+  assert materials[0].get_property("density").unit == "g/cm^3"
+  assert materials[0].get_property("bulk_modulus").unit == "GPa"
+  assert materials[0].get_property("energy_above_hull").unit == "eV/atom"
+
 
 def test_repeated_formula_polymorphs_do_not_fail_by_default() -> None:
   dataset = LeMatBulk.from_records(_load_records(), subset="compatible_pbesol")

@@ -416,6 +416,7 @@ class MatterGraphDataset:
 
   def _row_to_material(self, row: dict[str, Any]) -> Material:
     property_columns = list(self.metadata.get("property_columns", _infer_property_columns(self._frame)))
+    property_units = dict(self.metadata.get("property_units", {}))
     properties: list[MaterialProperty] = []
     for column in property_columns:
       value = row.get(column)
@@ -427,6 +428,7 @@ class MatterGraphDataset:
         MaterialProperty(
           name=column,
           value=_coerce_property_value(value),
+          unit=property_units.get(column),
           source=self.source_dataset,
           method=_property_method_from_row(row),
         )

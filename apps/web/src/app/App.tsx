@@ -1,69 +1,142 @@
 import { useEffect, useState } from "react";
 
+import { CapabilityLedger } from "../components/CapabilityLedger";
 import { ComparisonView } from "../components/ComparisonView";
 import { ConstraintPanel } from "../components/ConstraintPanel";
+import { GraphSummaryPanel } from "../components/GraphSummaryPanel";
 import { MaterialCard } from "../components/MaterialCard";
 import { MaterialTable } from "../components/MaterialTable";
 import { SimulationQueue } from "../components/SimulationQueue";
 import { WorkflowSummaryPanel } from "../components/WorkflowSummaryPanel";
-import { fetchLeMaterialWorkflow, fetchMaterials, rankMaterials } from "../lib/api";
-import { formatUnknown } from "../lib/format";
-import type { LeMaterialWorkflowSummary, Material, RankedRow } from "../types/material";
+import {
+  fetchCapabilities,
+  fetchGraphSummary,
+  fetchLeMaterialWorkflow,
+  fetchMaterials,
+  fetchPreflight,
+  rankMaterialsAudit,
+} from "../lib/api";
+import type {
+  Capability,
+  DemoPreflight,
+  GraphSummary,
+  LeMaterialWorkflowSummary,
+  Material,
+  ScoreAudit,
+} from "../types/material";
 import { useSectionSpy } from "./useSectionSpy";
 
 const SECTIONS = [
-  { id: "workflow", index: "01", label: "Workflow" },
-  { id: "records", index: "02", label: "Records" },
-  { id: "scorecard", index: "03", label: "Scorecard" },
-  { id: "simulation", index: "04", label: "Simulation" },
+  { id: "source", index: "01", label: "Source" },
+  { id: "slice", index: "02", label: "Slice" },
+  { id: "graph", index: "03", label: "Graph" },
+  { id: "rank", index: "04", label: "Rank" },
+  { id: "simulation", index: "05", label: "Simulate" },
 ] as const;
 
 const SECTION_IDS = SECTIONS.map((section) => section.id);
+const DEFAULT_EAH_MAX = 0.025;
+const DEFAULT_DENSITY_MAX = 6;
+const DEFAULT_DENSITY_WEIGHT = 0.6;
+const DEFAULT_BULK_WEIGHT = 0.4;
+
+type ApiState = "loading" | "ready" | "degraded" | "offline";
 
 export function App() {
   const [rows, setRows] = useState<Material[]>([]);
-  const [materialsErr, setMaterialsErr] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [workflow, setWorkflow] = useState<LeMaterialWorkflowSummary | null>(null);
-  const [workflowErr, setWorkflowErr] = useState<string | null>(null);
-  const [workflowLoading, setWorkflowLoading] = useState(true);
-  const [eaMax, setEaMax] = useState(0.05);
-  const [dMax, setDMax] = useState(6.0);
-  const [ranked, setRanked] = useState<RankedRow[] | null>(null);
+  const [preflight, setPreflight] = useState<DemoPreflight | null>(null);
+  const [capabilities, setCapabilities] = useState<Capability[]>([]);
+  const [apiState, setApiState] = useState<ApiState>("loading");
+  const [bootstrapError, setBootstrapError] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [graph, setGraph] = useState<GraphSummary | null>(null);
+  const [graphLoading, setGraphLoading] = useState(false);
+  const [graphError, setGraphError] = useState<string | null>(null);
+  const [eaMax, setEaMax] = useState(DEFAULT_EAH_MAX);
+  const [dMax, setDMax] = useState(DEFAULT_DENSITY_MAX);
+  const [densityWeight, setDensityWeight] = useState(DEFAULT_DENSITY_WEIGHT);
+  const [bulkWeight, setBulkWeight] = useState(DEFAULT_BULK_WEIGHT);
+  const [missing, setMissing] = useState<"worst" | "neutral" | "exclude">("worst");
+  const [audit, setAudit] = useState<ScoreAudit | null>(null);
   const [rankLoading, setRankLoading] = useState(false);
-  const [rankErr, setRankErr] = useState<string | null>(null);
+  const [rankError, setRankError] = useState<string | null>(null);
 
   const activeSection = useSectionSpy(SECTION_IDS);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const materials = await fetchMaterials();
-        setRows(materials);
-        setSelectedId((current) => current ?? preferredMaterialId(materials));
-      } catch (e) {
-        setMaterialsErr(String(e));
-      }
-    })();
-  }, []);
+    let active = true;
+    setApiState("loading");
+    setBootstrapError(null);
+    Promise.all([
+      fetchPreflight(),
+      fetchCapabilities(),
+      fetchMaterials(),
+      fetchLeMaterialWorkflow(),
+    ])
+      .then(([nextPreflight, nextCapabilities, nextRows, nextWorkflow]) => {
+        if (!active) return;
+        setPreflight(nextPreflight);
+        setCapabilities(nextCapabilities);
+        setRows(nextRows);
+        setWorkflow(nextWorkflow);
+        setSelectedId(nextPreflight.default_material_id);
+        setApiState(nextPreflight.status === "ready" ? "ready" : "degraded");
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setApiState("offline");
+        setBootstrapError(error instanceof Error ? error.message : String(error));
+      });
+    return () => {
+      active = false;
+    };
+  }, [loadAttempt]);
 
   useEffect(() => {
-    (async () => {
-      setWorkflowLoading(true);
-      try {
-        setWorkflow(await fetchLeMaterialWorkflow());
-      } catch (e) {
-        setWorkflowErr(String(e));
-      } finally {
-        setWorkflowLoading(false);
-      }
-    })();
-  }, []);
+    let active = true;
+    if (!selectedId || apiState === "offline") {
+      setGraph(null);
+      setGraphError(null);
+      return () => {
+        active = false;
+      };
+    }
+    setGraphLoading(true);
+    setGraphError(null);
+    fetchGraphSummary(selectedId)
+      .then((summary) => {
+        if (active) setGraph(summary);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setGraph(null);
+        setGraphError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (active) setGraphLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [apiState, selectedId]);
 
   const selectedMaterial = rows.find((row) => row.material_id === selectedId) ?? rows[0];
-  const schema = workflow?.schema_report;
-  const apiFailed = Boolean(materialsErr || workflowErr);
-  const apiPending = workflowLoading && !apiFailed;
+  const selectedReadiness = selectedId
+    ? preflight?.simulation_targets[selectedId]
+    : undefined;
+
+  function resetDemo() {
+    setEaMax(DEFAULT_EAH_MAX);
+    setDMax(DEFAULT_DENSITY_MAX);
+    setDensityWeight(DEFAULT_DENSITY_WEIGHT);
+    setBulkWeight(DEFAULT_BULK_WEIGHT);
+    setMissing("worst");
+    setAudit(null);
+    setRankError(null);
+    setSelectedId(preflight?.default_material_id ?? null);
+  }
 
   return (
     <div className="shell">
@@ -71,44 +144,38 @@ export function App() {
         <div className="brand-lockup">
           <span className="dot"></span>
           <span className="brand">MatterGraph</span>
-          <span className="mode">public demo workbench</span>
+          <span className="mode">open-source capability walkthrough</span>
         </div>
-        <span>v0.1 local fixture mode</span>
+        <div className="topbar-actions">
+          <span>deterministic fixture · v0.2</span>
+          <button className="text-button" type="button" onClick={resetDemo}>
+            Reset demo
+          </button>
+        </div>
       </header>
 
       <main className="os-grid">
         <aside className="rail">
           <div className="rail-inner">
             <div className="rail-section">
-              <div className="rail-title">Demo source</div>
-              {workflow ? (
-                <>
-                  <span className="rail-kv">
-                    <span>Fixture</span>
-                    <strong>{workflow.provenance.fixture_path}</strong>
+              <div className="rail-title">Demo preflight</div>
+              <span className={`tag ${apiStateClass(apiState)}`}>{apiState}</span>
+              {preflight?.checks.map((check) => (
+                <span className="rail-check" key={check.id}>
+                  <span className={`check-dot ${check.status}`}></span>
+                  <span>
+                    <strong>{check.id}</strong>
+                    <small>{check.detail}</small>
                   </span>
-                  <span className="rail-kv">
-                    <span>Loader</span>
-                    <strong>{workflow.provenance.loader}</strong>
-                  </span>
-                  <span className="rail-kv">
-                    <span>Version</span>
-                    <strong>{workflow.provenance.workflow_version}</strong>
-                  </span>
-                  <span className="rail-kv">
-                    <span>Run ID</span>
-                    <strong>{workflow.provenance.run_id}</strong>
-                  </span>
-                </>
-              ) : (
-                <p className="empty-note">
-                  {apiFailed ? "Source unavailable." : "Loading fixture provenance..."}
-                </p>
-              )}
+                </span>
+              ))}
+              {apiState === "loading" ? (
+                <p className="empty-note">Running fixture and dependency checks…</p>
+              ) : null}
             </div>
 
             <div className="rail-section">
-              <div className="rail-title">Sections</div>
+              <div className="rail-title">Guided flow</div>
               <div className="rail-nav">
                 {SECTIONS.map((section) => (
                   <button
@@ -127,9 +194,14 @@ export function App() {
             </div>
 
             <div className="rail-section">
-              <div className="rail-title">API status</div>
-              <span className={`tag ${apiFailed ? "fail" : apiPending ? "warn" : "pass"}`}>
-                {apiFailed ? "unreachable" : apiPending ? "checking" : "reachable"}
+              <div className="rail-title">Fixture provenance</div>
+              <span className="rail-kv">
+                <span>Path</span>
+                <strong>{preflight?.fixture.path ?? "checking…"}</strong>
+              </span>
+              <span className="rail-kv">
+                <span>Mode</span>
+                <strong>{preflight?.fixture.kind ?? "illustrative schema fixture"}</strong>
               </span>
             </div>
           </div>
@@ -138,69 +210,64 @@ export function App() {
         <section className="workspace">
           <div className="workspace-header">
             <p className="eyebrow">transparent materials workflow</p>
-            <h1>Demo workbench</h1>
+            <h1>From public records to a validation-ready candidate.</h1>
             <p className="subhead">
-              Inspect demo records, run a toy scorecard, review a LeMaterial demo workflow summary,
-              and trigger an ASE demo relaxation.
+              A reproducible Ti–Al–N screening walkthrough: preserve provenance, enforce slice
+              guardrails, export crystal graphs, audit a transparent baseline, then run one local
+              relaxation.
             </p>
           </div>
 
+          {bootstrapError ? (
+            <div className="api-offline" role="alert">
+              <div>
+                <span className="eval-label">Demo API offline</span>
+                <strong>The workbench stopped waiting for the unavailable API.</strong>
+                <p>{bootstrapError}</p>
+              </div>
+              <button className="primary-button" type="button" onClick={() => setLoadAttempt((n) => n + 1)}>
+                Retry preflight
+              </button>
+            </div>
+          ) : null}
+
           <div className="status-strip">
-            <div>
-              <span className="metric-label">Demo records</span>
-              <strong>{rows.length}</strong>
-            </div>
-            <div>
-              <span className="metric-label">LeMat rows</span>
-              <strong>{formatUnknown(schema?.row_count)}</strong>
-            </div>
-            <div>
-              <span className="metric-label">Missing structures</span>
-              <strong>{formatUnknown(schema?.missing_structure_count)}</strong>
-            </div>
-            <div>
-              <span className="metric-label">Graph included</span>
-              <strong>{formatUnknown(workflow?.graph_export.included_count)}</strong>
-            </div>
-            <div>
-              <span className="metric-label">Graph excluded</span>
-              <strong>{formatUnknown(workflow?.graph_export.excluded_count)}</strong>
-            </div>
-            <div>
-              <span className="metric-label">Ranked</span>
-              <strong>{ranked === null ? "not run" : `${ranked.length} rows`}</strong>
-            </div>
+            <Status label="Normalized records" value={preflight?.record_count ?? "—"} />
+            <Status label="Graph ready" value={preflight?.graph.included_count ?? "—"} />
+            <Status label="Graph excluded" value={preflight?.graph.excluded_count ?? "—"} />
+            <Status label="Rank eligible" value={preflight?.ranking.ranked_count ?? "—"} />
+            <Status label="Hard excluded" value={preflight?.ranking.excluded_by_constraints ?? "—"} />
+            <Status label="Rank output" value={audit ? `${audit.ranked.length} candidates` : "not run"} />
           </div>
 
-          <section className="section-block" id="workflow">
-            <div className="sheet-header">
-              <span>01 — Workflow</span>
-              <span>Section 01 / 04</span>
+          <section className="section-block" id="source">
+            <SectionHeader index="01" label="Ingest + normalize" />
+            <div className="panel scenario-panel">
+              <div>
+                <span className="metric-label">Screening question</span>
+                <h2>Which lightweight, stiff, near-stable nitride should reach local validation?</h2>
+              </div>
+              <p>{preflight?.fixture.disclaimer ?? "Loading fixture contract…"}</p>
             </div>
-            <WorkflowSummaryPanel
-              workflow={workflow}
-              loading={workflowLoading}
-              error={workflowErr}
-            />
-          </section>
 
-          <section className="section-block" id="records">
-            <div className="sheet-header">
-              <span>02 — Records</span>
-              <span>Section 02 / 04</span>
+            <div className="panel">
+              <div className="panel-heading">
+                <span>Open-source capability ledger</span>
+                <span>A1</span>
+              </div>
+              {capabilities.length ? (
+                <CapabilityLedger capabilities={capabilities} />
+              ) : (
+                <p className="empty-note">Loading code-backed capability status…</p>
+              )}
             </div>
+
             <div className="layout-two">
               <div className="panel">
                 <div className="panel-heading">
-                  <span>Demo records</span>
-                  <span>E2</span>
+                  <span>Normalized records</span>
+                  <span>B1</span>
                 </div>
-                {materialsErr && (
-                  <div className="eval-output fail">
-                    <span className="eval-label">Load failed</span>
-                    <span>{materialsErr}</span>
-                  </div>
-                )}
                 <MaterialTable
                   materials={rows}
                   selectedId={selectedId}
@@ -211,39 +278,70 @@ export function App() {
               </div>
               <div className="panel">
                 <div className="panel-heading">
-                  <span>Material inspector</span>
-                  <span>F2</span>
+                  <span>Provenance inspector</span>
+                  <span>C1</span>
                 </div>
                 <MaterialCard m={selectedMaterial} />
               </div>
             </div>
           </section>
 
-          <section className="section-block" id="scorecard">
-            <div className="sheet-header">
-              <span>03 — Scorecard</span>
-              <span>Section 03 / 04</span>
+          <section className="section-block" id="slice">
+            <SectionHeader index="02" label="Slice + guardrails" />
+            <WorkflowSummaryPanel
+              workflow={workflow}
+              loading={apiState === "loading"}
+              error={apiState === "offline" ? bootstrapError : null}
+            />
+          </section>
+
+          <section className="section-block" id="graph">
+            <SectionHeader index="03" label="Graph + benchmark readiness" />
+            <div className="panel">
+              <div className="panel-heading">
+                <span>Selected crystal graph · {selectedId ?? "none"}</span>
+                <span>D3</span>
+              </div>
+              <GraphSummaryPanel summary={graph} loading={graphLoading} error={graphError} />
             </div>
+          </section>
+
+          <section className="section-block" id="rank">
+            <SectionHeader index="04" label="Rank + audit" />
             <div className="layout-two">
               <div className="panel">
                 <div className="panel-heading">
                   <span>Objectives + constraints</span>
-                  <span>G3</span>
+                  <span>E4</span>
                 </div>
                 <ConstraintPanel
                   eahMax={eaMax}
                   onEah={setEaMax}
                   dMax={dMax}
                   onD={setDMax}
+                  densityWeight={densityWeight}
+                  onDensityWeight={setDensityWeight}
+                  bulkWeight={bulkWeight}
+                  onBulkWeight={setBulkWeight}
+                  missing={missing}
+                  onMissing={setMissing}
                   loading={rankLoading}
                   onRank={async (objectives) => {
                     setRankLoading(true);
-                    setRankErr(null);
-                    setRanked(null);
+                    setRankError(null);
+                    setAudit(null);
                     try {
-                      setRanked(await rankMaterials(objectives, eaMax, dMax));
-                    } catch (e) {
-                      setRankErr(String(e));
+                      const result = await rankMaterialsAudit(
+                        objectives,
+                        eaMax,
+                        dMax,
+                        missing,
+                      );
+                      setAudit(result);
+                      const lead = String(result.ranked[0]?.material_id ?? "");
+                      if (lead) setSelectedId(lead);
+                    } catch (error) {
+                      setRankError(error instanceof Error ? error.message : String(error));
                     } finally {
                       setRankLoading(false);
                     }
@@ -252,34 +350,32 @@ export function App() {
               </div>
               <div className="panel">
                 <div className="panel-heading">
-                  <span>Ranked candidates</span>
-                  <span>H3</span>
+                  <span>Ranked candidates + audit report</span>
+                  <span>F4</span>
                 </div>
                 <ComparisonView
-                  rows={ranked}
+                  audit={audit}
                   loading={rankLoading}
-                  error={rankErr}
+                  error={rankError}
                   eahMax={eaMax}
                   densityMax={dMax}
-                  poolSize={rows.length}
+                  onSelect={setSelectedId}
                 />
               </div>
             </div>
           </section>
 
           <section className="section-block" id="simulation">
-            <div className="sheet-header">
-              <span>04 — Simulation</span>
-              <span>Section 04 / 04</span>
-            </div>
+            <SectionHeader index="05" label="Local validation hook" />
             <div className="panel">
               <div className="panel-heading">
-                <span>ASE demo relaxation</span>
-                <span>I4</span>
+                <span>ASE / EMT relaxation</span>
+                <span>G5</span>
               </div>
               <SimulationQueue
                 materialId={String(selectedMaterial?.material_id ?? "")}
                 formula={selectedMaterial?.formula}
+                readiness={selectedReadiness}
               />
             </div>
           </section>
@@ -289,7 +385,28 @@ export function App() {
   );
 }
 
-function preferredMaterialId(materials: Material[]): string | null {
-  const preferred = materials.find((material) => material.material_id === "demo-al-fcc-1");
-  return String(preferred?.material_id ?? materials[0]?.material_id ?? "") || null;
+function Status({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div>
+      <span className="metric-label">{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function SectionHeader({ index, label }: { index: string; label: string }) {
+  return (
+    <div className="sheet-header">
+      <span>
+        {index} — {label}
+      </span>
+      <span>Step {index} / 05</span>
+    </div>
+  );
+}
+
+function apiStateClass(state: ApiState): "pass" | "warn" | "fail" {
+  if (state === "ready") return "pass";
+  if (state === "loading" || state === "degraded") return "warn";
+  return "fail";
 }

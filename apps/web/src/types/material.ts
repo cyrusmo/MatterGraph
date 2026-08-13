@@ -41,6 +41,30 @@ export type RankedRow = {
   [key: string]: unknown;
 };
 
+export type ScoreReport = {
+  pool_size: number;
+  ranked_count: number;
+  excluded_by_constraints: number;
+  objectives: string[];
+  weights: Record<string, number>;
+  missing_policy: "worst" | "neutral" | "exclude";
+  coverage: Record<string, number>;
+  ignored_objectives: string[];
+  effective_objectives: string[];
+  mixed_methods: Record<string, string[]>;
+  mixed_averaging_schemes: Record<string, string[]>;
+  mixed_hull_conventions: Record<string, string[]>;
+  binary_normalization: boolean;
+  scores_are_pool_relative: boolean;
+  [key: string]: unknown;
+};
+
+export type ScoreAudit = {
+  ranked: RankedRow[];
+  report: ScoreReport;
+  request: Record<string, unknown>;
+};
+
 export type SimulationResult = {
   engine?: string;
   calculator?: string;
@@ -60,6 +84,75 @@ export type SimulationJob = {
   [key: string]: unknown;
 };
 
+export type SimulationReadiness = {
+  ready: boolean;
+  ase_available: boolean;
+  calculator: string;
+  unsupported_species: string[];
+  reason: string;
+};
+
+export type PreflightCheck = {
+  id: string;
+  status: "pass" | "warn" | "fail";
+  detail: string;
+};
+
+export type DemoPreflight = {
+  status: "ready" | "degraded";
+  fixture: { path: string; kind: string; disclaimer: string };
+  record_count: number;
+  graph: { included_count: number; excluded_count: number };
+  ranking: {
+    ranked_count: number;
+    excluded_by_constraints: number;
+    binary_normalization: boolean;
+    objectives: Record<string, { direction: string; weight: number }>;
+    constraints: Record<string, Record<string, number>>;
+  };
+  default_material_id: string;
+  simulation_targets: Record<string, SimulationReadiness>;
+  checks: PreflightCheck[];
+};
+
+export type CapabilityStatus = "demo_ready" | "sdk_ready" | "stub" | "out_of_scope";
+
+export type Capability = {
+  id: string;
+  label: string;
+  category: string;
+  status: CapabilityStatus;
+  evidence: string;
+  optional_dependency?: string | null;
+  boundary?: string | null;
+};
+
+export type GraphNode = {
+  index: number;
+  species: string;
+  fractional_coordinates: number[];
+};
+
+export type GraphEdge = {
+  source: number;
+  target: number;
+  distance: number;
+  image: number[];
+};
+
+export type GraphSummary = {
+  material_id: string;
+  formula: string;
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  edge_count: number;
+  edges_truncated: boolean;
+  node_feature_shape: number[];
+  edge_feature_shape: number[];
+  global_features: Record<string, number>;
+  builder: { cutoff: number; max_neighbors: number };
+};
+
 export type CandidateSliceSummary = {
   slice_id: string;
   slice_name: string;
@@ -68,11 +161,21 @@ export type CandidateSliceSummary = {
   output_count: number;
   removed_count: number;
   filter_steps: Array<Record<string, unknown>>;
+  report: Record<string, unknown>;
 };
 
 export type GraphExportSummary = {
   included_count: number;
   excluded_count: number;
+  previews: Array<{
+    material_id: string;
+    formula: string;
+    node_count: number;
+    edge_count: number;
+    node_feature_shape: number[];
+    edge_feature_shape: number[];
+    global_features: Record<string, number>;
+  }>;
 };
 
 export type BenchmarkPreviewRow = {
@@ -91,6 +194,8 @@ export type WorkflowProvenance = {
   loader: string;
   workflow_version: string;
   run_id: string;
+  fixture_kind: string;
+  disclaimer: string;
 };
 
 export type LeMaterialWorkflowSummary = {
@@ -100,6 +205,7 @@ export type LeMaterialWorkflowSummary = {
   schema_report: Record<string, unknown>;
   candidate_slice: CandidateSliceSummary;
   graph_export: GraphExportSummary;
+  benchmark: { target: string; row_count: number; columns: string[] };
   benchmark_preview: BenchmarkPreviewRow[];
   provenance: WorkflowProvenance;
 };

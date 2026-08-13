@@ -71,6 +71,15 @@ export MATTERGRAPH_DEMO_DATA=data/demo/materials_sample.jsonl
 uv run uvicorn mattergraph_api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+For the deterministic public capability walkthrough, start the API and UI together:
+
+```bash
+./scripts/run_public_demo.sh
+```
+
+This runs a preflight-checked LeMaterial-schema fixture at `http://127.0.0.1:5173` without
+network calls or API credentials.
+
 Example: rank candidates with a **toy scorecard** (min–max normalized objectives, hard constraints).
 
 ```python
