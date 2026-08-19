@@ -1162,13 +1162,260 @@
   font-size: 13px;
 }
 
+/* ---------- local contributor workbench ---------- */
+
+.workbench-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+.workbench-grid {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: calc(100vh - 70px);
+  border: 1px solid var(--line-soft);
+  background: var(--grid-bg);
+}
+
+.workbench-workspace {
+  position: relative;
+}
+
+.dataset-nav strong,
+.dataset-nav small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.dataset-nav strong {
+  color: var(--text);
+  font-size: 11px;
+}
+
+.dataset-nav small {
+  margin-top: 3px;
+  color: var(--faint);
+  font-size: 9px;
+}
+
+.swap-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  margin-bottom: var(--gutter);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 9px 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.swap-status.loading {
+  border-color: var(--accent-line);
+}
+
+.swap-status.failed {
+  border-color: var(--fail-line);
+}
+
+.swap-status .text-button {
+  margin-left: auto;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--cyan);
+  border-radius: 999px;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.workbench-import {
+  margin-bottom: var(--gutter);
+}
+
+.import-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.file-drop {
+  display: grid;
+  gap: 7px;
+  border: 1px dashed var(--line-strong);
+  background: var(--surface-1);
+  padding: 14px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.file-drop input {
+  width: 100%;
+  color: var(--muted);
+}
+
+.file-drop small {
+  color: var(--faint);
+}
+
+.mapping-editor {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.compact-status {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.mapping-editor label,
+.workbench-section label {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.mapping-editor input,
+.mapping-editor select,
+.workbench-section input,
+.workbench-section select {
+  width: 100%;
+  min-height: 36px;
+  margin: 6px 0 10px;
+  border: 1px solid var(--line);
+  background: var(--field);
+  color: var(--text);
+  padding: 8px 9px;
+}
+
+.mapping-table-wrap,
+.ranking-compact {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.mapping-table-wrap input,
+.mapping-table-wrap select {
+  min-width: 110px;
+  margin: 0;
+}
+
+.import-policy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+
+.import-policy label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.import-policy input {
+  width: auto;
+  min-height: auto;
+  margin: 0;
+}
+
+.eval-output ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.active-dataset {
+  position: relative;
+  transition: opacity var(--motion-fast) ease;
+}
+
+.active-dataset.is-swapping {
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.dataset-skeleton {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 18px;
+  background: rgba(7, 12, 17, 0.45);
+}
+
+.dataset-skeleton span {
+  height: 12px;
+  width: 68%;
+  background: linear-gradient(90deg, var(--surface-1), var(--line), var(--surface-1));
+  background-size: 220% 100%;
+  animation: skeleton 1.2s linear infinite;
+}
+
+.dataset-skeleton span:nth-child(2) { width: 90%; }
+.dataset-skeleton span:nth-child(3) { width: 46%; }
+
+@keyframes skeleton {
+  to { background-position: -220% 0; }
+}
+
+.workbench-section {
+  margin-top: var(--gutter);
+}
+
+.fixture-boundary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  border-color: var(--warn-line);
+  background: var(--warn-wash);
+}
+
+.fixture-boundary h2 {
+  margin: 10px 0 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.fixture-boundary p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workbench-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: var(--gutter) 0;
+  color: var(--faint);
+  font-size: 11px;
+}
+
 /* ---------- responsive ----------
    Two breakpoints, each written once. 1120: the rail unsticks and becomes a
    horizontal nav bar above the workspace. 620: everything to one column. */
 
 @media (max-width: 1120px) {
   .os-grid,
-  .presentation-grid {
+  .presentation-grid,
+  .workbench-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1180,6 +1427,16 @@
   .rail-inner {
     position: static;
     max-height: none;
+  }
+
+  .workbench-rail .rail-inner {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.35fr) minmax(0, 1fr) minmax(180px, 0.35fr);
+    gap: 12px;
+  }
+
+  .workbench-rail .rail-section + .rail-section {
+    margin-top: 0;
   }
 
   .presentation-rail .rail-inner {
@@ -1292,6 +1549,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .workbench-rail .rail-inner,
+  .import-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .presentation-rail .rail-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1312,7 +1574,9 @@
   }
 
   .topbar-actions,
-  .api-offline {
+  .api-offline,
+  .fixture-boundary,
+  .workbench-actions {
     align-items: flex-start;
     flex-direction: column;
   }

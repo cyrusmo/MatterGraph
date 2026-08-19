@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ApiUnavailableError, fetchPreflight, rankMaterialsAudit } from "./api";
+import {
+  ApiUnavailableError,
+  fetchMaterials,
+  fetchPreflight,
+  importDataset,
+  inspectDataset,
+  rankMaterialsAudit,
+} from "./api";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -94,6 +101,70 @@ describe("demo API client", () => {
         max_force: { max: 0.2 },
       },
       missing: "worst",
+    });
+  });
+
+  it("scopes material requests to an explicitly selected local dataset", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response("[]", { status: 200, headers: { "Content-Type": "application/json" } }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fetchMaterials("mg_ds_example");
+
+    expect(fetchMock.mock.calls[0][0]).toBe("/materials?dataset_id=mg_ds_example");
+  });
+
+  it("keeps inspect non-registering and sends explicit import policy plus mapping", async () => {
+    const inspection = {
+      status: "ready",
+      checksum: "a".repeat(64),
+      row_count: 1,
+      accepted_count: 1,
+      rejected_count: 0,
+      columns: ["id", "formula", "density"],
+      inferred_mapping: {
+        identity_column: "id",
+        formula_column: "formula",
+        structure_column: null,
+        source_id_column: null,
+        property_columns: [
+          { column: "density", name: "density", unit: null, source: "local_file", method: "unknown" },
+        ],
+      },
+      issues: [],
+      issue_counts: {},
+      truncated_issue_count: 0,
+    };
+    const imported = {
+      dataset_id: "mg_ds_example",
+      manifest: {},
+      accepted_count: 1,
+      rejected_count: 0,
+      issues: [],
+      issue_counts: {},
+      truncated_issue_count: 0,
+      preview: [],
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify(inspection), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(imported), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const file = { filename: "one.csv", format: "csv" as const, content: "id,formula\na,AlN\n" };
+
+    const report = await inspectDataset(file);
+    await importDataset({
+      ...file,
+      mapping: report.inferred_mapping!,
+      error_policy: "skip_invalid_rows",
+    });
+
+    expect(fetchMock.mock.calls[0][0]).toBe("/datasets/inspect");
+    expect(fetchMock.mock.calls[1][0]).toBe("/datasets/import");
+    expect(JSON.parse(String(fetchMock.mock.calls[1][1]?.body))).toMatchObject({
+      filename: "one.csv",
+      error_policy: "skip_invalid_rows",
+      mapping: { identity_column: "id" },
     });
   });
 });

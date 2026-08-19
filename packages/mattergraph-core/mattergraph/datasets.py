@@ -14,6 +14,7 @@ from mattergraph.schema.property import MaterialProperty, PropertyMethod
 from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.structure import CrystalStructure
 from mattergraph.store import MaterialStore
+from pydantic import BaseModel
 
 DeduplicationBasis = Literal[
   "none",
@@ -627,6 +628,8 @@ def _json_ready_record(record: dict[str, Any]) -> dict[str, Any]:
 
 
 def _json_ready_value(value: Any) -> Any:
+  if isinstance(value, BaseModel):
+    return value.model_dump(mode="json", exclude_none=True)
   if isinstance(value, CrystalStructure):
     return value.to_json_dict()
   if isinstance(value, dict):

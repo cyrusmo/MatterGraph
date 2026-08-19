@@ -64,6 +64,23 @@ jobs:
       - name: Check metadata
         run: uvx twine check dist/*
 
+  memory-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      - name: Sync test environment
+        run: uv sync --all-packages --group dev --python 3.12
+      - name: Verify byte registry and peak child RSS
+        env:
+          MATTERGRAPH_RUN_MEMORY_TEST: "1"
+        run: uv run pytest -q packages/mattergraph-api/tests/test_registry_memory_budget.py
+
   web:
     runs-on: ubuntu-latest
     steps:
@@ -75,5 +92,30 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
         working-directory: apps/web
+      - run: npm test
+        working-directory: apps/web
       - run: npm run build
+        working-directory: apps/web
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.x"
+      - run: uv sync --all-packages --group dev --python 3.12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+        working-directory: apps/web
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run test:e2e
         working-directory: apps/web

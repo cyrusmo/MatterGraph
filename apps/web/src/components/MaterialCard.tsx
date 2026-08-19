@@ -8,6 +8,7 @@ export function MaterialCard({ m }: { m: Material | undefined }) {
     return <p className="empty-note">Select a material first.</p>;
   }
   const properties = m.properties ?? [];
+  const recordProvenance = m.provenance?.[0];
   const fieldProvenance = m.metadata?.field_provenance;
   const fieldEntries = fieldProvenance && typeof fieldProvenance === "object"
     ? Object.entries(fieldProvenance as Record<string, unknown>)
@@ -72,6 +73,10 @@ export function MaterialCard({ m }: { m: Material | undefined }) {
 
       <h3>Record provenance</h3>
       <div className="kv-grid">
+        <span>Record source</span>
+        <strong>{String(recordProvenance?.source ?? "unknown")}</strong>
+        <span>Source ID</span>
+        <strong>{String(m.source_id ?? recordProvenance?.source_id ?? "unknown")}</strong>
         <span>Source dataset</span>
         <strong>{String(m.metadata?.source_dataset ?? "unknown")}</strong>
         <span>Subset</span>

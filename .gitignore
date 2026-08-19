@@ -26,6 +26,8 @@ site/
 # Node
 node_modules/
 apps/web/dist/
+apps/web/playwright-report/
+apps/web/test-results/
 *.tsbuildinfo
 .next/
 out/

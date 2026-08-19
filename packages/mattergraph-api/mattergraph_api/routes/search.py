@@ -12,8 +12,9 @@ def search(
   element: str | None = Query(
     default=None, description="Filter materials whose elements contain this symbol, e.g. Fe"
   ),
+  dataset_id: str | None = Query(default=None),
 ) -> list[dict]:
-  store = store_service.get_store()
+  store = store_service.resolve_store(dataset_id)
   out = []
   for m in store.materials:
     if not element:

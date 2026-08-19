@@ -11,7 +11,7 @@ type Props = {
 
 export function MaterialTable({ materials, selectedId, onSelect, eahMax, forceMax }: Props) {
   if (!materials.length) {
-    return <p className="empty-note">No demo materials loaded.</p>;
+    return <p className="empty-note">No materials loaded.</p>;
   }
 
   return (

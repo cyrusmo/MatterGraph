@@ -5,7 +5,7 @@ from typing import Any
 import httpx
 import pytest
 from mattergraph.schema.material import Material
-from mattergraph_connectors import NOMADConnector, NOMADStubConnector
+from mattergraph_connectors import ConnectorQuery, NOMADConnector, NOMADStubConnector
 from mattergraph_connectors.nomad import NOMADHTTPError, NOMADPayloadError, _row_to_material
 
 
@@ -88,7 +88,9 @@ def test_nomad_connector_builds_public_element_query_payload() -> None:
   client = FakeClient([FakeResponse(_page([_row("a")]))])
   connector = NOMADConnector(base_url="https://nomad.test/api/v1", client=client)  # type: ignore[arg-type]
 
-  materials = connector.fetch(elements=["Ti", "O"], max_records=1, page_size=25)
+  materials = connector.fetch(
+    ConnectorQuery(elements=["Ti", "O"], max_records=1, page_size=25)
+  )
 
   assert len(materials) == 1
   call = client.calls[0]
@@ -121,7 +123,7 @@ def test_nomad_connector_paginates_with_after_value_and_truncates() -> None:
   )
   connector = NOMADConnector(base_url="https://nomad.test/api/v1", client=client)  # type: ignore[arg-type]
 
-  materials = connector.fetch(max_records=2, page_size=10)
+  materials = connector.fetch(ConnectorQuery(max_records=2, page_size=10))
 
   assert [material.material_id for material in materials] == ["nomad:a", "nomad:b"]
   assert client.calls[0]["json"]["pagination"]["page_size"] == 2
@@ -134,7 +136,7 @@ def test_nomad_connector_maps_valid_rows_to_materials() -> None:
   client = FakeClient([FakeResponse(_page([_row("entry-1")]))])
   connector = NOMADConnector(client=client)  # type: ignore[arg-type]
 
-  materials = connector.fetch(max_records=1)
+  materials = connector.fetch(ConnectorQuery(max_records=1))
 
   assert len(materials) == 1
   material = materials[0]
@@ -157,7 +159,7 @@ def test_nomad_connector_skips_malformed_rows_with_warning() -> None:
   connector = NOMADConnector(client=client)  # type: ignore[arg-type]
 
   with pytest.warns(RuntimeWarning, match="missing material formula"):
-    materials = connector.fetch(max_records=2)
+    materials = connector.fetch(ConnectorQuery(max_records=2))
 
   assert [material.material_id for material in materials] == ["nomad:valid"]
 
@@ -167,7 +169,7 @@ def test_nomad_connector_raises_for_http_failures() -> None:
   connector = NOMADConnector(client=client)  # type: ignore[arg-type]
 
   with pytest.raises(NOMADHTTPError, match="HTTP 503"):
-    connector.fetch(max_records=1)
+    connector.fetch(ConnectorQuery(max_records=1))
 
 
 def test_nomad_connector_raises_for_malformed_page_payload() -> None:
@@ -175,7 +177,7 @@ def test_nomad_connector_raises_for_malformed_page_payload() -> None:
   connector = NOMADConnector(client=client)  # type: ignore[arg-type]
 
   with pytest.raises(NOMADPayloadError, match="list data and object pagination"):
-    connector.fetch(max_records=1)
+    connector.fetch(ConnectorQuery(max_records=1))
 
 
 def test_nomad_connector_does_not_close_injected_client() -> None:
@@ -196,7 +198,7 @@ def test_nomad_context_manager_closes_owned_client(monkeypatch: pytest.MonkeyPat
   monkeypatch.setattr("mattergraph_connectors.nomad.httpx.Client", fake_client_factory)
 
   with NOMADConnector() as connector:
-    assert connector.fetch(max_records=1) == []
+    assert connector.fetch(ConnectorQuery(max_records=1)) == []
 
   assert client.closed
 

@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "PropertyMethod": {
+      "enum": [
+        "dft",
+        "experimental",
+        "model_predicted",
+        "derived",
+        "unknown"
+      ],
+      "title": "PropertyMethod",
+      "type": "string"
+    }
+  },
+  "$id": "https://mattergraph.dev/schemas/0.1/provenance.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Lineage and confidence for a value or field.\n\nJSON contract: enum values serialize as strings; source-specific fields belong in ``extra``.",
+  "properties": {
+    "confidence": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence"
+    },
+    "method": {
+      "$ref": "#/$defs/PropertyMethod",
+      "default": "unknown",
+      "description": "e.g. dft, experiment, model_predicted"
+    },
+    "model_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Version"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "parameters": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Settings that produced the value, e.g. functional, k-point mesh, cutoff, calculator. Without these a computed number cannot be reproduced, only repeated.",
+      "title": "Parameters"
+    },
+    "source": {
+      "title": "Source",
+      "type": "string"
+    },
+    "source_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional upstream record identifier, task ID, DOI, or dataset row ID",
+      "title": "Source Id"
+    }
+  },
+  "required": [
+    "source"
+  ],
+  "title": "ProvenanceRecord",
+  "type": "object"
+}

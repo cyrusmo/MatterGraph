@@ -1,0 +1,237 @@
+{
+  "$defs": {
+    "DatasetImportMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "formula_column": {
+          "default": "formula",
+          "title": "Formula Column",
+          "type": "string"
+        },
+        "identity_column": {
+          "default": "material_id",
+          "title": "Identity Column",
+          "type": "string"
+        },
+        "property_columns": {
+          "items": {
+            "$ref": "#/$defs/PropertyColumnMapping"
+          },
+          "title": "Property Columns",
+          "type": "array"
+        },
+        "source_id_column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id Column"
+        },
+        "structure_column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Structure Column"
+        }
+      },
+      "title": "DatasetImportMapping",
+      "type": "object"
+    },
+    "ImportIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "row": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Row"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ImportIssue",
+      "type": "object"
+    },
+    "PropertyColumnMapping": {
+      "additionalProperties": false,
+      "description": "Map one input column to a contextual, provenance-aware property.",
+      "properties": {
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/PropertyMethod",
+          "default": "unknown"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "source": {
+          "default": "local_file",
+          "title": "Source",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "column",
+        "name"
+      ],
+      "title": "PropertyColumnMapping",
+      "type": "object"
+    },
+    "PropertyMethod": {
+      "enum": [
+        "dft",
+        "experimental",
+        "model_predicted",
+        "derived",
+        "unknown"
+      ],
+      "title": "PropertyMethod",
+      "type": "string"
+    }
+  },
+  "$id": "https://mattergraph.dev/schemas/0.1/import-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_count": {
+      "minimum": 0,
+      "title": "Accepted Count",
+      "type": "integer"
+    },
+    "checksum": {
+      "title": "Checksum",
+      "type": "string"
+    },
+    "columns": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Columns",
+      "type": "array"
+    },
+    "inferred_mapping": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DatasetImportMapping"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "issue_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Issue Counts",
+      "type": "object"
+    },
+    "issues": {
+      "items": {
+        "$ref": "#/$defs/ImportIssue"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "rejected_count": {
+      "minimum": 0,
+      "title": "Rejected Count",
+      "type": "integer"
+    },
+    "row_count": {
+      "minimum": 0,
+      "title": "Row Count",
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "degraded",
+        "invalid"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "truncated_issue_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Truncated Issue Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "status",
+    "checksum",
+    "row_count",
+    "accepted_count",
+    "rejected_count"
+  ],
+  "title": "ImportReport",
+  "type": "object"
+}

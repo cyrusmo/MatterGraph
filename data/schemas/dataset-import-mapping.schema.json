@@ -1,0 +1,104 @@
+{
+  "$defs": {
+    "PropertyColumnMapping": {
+      "additionalProperties": false,
+      "description": "Map one input column to a contextual, provenance-aware property.",
+      "properties": {
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/PropertyMethod",
+          "default": "unknown"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "source": {
+          "default": "local_file",
+          "title": "Source",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "column",
+        "name"
+      ],
+      "title": "PropertyColumnMapping",
+      "type": "object"
+    },
+    "PropertyMethod": {
+      "enum": [
+        "dft",
+        "experimental",
+        "model_predicted",
+        "derived",
+        "unknown"
+      ],
+      "title": "PropertyMethod",
+      "type": "string"
+    }
+  },
+  "$id": "https://mattergraph.dev/schemas/0.1/dataset-import-mapping.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "formula_column": {
+      "default": "formula",
+      "title": "Formula Column",
+      "type": "string"
+    },
+    "identity_column": {
+      "default": "material_id",
+      "title": "Identity Column",
+      "type": "string"
+    },
+    "property_columns": {
+      "items": {
+        "$ref": "#/$defs/PropertyColumnMapping"
+      },
+      "title": "Property Columns",
+      "type": "array"
+    },
+    "source_id_column": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Id Column"
+    },
+    "structure_column": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Structure Column"
+    }
+  },
+  "title": "DatasetImportMapping",
+  "type": "object"
+}

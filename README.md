@@ -34,6 +34,7 @@ Materials data is fragmented across repositories, schemas, units, structures, an
 - Support **transparent baseline** scorecards with auditable ranking behavior
 - Provide adapters for benchmarking and **simulation job specs** (e.g. ASE)
 - Expose a **small demo API** and **minimal web UI** for end-to-end exploration
+- Inspect, validate, graph, rank, and export small local CSV/JSONL datasets without uploading them
 
 ## Scope
 
@@ -80,6 +81,11 @@ For the deterministic public capability walkthrough, start the API and UI togeth
 This runs a preflight-checked, checksummed snapshot of 24 real LeMaterial records at
 `http://127.0.0.1:5173` without network calls or API credentials. The snapshot preserves the
 upstream revision, immutable IDs, license, citation, and field-level provenance.
+
+The UI opens in **Guided demo** mode. Choose **Local workbench** to inspect a CSV or JSONL file
+up to 5 MiB / 5,000 rows. Imported datasets are ephemeral: normalized JSONL remains in memory,
+the registry is capped at eight entries and 32 MiB, and only the selected dataset is
+materialized. Imported content is never sent to an external service or written to disk.
 
 Example: rank candidates with a **transparent baseline scorecard** (pool-relative min–max
 objectives plus hard constraints).
@@ -138,17 +144,17 @@ Raw dataset → MatterGraphDataset / Material → candidate slice / crystal grap
 
 ## Roadmap
 
-High-level [ROADMAP.md](ROADMAP.md) covers connectors, the unified schema, workflow slicing, graph building, benchmark adapters, simulation job specs, and uncertainty. For the LeMaterial companion layer, see [docs/integrations/lematerial.md](docs/integrations/lematerial.md).
+High-level [ROADMAP.md](ROADMAP.md) covers connectors, the unified schema, workflow slicing, graph building, benchmark adapters, simulation interchange, and uncertainty. For the LeMaterial companion layer, see [docs/integrations/lematerial.md](docs/integrations/lematerial.md), and for local data see [docs/local-workbench.md](docs/local-workbench.md).
 
 ## Packages
 
 | Package | Role |
 |--------|------|
 | `mattergraph-core` | Schema, normalization, `MatterGraphDataset`, `CandidateSlice`, crystal graphs, transparent `Scorecard`, `MaterialStore` |
-| `mattergraph-connectors` | MP, JARVIS, NOMAD public metadata, LeMat-Bulk companion adapter, local CSV, OQMD stub |
+| `mattergraph-connectors` | MP, JARVIS, NOMAD public metadata, OPTIMADE, LeMat-Bulk companion adapter, bounded local CSV/JSONL import, OQMD stub |
 | `mattergraph-benchmarks` | Metrics, Matbench-style adapter (optional `matbench` install) |
 | `mattergraph-sim` | ASE / stub LAMMPS+QE around job specs |
-| `mattergraph-api` | FastAPI demo for materials, graph summaries, audited ranking, and labeled CHGNet reference evidence |
+| `mattergraph-api` | FastAPI demo plus ephemeral local-dataset registry, graph summaries, slicing, audited ranking, export, and labeled CHGNet reference evidence |
 
 ## License
 

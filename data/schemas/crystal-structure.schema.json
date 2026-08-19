@@ -1,0 +1,78 @@
+{
+  "$id": "https://mattergraph.dev/schemas/0.1/crystal-structure.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Unit cell + fractional sites; can round-trip to :class:`pymatgen.core.Structure`.",
+  "properties": {
+    "coords": {
+      "description": "Fractional coordinates for each site",
+      "items": {
+        "items": {
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "title": "Coords",
+      "type": "array"
+    },
+    "lattice": {
+      "description": "3x3 row-major lattice matrix (Angstrom) in the convention used by the source",
+      "items": {
+        "items": {
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "title": "Lattice",
+      "type": "array"
+    },
+    "site_properties": {
+      "anyOf": [
+        {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Site Properties"
+    },
+    "species": {
+      "description": "Oxidation state dicts are supported, e.g. {'Li': 1, 'O': -2}.",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "title": "Species",
+      "type": "array"
+    }
+  },
+  "required": [
+    "lattice",
+    "species",
+    "coords"
+  ],
+  "title": "CrystalStructure",
+  "type": "object"
+}

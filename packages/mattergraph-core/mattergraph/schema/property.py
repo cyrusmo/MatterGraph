@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from mattergraph.normalization.properties import canonical_property_name
+from mattergraph.schema.context import PropertyContext, SourceArtifact
 
 
 class PropertyMethod(str, Enum):
@@ -38,6 +39,14 @@ class MaterialProperty(BaseModel):
   source_id: str | None = Field(
     default=None,
     description="Optional upstream property identifier, e.g. MP task ID or DOI field",
+  )
+  context: PropertyContext | None = Field(
+    default=None,
+    description="Conditions and applicability for this property value",
+  )
+  source_artifact: SourceArtifact | None = Field(
+    default=None,
+    description="Citation, revision, license, and checksum for the upstream artifact",
   )
   extra: dict[str, Any] = Field(default_factory=dict)
 

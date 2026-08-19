@@ -42,6 +42,11 @@ from mattergraph_connectors.base import (
   coerce_query,
   connector_provenance,
 )
+from mattergraph_connectors.http_policy import (
+  ConnectorHTTPPolicy,
+  ResponseCache,
+  request_with_policy,
+)
 
 SOURCE_NAME = "optimade"
 
@@ -125,6 +130,8 @@ class OptimadeConnector:
     base_url: str | None = None,
     timeout: float = 30.0,
     client: httpx.Client | None = None,
+    http_policy: ConnectorHTTPPolicy | None = None,
+    cache: ResponseCache | None = None,
   ) -> None:
     if base_url is None:
       if provider not in PROVIDERS:
@@ -139,6 +146,8 @@ class OptimadeConnector:
     self.base_url = base_url.rstrip("/")
     self._owns_client = client is None
     self._client = client or httpx.Client(timeout=timeout, follow_redirects=True)
+    self._http_policy = http_policy or ConnectorHTTPPolicy(timeout_seconds=timeout)
+    self._cache = cache
 
   def __enter__(self) -> OptimadeConnector:
     return self
@@ -204,7 +213,14 @@ class OptimadeConnector:
 
   def _get(self, url: str, params: dict[str, Any] | None) -> dict[str, Any]:
     try:
-      response = self._client.get(url, params=params)
+      response = request_with_policy(
+        self._client,
+        "GET",
+        url,
+        params=params,
+        policy=self._http_policy,
+        cache=self._cache,
+      )
       response.raise_for_status()
     except httpx.HTTPStatusError as exc:
       status = exc.response.status_code

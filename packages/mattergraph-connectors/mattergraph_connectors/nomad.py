@@ -9,6 +9,11 @@ from mattergraph.schema.material import Material
 from mattergraph.schema.property import PropertyMethod
 
 from mattergraph_connectors.base import ConnectorQuery, coerce_query, connector_provenance
+from mattergraph_connectors.http_policy import (
+  ConnectorHTTPPolicy,
+  ResponseCache,
+  request_with_policy,
+)
 
 NOMAD_BASE_URL = "https://nomad-lab.eu/prod/v1/api/v1"
 
@@ -52,10 +57,14 @@ class NOMADConnector:
     base_url: str = NOMAD_BASE_URL,
     timeout: float = 30.0,
     client: httpx.Client | None = None,
+    http_policy: ConnectorHTTPPolicy | None = None,
+    cache: ResponseCache | None = None,
   ) -> None:
     self.base_url = base_url.rstrip("/")
     self._owns_client = client is None
     self._client = client or httpx.Client(timeout=timeout)
+    self._http_policy = http_policy or ConnectorHTTPPolicy(timeout_seconds=timeout)
+    self._cache = cache
 
   def __enter__(self) -> NOMADConnector:
     return self
@@ -123,7 +132,14 @@ class NOMADConnector:
 
   def _post_entries_query(self, payload: dict[str, Any]) -> dict[str, Any]:
     try:
-      response = self._client.post(f"{self.base_url}/entries/query", json=payload)
+      response = request_with_policy(
+        self._client,
+        "POST",
+        f"{self.base_url}/entries/query",
+        json=payload,
+        policy=self._http_policy,
+        cache=self._cache,
+      )
       response.raise_for_status()
     except httpx.HTTPStatusError as exc:
       status = exc.response.status_code

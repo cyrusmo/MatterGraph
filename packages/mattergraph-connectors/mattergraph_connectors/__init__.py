@@ -11,9 +11,22 @@ if TYPE_CHECKING:
     coerce_query,
     connector_provenance,
   )
+  from mattergraph_connectors.http_policy import ConnectorHTTPPolicy, MemoryResponseCache
   from mattergraph_connectors.jarvis import JarvisConnector
   from mattergraph_connectors.lematerial import LeMatBulk
   from mattergraph_connectors.local_csv import load_materials_from_csv
+  from mattergraph_connectors.local_import import (
+    DatasetImportMapping,
+    ImportIssue,
+    ImportLimitError,
+    ImportReport,
+    ImportResult,
+    ImportValidationError,
+    NormalizedImport,
+    PropertyColumnMapping,
+    import_local_content,
+    inspect_local_content,
+  )
   from mattergraph_connectors.materials_project import MaterialsProjectConnector
   from mattergraph_connectors.nomad import (
     NOMADConnector,
@@ -62,6 +75,34 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
     "load_materials_from_csv",
     None,
   ),
+  "ConnectorHTTPPolicy": (
+    "mattergraph_connectors.http_policy",
+    "ConnectorHTTPPolicy",
+    None,
+  ),
+  "MemoryResponseCache": (
+    "mattergraph_connectors.http_policy",
+    "MemoryResponseCache",
+    None,
+  ),
+  "DatasetImportMapping": ("mattergraph_connectors.local_import", "DatasetImportMapping", None),
+  "ImportIssue": ("mattergraph_connectors.local_import", "ImportIssue", None),
+  "ImportLimitError": ("mattergraph_connectors.local_import", "ImportLimitError", None),
+  "ImportReport": ("mattergraph_connectors.local_import", "ImportReport", None),
+  "ImportResult": ("mattergraph_connectors.local_import", "ImportResult", None),
+  "ImportValidationError": (
+    "mattergraph_connectors.local_import",
+    "ImportValidationError",
+    None,
+  ),
+  "NormalizedImport": ("mattergraph_connectors.local_import", "NormalizedImport", None),
+  "PropertyColumnMapping": (
+    "mattergraph_connectors.local_import",
+    "PropertyColumnMapping",
+    None,
+  ),
+  "import_local_content": ("mattergraph_connectors.local_import", "import_local_content", None),
+  "inspect_local_content": ("mattergraph_connectors.local_import", "inspect_local_content", None),
   "LeMatBulk": (
     "mattergraph_connectors.lematerial",
     "LeMatBulk",
@@ -124,6 +165,18 @@ __all__ = [
   "JarvisConnector",
   "LeMatBulk",
   "load_materials_from_csv",
+  "ConnectorHTTPPolicy",
+  "MemoryResponseCache",
+  "DatasetImportMapping",
+  "ImportIssue",
+  "ImportLimitError",
+  "ImportReport",
+  "ImportResult",
+  "ImportValidationError",
+  "NormalizedImport",
+  "PropertyColumnMapping",
+  "import_local_content",
+  "inspect_local_content",
   "OQMDStubConnector",
   "NOMADConnector",
   "NOMADConnectorError",

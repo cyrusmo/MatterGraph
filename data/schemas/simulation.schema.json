@@ -1,15 +1,69 @@
 {
+  "$id": "https://mattergraph.dev/schemas/0.1/simulation.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "MatterGraph Simulation job reference",
-  "type": "object",
-  "required": ["job_id", "engine"],
   "additionalProperties": false,
+  "description": "Reference to a simulation that produced or post-processes a material result.\n\nThe object is deliberately small: store full scheduler payloads outside core and link them\nthrough URI fields.",
   "properties": {
-    "job_id": { "type": "string", "minLength": 1 },
-    "engine": { "type": "string", "enum": ["ase", "lammps", "qe", "custom"] },
-    "spec_version": { "type": "string" },
-    "input_uri": { "type": ["string", "null"] },
-    "output_uri": { "type": ["string", "null"] },
-    "status": { "type": "string", "enum": ["pending", "running", "completed", "failed"] }
-  }
+    "engine": {
+      "default": "ase",
+      "description": "ase, lammps, qe, custom",
+      "enum": [
+        "ase",
+        "lammps",
+        "qe",
+        "custom"
+      ],
+      "title": "Engine",
+      "type": "string"
+    },
+    "input_uri": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Uri"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "output_uri": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Uri"
+    },
+    "spec_version": {
+      "default": "0.1.0",
+      "title": "Spec Version",
+      "type": "string"
+    },
+    "status": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "running",
+        "completed",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "job_id"
+  ],
+  "title": "SimulationJobRef",
+  "type": "object"
 }

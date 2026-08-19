@@ -39,11 +39,12 @@ class ScoreRequest(BaseModel):
   constraints: dict[str, ConstraintConfig] = Field(default_factory=dict)
   weights: dict[str, float] | None = None
   missing: MissingPolicy = "worst"
+  dataset_id: str | None = None
 
 
 @router.post("/scores/rank")
 def rank(request: ScoreRequest) -> list[dict]:
-  store = store_service.get_store()
+  store = store_service.resolve_store(request.dataset_id)
   sc = _scorecard(request)
   df = sc.rank(store.materials)
   return df.to_dict(orient="records")
@@ -51,7 +52,7 @@ def rank(request: ScoreRequest) -> list[dict]:
 
 @router.post("/scores/rank/audit")
 def rank_with_audit(request: ScoreRequest) -> dict[str, Any]:
-  store = store_service.get_store()
+  store = store_service.resolve_store(request.dataset_id)
   scorecard = _scorecard(request)
   ranked = scorecard.rank(store.materials).to_dict(orient="records")
   materials_by_id = {material.material_id: material for material in store.materials}
@@ -70,6 +71,7 @@ def rank_with_audit(request: ScoreRequest) -> dict[str, Any]:
 
 def _scorecard(request: ScoreRequest) -> Scorecard:
   payload = request.model_dump(mode="python", exclude_none=True)
+  payload.pop("dataset_id", None)
   return Scorecard(
     objectives=payload["objectives"],
     constraints=payload["constraints"],

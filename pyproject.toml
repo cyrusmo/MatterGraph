@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Open-source materials data infrastructure for physics-aware ML and simulation workflows."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 authors = [{ name = "MatterGraph contributors" }]
 keywords = [
   "materials-science",
@@ -43,6 +43,7 @@ dev = [
   "pytest-cov>=4.0",
   "ruff>=0.4.0",
   "httpx>=0.27.0",
+  "psutil>=6.0",
   "pyyaml>=6.0",
 ]
 docs = [
@@ -74,7 +75,7 @@ Issues = "https://github.com/cyrusmo/MatterGraph/issues"
 Changelog = "https://github.com/cyrusmo/MatterGraph/blob/main/CHANGELOG.md"
 
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -93,6 +94,10 @@ testpaths = ["packages", "tests"]
 pythonpath = ["packages/mattergraph-core", "packages/mattergraph-connectors", "packages/mattergraph-benchmarks", "packages/mattergraph-sim", "packages/mattergraph-api"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+markers = ["memory_budget: process-level RSS budget gate (run explicitly in CI)"]
+filterwarnings = [
+  "ignore:Set OLD_ERROR_HANDLING to false and catch the errors directly.:DeprecationWarning:spglib",
+]
 
 [tool.coverage.run]
 source = [

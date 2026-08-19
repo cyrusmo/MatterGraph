@@ -7,6 +7,8 @@ export type MaterialProperty = {
   confidence?: number | null;
   uncertainty?: number | null;
   source_id?: string | null;
+  context?: Record<string, unknown> | null;
+  source_artifact?: Record<string, unknown> | null;
   extra?: Record<string, unknown>;
 };
 
@@ -290,4 +292,95 @@ export type LeMaterialWorkflowSummary = {
   benchmark: { target: string; row_count: number; columns: string[] };
   benchmark_preview: BenchmarkPreviewRow[];
   provenance: WorkflowProvenance;
+};
+
+export type PropertyColumnMapping = {
+  column: string;
+  name: string;
+  unit?: string | null;
+  source: string;
+  method: "dft" | "experimental" | "model_predicted" | "derived" | "unknown";
+};
+
+export type DatasetImportMapping = {
+  identity_column: string;
+  formula_column: string;
+  structure_column?: string | null;
+  source_id_column?: string | null;
+  property_columns: PropertyColumnMapping[];
+};
+
+export type ImportIssue = {
+  code: string;
+  severity: "error" | "warning";
+  message: string;
+  row?: number | null;
+  column?: string | null;
+};
+
+export type ImportReport = {
+  status: "ready" | "degraded" | "invalid";
+  checksum: string;
+  row_count: number;
+  accepted_count: number;
+  rejected_count: number;
+  columns: string[];
+  inferred_mapping?: DatasetImportMapping | null;
+  issues: ImportIssue[];
+  issue_counts: Record<string, number>;
+  truncated_issue_count: number;
+};
+
+export type DatasetManifest = {
+  schema_version: "0.1";
+  dataset_id: string;
+  name: string;
+  source: string;
+  format: "csv" | "jsonl" | "normalized_jsonl";
+  record_count: number;
+  accepted_count: number;
+  rejected_count: number;
+  content_sha256: string;
+  normalized_sha256: string;
+  normalized_bytes: number;
+  degraded: boolean;
+  created_at: string;
+};
+
+export type ImportResult = {
+  dataset_id: string;
+  manifest: DatasetManifest;
+  accepted_count: number;
+  rejected_count: number;
+  issues: ImportIssue[];
+  issue_counts: Record<string, number>;
+  truncated_issue_count: number;
+  preview: Material[];
+};
+
+export type DatasetEntry = {
+  manifest: DatasetManifest;
+  readiness: "ready";
+  normalized_bytes: number;
+  materialized: boolean;
+  eviction: { policy: string; entry_limit: number; byte_limit: number };
+};
+
+export type DatasetList = {
+  datasets: DatasetEntry[];
+  registry: {
+    entry_count: number;
+    normalized_bytes: number;
+    max_entries: number;
+    max_normalized_bytes: number;
+    active_dataset_id?: string | null;
+    eviction_policy: string;
+  };
+};
+
+export type SlicePreview = {
+  slice: Record<string, unknown> & { output_count?: number };
+  material_ids: string[];
+  graph_readiness: { included_count: number; excluded_count: number };
+  benchmark_preview: Array<Record<string, unknown>>;
 };

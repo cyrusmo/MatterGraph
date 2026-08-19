@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 import { CapabilityLedger } from "../components/CapabilityLedger";
 import { ComparisonView } from "../components/ComparisonView";
 import { ConstraintPanel } from "../components/ConstraintPanel";
-import { GraphSummaryPanel } from "../components/GraphSummaryPanel";
 import { MaterialCard } from "../components/MaterialCard";
 import { MaterialTable } from "../components/MaterialTable";
 import { SimulationQueue } from "../components/SimulationQueue";
@@ -41,7 +40,37 @@ const DEFAULT_HULL_WEIGHT = 0.4;
 type ApiState = "loading" | "ready" | "degraded" | "offline";
 
 export function App() {
-  const [screen, setScreen] = useState(0);
+  const [mode, setMode] = useState<"demo" | "workbench">("demo");
+  const [demoStartScreen, setDemoStartScreen] = useState(0);
+  return mode === "demo" ? (
+    <GuidedDemo initialScreen={demoStartScreen} onOpenWorkbench={() => setMode("workbench")} />
+  ) : (
+    <Suspense fallback={<main className="workbench-loading">Loading local workbench…</main>}>
+      <LocalWorkbench onReturnDemo={(screen = 0) => {
+        setDemoStartScreen(screen);
+        setMode("demo");
+      }} />
+    </Suspense>
+  );
+}
+
+const GraphSummaryPanel = lazy(() =>
+  import("../components/GraphSummaryPanel").then((module) => ({
+    default: module.GraphSummaryPanel,
+  })),
+);
+const LocalWorkbench = lazy(() =>
+  import("./LocalWorkbench").then((module) => ({ default: module.LocalWorkbench })),
+);
+
+function GuidedDemo({
+  initialScreen,
+  onOpenWorkbench,
+}: {
+  initialScreen: number;
+  onOpenWorkbench: () => void;
+}) {
+  const [screen, setScreen] = useState(initialScreen);
   const [rows, setRows] = useState<Material[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [workflow, setWorkflow] = useState<LeMaterialWorkflowSummary | null>(null);
@@ -145,6 +174,7 @@ export function App() {
         </div>
         <div className="topbar-actions">
           <span>offline snapshot · v1</span>
+          <button className="text-button" type="button" onClick={onOpenWorkbench}>Local workbench</button>
           <button className="text-button" type="button" onClick={resetDemo}>Reset demo</button>
         </div>
       </header>
@@ -224,7 +254,7 @@ export function App() {
 
             {screen === 2 ? (
               <>
-                <div className="panel presentation-content"><div className="panel-heading"><span>Exact graph geometry · {selectedId}</span><span>C3</span></div><GraphSummaryPanel summary={graph} loading={graphLoading} error={graphError} /></div>
+                <div className="panel presentation-content"><div className="panel-heading"><span>Exact graph geometry · {selectedId}</span><span>C3</span></div><Suspense fallback={<p className="empty-note">Loading crystal viewer…</p>}><GraphSummaryPanel summary={graph} loading={graphLoading} error={graphError} /></Suspense></div>
                 <ScreenAction label="Review shortlist" onClick={() => setScreen(3)} />
               </>
             ) : null}

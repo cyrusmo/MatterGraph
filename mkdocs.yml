@@ -38,6 +38,7 @@ nav:
   - Getting started: getting-started.md
   - Architecture: architecture.md
   - Data model: data-model.md
+  - Local contributor workbench: local-workbench.md
   - Connectors: connectors.md
   - LeMaterial integration: integrations/lematerial.md
   - Scoring: scoring.md

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from io import StringIO
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -35,6 +36,13 @@ class MaterialStore:
         f.write(material.model_dump_json(exclude_none=True))
         f.write("\n")
 
+  def to_jsonl_text(self) -> str:
+    """Serialize to canonical JSONL without touching the filesystem."""
+    return "".join(
+      json.dumps(material.model_dump(mode="json", exclude_none=True), sort_keys=True) + "\n"
+      for material in self._materials
+    )
+
   @classmethod
   def from_jsonl(
     cls,
@@ -53,6 +61,24 @@ class MaterialStore:
           continue
         d = json.loads(line)
         out.append(_material_from_dict(d))
+    return cls(out)
+
+  @classmethod
+  def from_jsonl_text(
+    cls,
+    content: str,
+    *,
+    max_rows: int | None = None,
+  ) -> MaterialStore:
+    """Load JSONL held in memory, bounded by an optional row count."""
+    out: list[Material] = []
+    for n, line in enumerate(StringIO(content)):
+      if max_rows is not None and n >= max_rows:
+        break
+      line = line.strip()
+      if not line:
+        continue
+      out.append(_material_from_dict(json.loads(line)))
     return cls(out)
 
   @classmethod
@@ -85,6 +111,8 @@ def _material_from_dict(d: dict[str, Any]) -> Material:
         confidence=p.get("confidence"),
         uncertainty=p.get("uncertainty"),
         source_id=p.get("source_id"),
+        context=p.get("context"),
+        source_artifact=p.get("source_artifact"),
         extra=extra,
       )
     )
@@ -96,6 +124,7 @@ def _material_from_dict(d: dict[str, Any]) -> Material:
       notes=x.get("notes"),
       model_version=x.get("model_version"),
       source_id=x.get("source_id"),
+      parameters=x.get("parameters"),
     )
     for x in d.get("provenance", [])
   ]
@@ -108,6 +137,7 @@ def _material_from_dict(d: dict[str, Any]) -> Material:
     reduced_formula=d.get("reduced_formula", "") or d.get("formula", ""),
     elements=list(d.get("elements", [])),
     structure=st,
+    dimensionality=d.get("dimensionality"),
     properties=props,
     provenance=prov,
     source_id=d.get("source_id"),

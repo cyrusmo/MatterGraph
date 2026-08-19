@@ -7,7 +7,7 @@
 | JARVIS | `JarvisConnector` (loads a subset of JARVIS-DFT 3D) | `[jarvis]` |
 | NOMAD | `NOMADConnector` (read-only public metadata; no API key for public reads) | — |
 | OPTIMADE | `OptimadeConnector` — COD, OQMD, AFLOW, MP, NOMAD and ~18 more through one client | — |
-| Local CSV | `load_materials_from_csv` | — |
+| Local CSV/JSONL | `inspect_local_content` + `import_local_content` (or the web workbench) | — |
 | OQMD | No native connector; `OQMDStubConnector` **raises**. Use `OptimadeConnector(provider="oqmd")` | — |
 
 `mp-api` and `jarvis-tools` are optional extras, not hard dependencies:
@@ -21,6 +21,26 @@ pip install 'mattergraph-connectors[all]'     # both
 The LeMaterial companion adapter returns a **`MatterGraphDataset`** so users can inspect schema coverage, create candidate slices, export graphs, and prepare benchmark frames before converting rows into `Material` instances. It is a dataset adapter rather than a `Connector`.
 
 The other connectors output **`Material` instances** so downstream code stays database-agnostic.
+
+## Shared HTTP policy
+
+NOMAD and OPTIMADE use `ConnectorHTTPPolicy`: bounded request timeouts, at most five configured
+retries, exponential backoff, numeric `Retry-After` handling capped at 60 seconds, and explicit
+retryable status codes. Response caching is off by default. Contributors can opt into a bounded
+process-local `MemoryResponseCache`; credentials and live connector execution are deliberately
+absent from the web workbench.
+
+```python
+from mattergraph_connectors import ConnectorHTTPPolicy, MemoryResponseCache, OptimadeConnector
+
+policy = ConnectorHTTPPolicy(timeout_seconds=10, max_retries=2)
+with OptimadeConnector(http_policy=policy, cache=MemoryResponseCache(16)) as connector:
+    materials = connector.fetch()
+```
+
+The local import path has different operational limits: CSV or JSONL only, 5 MiB, 5,000 rows,
+100 returned issues, strict rejection by default, and no filesystem writes. See
+[Local contributor workbench](local-workbench.md).
 
 ## The connector contract
 

@@ -1,13 +1,13 @@
 # Roadmap (public)
 
-- **v0.1 (current direction)** — Material schema, MP + JARVIS + local CSV, LeMat-Bulk workflow companion, `MatterGraphDataset`, `CandidateSlice`, crystal graph, weighted scorecard, demo notebook, FastAPI, minimal dashboard
+- **v0.1 (implemented public foundation)** — additive contextual Material schema, generated JSON Schemas, MP/JARVIS/NOMAD/OPTIMADE plus bounded local CSV/JSONL import, LeMat-Bulk workflow companion, periodic crystal graph, transparent scorecard, ephemeral FastAPI registry, guided demo and local contributor workbench
 - **Workflow layer** — richer `CandidateSlice.report()` output, benchmark-frame presets, more transparent filtering recipes, offline-first analysis helpers
 - **LeMaterial companion** — deepen `LeMat-Bulk` coverage, document `LeMat-Traj` / `LeMat-Synth` as future integrations, expand the SQL/EDA cookbook
-- **Connectors** — NOMAD and OQMD beyond thin stubs, with stable pagination and error handling
-- **Schema** — Richer `ProvenanceRecord` and simulation linkage across databases
+- **Connectors** — deepen native provider coverage while reusing bounded timeout/retry/`Retry-After` policy; OQMD remains available through OPTIMADE and native OQMD remains an explicit stub
+- **Schema** — evolve additively from Pydantic source models; preserve contextual properties, dataset manifests, source artifacts and simulation-result envelopes
 - **Graphs** — More edge/node features, optional DGL/PyG examples while keeping the core library lightweight
 - **Benchmarks** — Tighter Matbench / leaderboard examples
-- **Simulation** — Documented LAMMPS/QE images and parsers for common outputs
+- **Simulation** — result-import/parser examples around `SimulationResultEnvelope`; LAMMPS/QE execution and multi-simulator orchestration remain out of scope
 - **Uncertainty** — First-class epistemic/aleatory fields where sources provide them
 
 ## Seed issues (suggested on GitHub)

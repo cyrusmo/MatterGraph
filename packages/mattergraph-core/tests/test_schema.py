@@ -2,13 +2,21 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from mattergraph import Material, MaterialProperty, MaterialStore
+from mattergraph import (
+  Material,
+  MaterialProperty,
+  MaterialStore,
+  PropertyContext,
+  Quantity,
+  SourceArtifact,
+)
 from pymatgen.core import Lattice, Structure
 from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.simulation import SimulationJobRef
 from mattergraph.graph.crystal_graph import CrystalGraphBuilder
 from mattergraph.normalization.structures import check_density
 from mattergraph.schema.structure import CrystalStructure
+from mattergraph.schema.generation import canonical_schema_json, generate_schema_documents
 
 
 def test_material_composition() -> None:
@@ -224,6 +232,17 @@ def test_store_jsonl_roundtrip(tmp_path: Path) -> None:
         unit="eV/atom",
         source="materials_project",
         source_id="task-1",
+        context=PropertyContext(
+          temperature=Quantity(value=298.15, unit="K"),
+          environment="ambient air",
+          test_method="computed reference",
+        ),
+        source_artifact=SourceArtifact(
+          citation="Example source",
+          revision="2024.01",
+          license="CC-BY-4.0",
+          checksum_sha256="a" * 64,
+        ),
         extra={"raw_field": "energy_above_hull"},
       )
     ],
@@ -232,6 +251,7 @@ def test_store_jsonl_roundtrip(tmp_path: Path) -> None:
         source="materials_project",
         source_id="task-1",
         model_version="2024.01",
+        parameters={"functional": "PBE"},
       )
     ],
   )
@@ -244,7 +264,27 @@ def test_store_jsonl_roundtrip(tmp_path: Path) -> None:
   assert loaded.materials[0].properties[0].name == "energy_above_hull"
   assert loaded.materials[0].properties[0].source_id == "task-1"
   assert loaded.materials[0].properties[0].extra["raw_field"] == "energy_above_hull"
+  assert loaded.materials[0].properties[0].context is not None
+  assert loaded.materials[0].properties[0].context.temperature is not None
+  assert loaded.materials[0].properties[0].context.temperature.value == pytest.approx(298.15)
+  assert loaded.materials[0].properties[0].source_artifact is not None
+  assert loaded.materials[0].properties[0].source_artifact.license == "CC-BY-4.0"
   assert loaded.materials[0].provenance[0].model_version == "2024.01"
+  assert loaded.materials[0].provenance[0].parameters == {"functional": "PBE"}
+
+
+def test_in_memory_jsonl_roundtrip_preserves_legacy_shape() -> None:
+  legacy = '{"material_id":"legacy-1","formula":"AlN","properties":[]}\n'
+  store = MaterialStore.from_jsonl_text(legacy)
+  assert store.materials[0].material_id == "legacy-1"
+  reloaded = MaterialStore.from_jsonl_text(store.to_jsonl_text())
+  assert reloaded.materials[0].formula == "AlN"
+
+
+def test_checked_in_json_schemas_match_pydantic_models() -> None:
+  schema_dir = Path("data/schemas")
+  for filename, document in generate_schema_documents():
+    assert (schema_dir / filename).read_text() == canonical_schema_json(document)
 
 
 def test_property_numeric() -> None:

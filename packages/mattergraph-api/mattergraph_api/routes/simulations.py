@@ -22,6 +22,7 @@ def get_chgnet_reference(material_id: str) -> dict:
 
 class RelaxRequest(BaseModel):
   material_id: str
+  dataset_id: str | None = None
   spec: AseJobSpec = Field(default_factory=AseJobSpec)
 
 
@@ -32,7 +33,7 @@ def run_relax(body: RelaxRequest) -> dict:
   except ImportError as e:
     raise HTTPException(status_code=503, detail=str(e)) from e
 
-  store = store_service.get_store()
+  store = store_service.resolve_store(body.dataset_id)
   m = store.get(body.material_id)
   if m is None or m.structure is None:
     raise HTTPException(status_code=400, detail="material or structure missing")

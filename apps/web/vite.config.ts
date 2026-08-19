@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
         "/health": { target: proxyTarget, changeOrigin: true },
         "/capabilities": { target: proxyTarget, changeOrigin: true },
         "/demo": { target: proxyTarget, changeOrigin: true },
+        "/datasets": { target: proxyTarget, changeOrigin: true },
         "/materials": { target: proxyTarget, changeOrigin: true },
         "/search": { target: proxyTarget, changeOrigin: true },
         "/scores": { target: proxyTarget, changeOrigin: true },

@@ -1,21 +1,638 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "MatterGraph Material",
-  "type": "object",
-  "required": ["material_id", "formula"],
-  "additionalProperties": false,
-  "properties": {
-    "material_id": { "type": "string", "minLength": 1 },
-    "formula": { "type": "string", "minLength": 1 },
-    "reduced_formula": { "type": "string", "minLength": 1 },
-    "elements": {
-      "type": "array",
-      "items": { "type": "string", "minLength": 1 },
-      "uniqueItems": true
+  "$defs": {
+    "CrystalStructure": {
+      "additionalProperties": false,
+      "description": "Unit cell + fractional sites; can round-trip to :class:`pymatgen.core.Structure`.",
+      "properties": {
+        "coords": {
+          "description": "Fractional coordinates for each site",
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Coords",
+          "type": "array"
+        },
+        "lattice": {
+          "description": "3x3 row-major lattice matrix (Angstrom) in the convention used by the source",
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Lattice",
+          "type": "array"
+        },
+        "site_properties": {
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Site Properties"
+        },
+        "species": {
+          "description": "Oxidation state dicts are supported, e.g. {'Li': 1, 'O': -2}.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              }
+            ]
+          },
+          "title": "Species",
+          "type": "array"
+        }
+      },
+      "required": [
+        "lattice",
+        "species",
+        "coords"
+      ],
+      "title": "CrystalStructure",
+      "type": "object"
     },
-    "structure": { "type": ["object", "null"] },
-    "properties": { "type": "array", "items": { "type": "object" } },
-    "provenance": { "type": "array", "items": { "type": "object" } },
-    "metadata": { "type": "object", "additionalProperties": true }
-  }
+    "MaterialProperty": {
+      "additionalProperties": false,
+      "description": "A provenance-aware property value attached to a material.\n\nJSON contract: enum values serialize as strings; unknown fields are rejected and should be\nplaced in ``extra`` by callers that need source-specific metadata.",
+      "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PropertyContext"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Conditions and applicability for this property value"
+        },
+        "extra": {
+          "additionalProperties": true,
+          "title": "Extra",
+          "type": "object"
+        },
+        "method": {
+          "$ref": "#/$defs/PropertyMethod",
+          "default": "unknown"
+        },
+        "name": {
+          "description": "Canonical property name, e.g. density or energy_above_hull",
+          "title": "Name",
+          "type": "string"
+        },
+        "source": {
+          "default": "unknown",
+          "description": "Database, experiment, or model source",
+          "title": "Source",
+          "type": "string"
+        },
+        "source_artifact": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceArtifact"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Citation, revision, license, and checksum for the upstream artifact"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional upstream property identifier, e.g. MP task ID or DOI field",
+          "title": "Source Id"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unit string as supplied or normalized",
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "MaterialProperty",
+      "type": "object"
+    },
+    "PropertyContext": {
+      "additionalProperties": false,
+      "description": "Decision-neutral conditions under which a property applies.",
+      "properties": {
+        "applicability": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Applicability"
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Environment"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument"
+        },
+        "material_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Material State"
+        },
+        "orientation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Orientation"
+        },
+        "pressure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "process_route": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Process Route"
+        },
+        "specimen": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Specimen"
+        },
+        "statistical_basis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Statistical Basis"
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "test_method": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Test Method"
+        }
+      },
+      "title": "PropertyContext",
+      "type": "object"
+    },
+    "PropertyMethod": {
+      "enum": [
+        "dft",
+        "experimental",
+        "model_predicted",
+        "derived",
+        "unknown"
+      ],
+      "title": "PropertyMethod",
+      "type": "string"
+    },
+    "ProvenanceRecord": {
+      "additionalProperties": false,
+      "description": "Lineage and confidence for a value or field.\n\nJSON contract: enum values serialize as strings; source-specific fields belong in ``extra``.",
+      "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "method": {
+          "$ref": "#/$defs/PropertyMethod",
+          "default": "unknown",
+          "description": "e.g. dft, experiment, model_predicted"
+        },
+        "model_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Version"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Settings that produced the value, e.g. functional, k-point mesh, cutoff, calculator. Without these a computed number cannot be reproduced, only repeated.",
+          "title": "Parameters"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional upstream record identifier, task ID, DOI, or dataset row ID",
+          "title": "Source Id"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "ProvenanceRecord",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A scalar quantity whose unit is explicit at the JSON boundary.",
+      "properties": {
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "SourceArtifact": {
+      "additionalProperties": false,
+      "description": "Public citation and integrity metadata for an upstream artifact.",
+      "properties": {
+        "checksum_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Lower-case SHA-256 digest of the referenced artifact",
+          "title": "Checksum Sha256"
+        },
+        "citation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Citation"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "license": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "License"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uri"
+        }
+      },
+      "title": "SourceArtifact",
+      "type": "object"
+    }
+  },
+  "$id": "https://mattergraph.dev/schemas/0.1/material.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Canonical, JSON-serializable material record.\n\n``properties`` intentionally remains a list so multiple sources can report the same property.\nUse ``get_property`` for the first matching property, or filter the list by source/method when\nprovenance matters.",
+  "properties": {
+    "dimensionality": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of periodic dimensions, 0-3. A vacuum-padded slab reports 2, and its bulk density and moduli are artifacts of the padding rather than material properties.",
+      "title": "Dimensionality"
+    },
+    "elements": {
+      "description": "Sorted element symbols",
+      "items": {
+        "type": "string"
+      },
+      "title": "Elements",
+      "type": "array"
+    },
+    "formula": {
+      "description": "Input chemical formula",
+      "title": "Formula",
+      "type": "string"
+    },
+    "material_id": {
+      "description": "Stable MatterGraph material identifier",
+      "title": "Material Id",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "properties": {
+      "items": {
+        "$ref": "#/$defs/MaterialProperty"
+      },
+      "title": "Properties",
+      "type": "array"
+    },
+    "provenance": {
+      "items": {
+        "$ref": "#/$defs/ProvenanceRecord"
+      },
+      "title": "Provenance",
+      "type": "array"
+    },
+    "reduced_formula": {
+      "default": "",
+      "description": "Formula reduced by pymatgen Composition",
+      "title": "Reduced Formula",
+      "type": "string"
+    },
+    "source_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional upstream material identifier, e.g. mp-149 or JVASP-1002",
+      "title": "Source Id"
+    },
+    "structure": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CrystalStructure"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "material_id",
+    "formula"
+  ],
+  "title": "Material",
+  "type": "object"
 }

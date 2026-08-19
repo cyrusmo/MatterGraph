@@ -339,6 +339,14 @@ def capability_catalog() -> list[dict[str, Any]]:
       "/scores/rank/audit",
     ),
     _cap(
+      "local_workbench",
+      "Ephemeral local contributor workbench",
+      "workflow",
+      "demo_ready",
+      "/datasets/inspect + /datasets/import",
+      boundary="Local, unauthenticated, in-memory, and limited to small exploratory datasets.",
+    ),
+    _cap(
       "chgnet_reference",
       "CHGNet reference relaxation",
       "simulation",
@@ -373,7 +381,35 @@ def capability_catalog() -> list[dict[str, Any]]:
     ),
     _cap("nomad", "NOMAD public metadata", "connectors", "sdk_ready", "NOMADConnector"),
     _cap("optimade", "OPTIMADE / OQMD", "connectors", "sdk_ready", "OptimadeConnector"),
-    _cap("local_csv", "Local CSV", "connectors", "sdk_ready", "load_materials_from_csv"),
+    _cap(
+      "local_csv",
+      "Bounded local CSV / JSONL import",
+      "connectors",
+      "sdk_ready",
+      "inspect_local_content + import_local_content",
+    ),
+    _cap(
+      "connector_http_policy",
+      "Connector HTTP resilience policy",
+      "connectors",
+      "sdk_ready",
+      "ConnectorHTTPPolicy",
+    ),
+    _cap(
+      "generated_schemas",
+      "Pydantic-generated JSON Schemas",
+      "schema",
+      "sdk_ready",
+      "scripts/generate_schemas.py --check",
+    ),
+    _cap(
+      "simulation_result_envelope",
+      "Simulation result interchange",
+      "simulation",
+      "sdk_ready",
+      "SimulationResultEnvelope",
+      boundary="Result import and parsing only; no simulator orchestration.",
+    ),
     _cap(
       "elastic", "Derived elasticity", "derived", "sdk_ready", "mattergraph.derived.elastic"
     ),

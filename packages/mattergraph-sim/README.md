@@ -14,6 +14,10 @@ Structures round-trip through pymatgen, jobs are declared as validated Pydantic 
 
 > **Note on scope.** EMT is a fast empirical potential with narrow element coverage; it is suitable for smoke-testing a workflow end to end, not for producing quantitative results. Universal ML interatomic potentials are the intended path to periodic-table-wide coverage.
 
+Externally produced results can be validated with
+`mattergraph_sim.parsers.parse_result_envelope`. This is result interchange only; it does not
+launch, route, or coordinate simulation engines.
+
 ## Install
 
 ```bash

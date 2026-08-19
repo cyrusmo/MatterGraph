@@ -20,7 +20,27 @@ Run checks:
 ```bash
 uv run ruff check .
 uv run pytest
+cd apps/web && npm ci && npm test && npm run build && npm run test:e2e
 ```
+
+## Public extension rails
+
+- **Schema evolution:** edit the Pydantic model first, keep changes additive under `0.1`, run
+  `python scripts/generate_schemas.py`, and add a backward-compatibility fixture plus parity test.
+  Reviewer approval, requirements, qualification, proprietary scores, and decision linkage do
+  not belong in public contracts.
+- **Connectors:** implement `Connector`, accept `ConnectorQuery`, preserve source IDs and method
+  provenance, and use `ConnectorHTTPPolicy` for HTTP paths. A connector must raise when it cannot
+  honor a query; it must not silently return an empty result for an unsupported capability.
+- **Contextual properties:** use `PropertyContext` for conditions and `SourceArtifact` for
+  citation, revision, license, page, and checksum. Do not hide context in an opaque `extra` field
+  when a typed public field exists.
+- **Graph features:** preserve exact periodic offsets and Cartesian displacements, reciprocal
+  edges, complete tied shells, no zero-distance self loops, and explicit disorder rejection.
+  Summary endpoints must omit raw `node_features`, `edge_index`, and large tensors.
+- **Result parsers:** produce `SimulationResultEnvelope` with engine/version, method, parameters,
+  checksums, convergence, properties, artifacts, and provenance. Parser examples import results;
+  they do not orchestrate simulators.
 
 ## Workspace packaging note
 

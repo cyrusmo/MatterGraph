@@ -2,10 +2,15 @@ import type {
   Capability,
   ChgnetReference,
   DemoPreflight,
+  DatasetImportMapping,
+  DatasetList,
+  ImportReport,
+  ImportResult,
   GraphSummary,
   LeMaterialWorkflowSummary,
   Material,
   ScoreAudit,
+  SlicePreview,
   SimulationJob,
 } from "../types/material";
 
@@ -21,8 +26,12 @@ class HttpError extends Error {
   }
 }
 
-export async function fetchMaterials(): Promise<Material[]> {
-  return requestJson<Material[]>("/materials", {}, "materials request failed");
+export async function fetchMaterials(datasetId?: string): Promise<Material[]> {
+  return requestJson<Material[]>(
+    withDataset("/materials", datasetId),
+    {},
+    "materials request failed",
+  );
 }
 
 export async function fetchLeMaterialWorkflow(): Promise<LeMaterialWorkflowSummary> {
@@ -46,9 +55,12 @@ export async function fetchCapabilities(): Promise<Capability[]> {
   return response.capabilities;
 }
 
-export async function fetchGraphSummary(materialId: string): Promise<GraphSummary> {
+export async function fetchGraphSummary(
+  materialId: string,
+  datasetId?: string,
+): Promise<GraphSummary> {
   return requestJson<GraphSummary>(
-    `/materials/${encodeURIComponent(materialId)}/graph-summary`,
+    withDataset(`/materials/${encodeURIComponent(materialId)}/graph-summary`, datasetId),
     {},
     "graph summary failed",
   );
@@ -62,6 +74,7 @@ export async function rankMaterialsAudit(
   eahMax: number,
   forceMax: number,
   missing: "worst" | "neutral" | "exclude",
+  datasetId?: string,
 ): Promise<ScoreAudit> {
   return requestJson<ScoreAudit>(
     "/scores/rank/audit",
@@ -75,10 +88,91 @@ export async function rankMaterialsAudit(
           max_force: { max: forceMax },
         },
         missing,
+        ...(datasetId ? { dataset_id: datasetId } : {}),
       }),
     },
     "rank request failed",
   );
+}
+
+export async function rankDatasetAudit(
+  datasetId: string,
+  objectives: Record<string, { direction: "minimize" | "maximize"; weight: number }>,
+  missing: "worst" | "neutral" | "exclude" = "worst",
+): Promise<ScoreAudit> {
+  return requestJson<ScoreAudit>(
+    "/scores/rank/audit",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dataset_id: datasetId, objectives, constraints: {}, missing }),
+    },
+    "local rank request failed",
+  );
+}
+
+export async function inspectDataset(input: {
+  filename: string;
+  format: "csv" | "jsonl";
+  content: string;
+}): Promise<ImportReport> {
+  return requestJson<ImportReport>(
+    "/datasets/inspect",
+    jsonPost(input),
+    "dataset inspection failed",
+  );
+}
+
+export async function importDataset(input: {
+  filename: string;
+  format: "csv" | "jsonl";
+  content: string;
+  mapping: DatasetImportMapping;
+  error_policy: "reject_file" | "skip_invalid_rows";
+}): Promise<ImportResult> {
+  return requestJson<ImportResult>(
+    "/datasets/import",
+    jsonPost(input),
+    "dataset import failed",
+  );
+}
+
+export async function fetchDatasets(): Promise<DatasetList> {
+  return requestJson<DatasetList>("/datasets", {}, "dataset registry request failed");
+}
+
+export async function deleteDataset(datasetId: string): Promise<void> {
+  await requestJson(
+    `/datasets/${encodeURIComponent(datasetId)}`,
+    { method: "DELETE" },
+    "dataset reset failed",
+  );
+}
+
+export async function fetchSlicePreview(
+  datasetId: string,
+  request: {
+    include_elements: string[];
+    exclude_elements: string[];
+    max_nsites?: number;
+    max_nelements?: number;
+    target?: string;
+  },
+): Promise<SlicePreview> {
+  return requestJson<SlicePreview>(
+    `/datasets/${encodeURIComponent(datasetId)}/slices/preview`,
+    jsonPost(request),
+    "slice preview failed",
+  );
+}
+
+export async function exportDataset(datasetId: string): Promise<Blob> {
+  const response = await requestRaw(
+    `/datasets/${encodeURIComponent(datasetId)}/export?format=jsonl`,
+    {},
+    "dataset export failed",
+  );
+  return response.blob();
 }
 
 export async function fetchChgnetReference(materialId: string): Promise<ChgnetReference> {
@@ -115,6 +209,15 @@ async function requestJson<T>(
   init: RequestInit,
   fallback: string,
 ): Promise<T> {
+  const response = await requestRaw(path, init, fallback);
+  return (await response.json()) as T;
+}
+
+async function requestRaw(
+  path: string,
+  init: RequestInit,
+  fallback: string,
+): Promise<Response> {
   const controller = new AbortController();
   const timeout = globalThis.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
@@ -122,7 +225,7 @@ async function requestJson<T>(
     if (!response.ok) {
       throw new HttpError(await responseMessage(response, fallback), response.status);
     }
-    return (await response.json()) as T;
+    return response;
   } catch (error) {
     if (error instanceof HttpError) {
       throw error;
@@ -136,6 +239,18 @@ async function requestJson<T>(
   } finally {
     globalThis.clearTimeout(timeout);
   }
+}
+
+function withDataset(path: string, datasetId?: string): string {
+  return datasetId ? `${path}?dataset_id=${encodeURIComponent(datasetId)}` : path;
+}
+
+function jsonPost(body: unknown): RequestInit {
+  return {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  };
 }
 
 async function responseMessage(response: Response, fallback: string): Promise<string> {

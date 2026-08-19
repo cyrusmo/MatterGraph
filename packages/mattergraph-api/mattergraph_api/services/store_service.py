@@ -5,6 +5,7 @@ from pathlib import Path
 
 from mattergraph import MaterialStore
 
+from mattergraph_api.services.dataset_registry import dataset_registry
 from mattergraph_api.services.demo_service import get_demo_store
 
 _store: MaterialStore | None = None
@@ -23,6 +24,13 @@ def get_store() -> MaterialStore:
     p = _resolve_demo_path()
     _store = MaterialStore.from_jsonl(p) if p is not None and p.is_file() else get_demo_store()
   return _store
+
+
+def resolve_store(dataset_id: str | None = None) -> MaterialStore:
+  """Return the bundled store or lazily materialize one selected local dataset."""
+  if dataset_id is None:
+    return get_store()
+  return dataset_registry.materialize(dataset_id)
 
 
 def reset_store(s: MaterialStore) -> None:

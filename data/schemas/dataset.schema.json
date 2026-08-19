@@ -1,0 +1,87 @@
+{
+  "$id": "https://mattergraph.dev/schemas/0.1/dataset.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Compact, public metadata for a reproducible material dataset snapshot.",
+  "properties": {
+    "accepted_count": {
+      "minimum": 0,
+      "title": "Accepted Count",
+      "type": "integer"
+    },
+    "content_sha256": {
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "dataset_id": {
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "degraded": {
+      "default": false,
+      "title": "Degraded",
+      "type": "boolean"
+    },
+    "format": {
+      "enum": [
+        "csv",
+        "jsonl",
+        "normalized_jsonl"
+      ],
+      "title": "Format",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "normalized_bytes": {
+      "minimum": 0,
+      "title": "Normalized Bytes",
+      "type": "integer"
+    },
+    "normalized_sha256": {
+      "title": "Normalized Sha256",
+      "type": "string"
+    },
+    "record_count": {
+      "minimum": 0,
+      "title": "Record Count",
+      "type": "integer"
+    },
+    "rejected_count": {
+      "minimum": 0,
+      "title": "Rejected Count",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "0.1",
+      "default": "0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "default": "local_file",
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "name",
+    "format",
+    "record_count",
+    "accepted_count",
+    "rejected_count",
+    "content_sha256",
+    "normalized_sha256",
+    "normalized_bytes"
+  ],
+  "title": "DatasetManifest",
+  "type": "object"
+}
