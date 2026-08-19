@@ -119,3 +119,5 @@ jobs:
         working-directory: apps/web
       - run: npm run test:e2e
         working-directory: apps/web
+        env:
+          MATTERGRAPH_API_READY_TIMEOUT_SECONDS: "30"

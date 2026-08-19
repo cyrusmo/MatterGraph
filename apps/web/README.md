@@ -2,7 +2,7 @@
 
 Vite + React + TypeScript + Three.js. The presentation-safe path starts the deterministic,
 checksummed real-record API snapshot,
-waits for its preflight checks, and then starts Vite:
+waits for API health, and then starts Vite:
 
 ```bash
 ./scripts/run_public_demo.sh
@@ -10,7 +10,9 @@ waits for its preflight checks, and then starts Vite:
 
 The UI is available at `http://127.0.0.1:5173`. The launcher defaults the API to port `8001`,
 fails without stopping anything if either port is occupied, and cleans up only its own child
-process. Override ports with `MATTERGRAPH_API_PORT` and `MATTERGRAPH_WEB_PORT`.
+process. Override ports with `MATTERGRAPH_API_PORT` and `MATTERGRAPH_WEB_PORT`. The positive
+integer `MATTERGRAPH_API_READY_TIMEOUT_SECONDS` controls the cold-start failure ceiling and
+defaults to 15 seconds; it does not change the UI's five-second API request timeout.
 
 The default **Guided demo** preserves the five-screen SPC story. **Local workbench** accepts
 CSV/JSONL up to 5 MiB and 5,000 rows, keeps imported content in an ephemeral byte-budgeted

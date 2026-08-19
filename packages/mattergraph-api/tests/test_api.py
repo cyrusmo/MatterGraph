@@ -8,7 +8,18 @@ from mattergraph_api.main import app
 pytestmark = pytest.mark.asyncio
 
 
-async def test_health() -> None:
+async def test_health_does_not_materialize_demo(monkeypatch: pytest.MonkeyPatch) -> None:
+  def unexpected_demo_work(*_args: object, **_kwargs: object) -> None:
+    raise AssertionError("health endpoint invoked demo materialization or graph work")
+
+  monkeypatch.setattr(
+    "mattergraph_api.services.store_service.get_store",
+    unexpected_demo_work,
+  )
+  monkeypatch.setattr(
+    "mattergraph_api.routes.demo.graph_summary",
+    unexpected_demo_work,
+  )
   transport = ASGITransport(app=app)
   async with AsyncClient(transport=transport, base_url="http://test") as ac:
     r = await ac.get("/health")
