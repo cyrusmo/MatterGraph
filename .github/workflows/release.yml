@@ -4,10 +4,11 @@ name: Release
 #
 # Authentication uses PyPI Trusted Publishing (OIDC) — there is no API token to
 # store or rotate. Before the first release, register this workflow as a trusted
-# publisher for each of the six project names on PyPI:
+# publisher for each of the six project names on PyPI and TestPyPI:
 #   mattergraph, mattergraph-core, mattergraph-connectors,
 #   mattergraph-benchmarks, mattergraph-sim, mattergraph-api
-# using owner `cyrusmo`, repository `MatterGraph`, workflow `release.yml`.
+# using owner `cyrusmo`, repository `MatterGraph`, workflow `release.yml`, and
+# environment `pypi` or `testpypi` respectively.
 #
 # Run the workflow manually (workflow_dispatch) to publish to TestPyPI instead,
 # which is the safe way to rehearse a release.
@@ -17,15 +18,6 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
-    inputs:
-      target:
-        description: "Publish target"
-        required: true
-        default: testpypi
-        type: choice
-        options:
-          - testpypi
-          - pypi
 
 jobs:
   # Never publish something that does not pass its own test suite.
@@ -38,8 +30,8 @@ jobs:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
-      - run: uv sync --all-packages --group dev
+          version: "0.11.7"
+      - run: uv sync --all-packages --group dev --extra all
       - run: uv run ruff check .
       - run: uv run pytest
 
@@ -53,7 +45,12 @@ jobs:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
+          version: "0.11.7"
+
+      - name: Check target registry and immutable version
+        env:
+          RELEASE_INDEX: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
+        run: python scripts/release_checks.py registry --index "$RELEASE_INDEX" --version 0.1.0
 
       # Guard against tagging v1.2.3 while pyproject still says 0.1.0.
       - name: Check tag matches project version
@@ -68,34 +65,80 @@ jobs:
           echo "Tag and project version agree: $project_version"
 
       - name: Build all workspace packages
-        run: uv build --all-packages --out-dir dist
+        run: >-
+          uv build --all-packages --out-dir dist --clear --no-create-gitignore
+          --build-constraints build-constraints.txt
+
+      - name: Audit release artifacts
+        run: python scripts/release_checks.py artifacts --dist dist --version 0.1.0
 
       - name: Check package metadata
-        run: uvx twine check dist/*
+        run: uvx --from twine==6.2.0 twine check dist/*
 
       # The metapackage depends on the member packages, so they are published
       # first. Splitting the artifacts here keeps that ordering explicit.
       - name: Split members from metapackage
-        run: |
-          mkdir -p dist-members dist-meta
-          mv dist/mattergraph_* dist-members/
-          mv dist/mattergraph-* dist-meta/
-          echo "members:"; ls dist-members
-          echo "metapackage:"; ls dist-meta
+        run: >-
+          python scripts/release_checks.py split --dist dist
+          --members dist-members --metapackage dist-meta
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
           name: dist-members
           path: dist-members/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: dist-meta
           path: dist-meta/
+          if-no-files-found: error
 
-  publish-members:
+  install-artifacts:
     needs: build
     runs-on: ubuntu-latest
-    environment: release
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+        install-mode: [default, all]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+      - name: Install and exercise built distributions
+        run: |
+          python -m venv .release-smoke
+          .release-smoke/bin/python -m pip install --upgrade pip
+          .release-smoke/bin/python -m pip install \
+            --no-cache-dir \
+            --report local-install-report.json \
+            dist/*.whl
+          if [ "${{ matrix.install-mode }}" = "all" ]; then
+            .release-smoke/bin/python -m pip install \
+              --no-cache-dir \
+              --find-links dist \
+              "mattergraph[all]==0.1.0"
+          fi
+          .release-smoke/bin/python -m pip check
+          .release-smoke/bin/python scripts/release_checks.py smoke \
+            --version 0.1.0 \
+            --mode "${{ matrix.install-mode }}"
+
+  publish-members:
+    needs: [build, install-artifacts]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
     permissions:
       id-token: write # required for Trusted Publishing
     steps:
@@ -106,12 +149,12 @@ jobs:
       - name: Publish member packages
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          repository-url: ${{ (github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi') && 'https://test.pypi.org/legacy/' || '' }}
+          repository-url: ${{ github.event_name == 'workflow_dispatch' && 'https://test.pypi.org/legacy/' || '' }}
 
   publish-metapackage:
     needs: publish-members
     runs-on: ubuntu-latest
-    environment: release
+    environment: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
     permissions:
       id-token: write
     steps:
@@ -122,10 +165,57 @@ jobs:
       - name: Publish metapackage
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          repository-url: ${{ (github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi') && 'https://test.pypi.org/legacy/' || '' }}
+          repository-url: ${{ github.event_name == 'workflow_dispatch' && 'https://test.pypi.org/legacy/' || '' }}
+
+  published-install:
+    needs: publish-metapackage
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+        install-mode: [default, all]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install from the target registry
+        env:
+          RELEASE_INDEX: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
+        run: |
+          python -m venv .published-smoke
+          .published-smoke/bin/python -m pip install --upgrade pip
+          spec="mattergraph==0.1.0"
+          if [ "${{ matrix.install-mode }}" = "all" ]; then
+            spec="mattergraph[all]==0.1.0"
+          fi
+          if [ "$RELEASE_INDEX" = "testpypi" ]; then
+            index_args=(
+              --index-url https://test.pypi.org/simple/
+              --extra-index-url https://pypi.org/simple/
+            )
+          else
+            index_args=(--index-url https://pypi.org/simple/)
+          fi
+          .published-smoke/bin/python -m pip install \
+            --no-cache-dir \
+            --retries 10 \
+            --timeout 15 \
+            "${index_args[@]}" \
+            --report install-report.json \
+            "$spec"
+          .published-smoke/bin/python -m pip check
+          .published-smoke/bin/python scripts/release_checks.py report \
+            --report install-report.json \
+            --index "$RELEASE_INDEX" \
+            --version 0.1.0
+          .published-smoke/bin/python scripts/release_checks.py smoke \
+            --version 0.1.0 \
+            --mode "${{ matrix.install-mode }}"
 
   github-release:
-    needs: publish-metapackage
+    needs: [build, published-install]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:

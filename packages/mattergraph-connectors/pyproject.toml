@@ -19,7 +19,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-  "mattergraph-core",
+  "mattergraph-core~=0.1.0",
   "httpx>=0.27.0",
   "pandas>=2.0",
   "pymatgen>=2024.1.1",
@@ -29,7 +29,7 @@ dependencies = [
 # mp-api and jarvis-tools are per-source SDKs, not needed to import this package or to use
 # the NOMAD, OPTIMADE, or CSV paths. They are extras so the ImportError hints in
 # __init__.py are true statements rather than instructions for an install that already
-# happened. `all` exists for `uv sync --all-packages`-style full environments.
+# happened. `all` exists for explicit full environments such as `uv sync --extra all`.
 [project.optional-dependencies]
 mp = ["mp-api>=0.40.0"]
 jarvis = ["jarvis-tools>=2024.1.1"]
@@ -50,3 +50,7 @@ mattergraph-core = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["mattergraph_connectors"]
+core-metadata-version = "2.4"
+
+[tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"

@@ -136,8 +136,14 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
   period. Query OQMD through its OPTIMADE endpoint instead.
 - **Breaking:** `mp-api` and `jarvis-tools` moved from hard dependencies of
   `mattergraph-connectors` to the `[mp]` and `[jarvis]` extras. The package already
-  told users these were optional while requiring them at install time. Installing
-  `mattergraph` itself is unaffected; it pulls `mattergraph-connectors[all]`.
+  told users these were optional while requiring them at install time. The
+  `mattergraph` metapackage is lightweight by default and exposes matching `[mp]`,
+  `[jarvis]`, and `[all]` extras.
+- Internal MatterGraph dependencies use the compatible `~=0.1.0` release family,
+  preventing an installation from mixing incompatible pre-1.0 minor versions.
+- Release builds pin their backends, require Core Metadata 2.4, audit all twelve
+  wheel/sdist artifacts, and block publication until clean Python 3.10 and 3.12
+  installs pass for both the lightweight and `[all]` surfaces.
 - Connector `fetch()` takes a `ConnectorQuery`. The previous keyword form still
   works and warns; `material_ids` and `chunk_size` map to `source_ids` and
   `page_size`.

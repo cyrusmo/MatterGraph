@@ -1,0 +1,5 @@
+# Release build backends are pinned so a backend update cannot silently change
+# generated Core Metadata. The release audit still inspects every archive.
+hatchling==1.32.0
+setuptools==84.0.0
+wheel==0.48.0

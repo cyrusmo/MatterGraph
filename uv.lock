@@ -1381,9 +1381,20 @@ source = { editable = "." }
 dependencies = [
     { name = "mattergraph-api" },
     { name = "mattergraph-benchmarks" },
-    { name = "mattergraph-connectors", extra = ["all"] },
+    { name = "mattergraph-connectors" },
     { name = "mattergraph-core" },
     { name = "mattergraph-sim" },
+]
+
+[package.optional-dependencies]
+all = [
+    { name = "mattergraph-connectors", extra = ["all"] },
+]
+jarvis = [
+    { name = "mattergraph-connectors", extra = ["jarvis"] },
+]
+mp = [
+    { name = "mattergraph-connectors", extra = ["mp"] },
 ]
 
 [package.dev-dependencies]
@@ -1406,10 +1417,14 @@ docs = [
 requires-dist = [
     { name = "mattergraph-api", editable = "packages/mattergraph-api" },
     { name = "mattergraph-benchmarks", editable = "packages/mattergraph-benchmarks" },
-    { name = "mattergraph-connectors", extras = ["all"], editable = "packages/mattergraph-connectors" },
+    { name = "mattergraph-connectors", editable = "packages/mattergraph-connectors" },
+    { name = "mattergraph-connectors", extras = ["all"], marker = "extra == 'all'", editable = "packages/mattergraph-connectors" },
+    { name = "mattergraph-connectors", extras = ["jarvis"], marker = "extra == 'jarvis'", editable = "packages/mattergraph-connectors" },
+    { name = "mattergraph-connectors", extras = ["mp"], marker = "extra == 'mp'", editable = "packages/mattergraph-connectors" },
     { name = "mattergraph-core", editable = "packages/mattergraph-core" },
     { name = "mattergraph-sim", editable = "packages/mattergraph-sim" },
 ]
+provides-extras = ["mp", "jarvis", "all"]
 
 [package.metadata.requires-dev]
 dev = [

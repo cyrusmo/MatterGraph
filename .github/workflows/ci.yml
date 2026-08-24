@@ -21,9 +21,9 @@ jobs:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
+          version: "0.11.7"
       - name: Sync
-        run: uv sync --all-packages --group dev
+        run: uv sync --all-packages --group dev --extra all
       - name: Ruff
         run: uv run ruff check .
 
@@ -42,9 +42,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
+          version: "0.11.7"
       - name: Sync
-        run: uv sync --all-packages --group dev --python ${{ matrix.python-version }}
+        run: uv sync --all-packages --group dev --extra all --python ${{ matrix.python-version }}
       - name: Pytest
         run: uv run pytest --cov --cov-report=term-missing --cov-report=xml
 
@@ -57,12 +57,57 @@ jobs:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
+          version: "0.11.7"
       # Catches packaging breakage on the pull request rather than at tag time.
       - name: Build all packages
-        run: uv build --all-packages --out-dir dist
+        run: >-
+          uv build --all-packages --out-dir dist --clear --no-create-gitignore
+          --build-constraints build-constraints.txt
+      - name: Audit release artifacts
+        run: python scripts/release_checks.py artifacts --dist dist --version 0.1.0
       - name: Check metadata
-        run: uvx twine check dist/*
+        run: uvx --from twine==6.2.0 twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+          if-no-files-found: error
+
+  install-wheels:
+    needs: build-wheels
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+        install-mode: [default, all]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+      - name: Install and exercise built distributions
+        run: |
+          python -m venv .release-smoke
+          .release-smoke/bin/python -m pip install --upgrade pip
+          .release-smoke/bin/python -m pip install \
+            --no-cache-dir \
+            --report local-install-report.json \
+            dist/*.whl
+          if [ "${{ matrix.install-mode }}" = "all" ]; then
+            .release-smoke/bin/python -m pip install \
+              --no-cache-dir \
+              --find-links dist \
+              "mattergraph[all]==0.1.0"
+          fi
+          .release-smoke/bin/python -m pip check
+          .release-smoke/bin/python scripts/release_checks.py smoke \
+            --version 0.1.0 \
+            --mode "${{ matrix.install-mode }}"
 
   memory-budget:
     runs-on: ubuntu-latest
@@ -73,9 +118,9 @@ jobs:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
+          version: "0.11.7"
       - name: Sync test environment
-        run: uv sync --all-packages --group dev --python 3.12
+        run: uv sync --all-packages --group dev --extra all --python 3.12
       - name: Verify byte registry and peak child RSS
         env:
           MATTERGRAPH_RUN_MEMORY_TEST: "1"
@@ -106,8 +151,8 @@ jobs:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.11.x"
-      - run: uv sync --all-packages --group dev --python 3.12
+          version: "0.11.7"
+      - run: uv sync --all-packages --group dev --extra all --python 3.12
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
