@@ -139,6 +139,18 @@ jobs:
         working-directory: apps/web
       - run: npm test
         working-directory: apps/web
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+        working-directory: apps/web
       - run: npm run build
         working-directory: apps/web
 
@@ -166,3 +178,17 @@ jobs:
         working-directory: apps/web
         env:
           MATTERGRAPH_API_READY_TIMEOUT_SECONDS: "30"
+
+  # Stable branch-protection context for the complete matrix and release gates.
+  tests:
+    needs:
+      - test
+      - build-wheels
+      - install-wheels
+      - memory-budget
+      - web
+      - typecheck
+      - browser-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All required MatterGraph CI gates passed."
