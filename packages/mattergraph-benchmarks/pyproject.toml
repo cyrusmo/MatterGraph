@@ -19,7 +19,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-  "mattergraph-core",
+  "mattergraph-core~=0.1.0",
   "numpy>=1.24",
   "pandas>=2.0",
   "scikit-learn>=1.3",
@@ -42,3 +42,7 @@ mattergraph-core = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["mattergraph_benchmarks"]
+core-metadata-version = "2.4"
+
+[tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"

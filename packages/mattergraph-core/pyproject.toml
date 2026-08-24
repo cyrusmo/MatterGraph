@@ -37,9 +37,11 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["mattergraph"]
+core-metadata-version = "2.4"
 
 [tool.hatch.build.targets.sdist]
 include = ["mattergraph/**"]
+core-metadata-version = "2.4"
 
 [tool.ruff]
 line-length = 100

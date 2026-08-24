@@ -58,7 +58,7 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
     (
       "MaterialsProjectConnector needs the optional `mp-api` dependency: install the extra "
       "with `pip install 'mattergraph-connectors[mp]'`, or run "
-      "`uv sync --all-packages --group dev` for a full workspace environment."
+      "`uv sync --all-packages --group dev --extra all` for a full workspace environment."
     ),
   ),
   "JarvisConnector": (
@@ -67,7 +67,7 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
     (
       "JarvisConnector needs the optional `jarvis-tools` dependency: install the extra "
       "with `pip install 'mattergraph-connectors[jarvis]'`, or run "
-      "`uv sync --all-packages --group dev` for a full workspace environment."
+      "`uv sync --all-packages --group dev --extra all` for a full workspace environment."
     ),
   ),
   "load_materials_from_csv": (

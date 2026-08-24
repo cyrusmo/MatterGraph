@@ -48,11 +48,20 @@ MatterGraph Core focuses on transparent workflow primitives and guardrails. Prop
 pip install mattergraph
 ```
 
-That pulls the full workspace. Install only what you need instead:
+That installs the public toolkit without provider-specific SDKs. Opt into only the connector
+SDKs you need:
+
+```bash
+pip install 'mattergraph[mp]'       # Materials Project SDK
+pip install 'mattergraph[jarvis]'   # JARVIS SDK
+pip install 'mattergraph[all]'      # all optional public connector SDKs
+```
+
+Install an individual package for a smaller application surface:
 
 ```bash
 pip install mattergraph-core         # schema, normalization, graphs, scoring
-pip install mattergraph-connectors   # Materials Project, JARVIS, NOMAD, LeMat-Bulk
+pip install mattergraph-connectors   # NOMAD, OPTIMADE, local data, LeMat-Bulk
 pip install mattergraph-sim          # ASE job specs and runners
 pip install mattergraph-benchmarks   # metrics and Matbench adapter
 pip install mattergraph-api          # FastAPI demo service
@@ -66,7 +75,7 @@ cd MatterGraph
 python3 -m venv .venv
 source .venv/bin/activate
 pip install uv
-uv sync --all-packages --group dev
+uv sync --all-packages --group dev --extra all
 # Optional: copy .env.example to .env and set MP_API_KEY for Materials Project
 export MATTERGRAPH_DEMO_DATA=data/demo/materials_sample.jsonl
 uv run uvicorn mattergraph_api.main:app --reload --host 0.0.0.0 --port 8000

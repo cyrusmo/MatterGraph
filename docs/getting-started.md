@@ -1,7 +1,7 @@
 # Getting started
 
 1. Clone the repository and create a virtual environment (see the root [README](https://github.com/cyrusmo/MatterGraph/blob/main/README.md)).
-2. `uv sync --all-packages --group dev`
+2. `uv sync --all-packages --group dev --extra all`
 3. Run `./scripts/run_public_demo.sh` from the repository root.
 4. Open `http://127.0.0.1:5173`. The launcher checks both ports, waits for API health, and stops only the processes it started.
 5. Use **Guided demo** for the deterministic SPC story or **Local workbench** for a bounded CSV/JSONL file.

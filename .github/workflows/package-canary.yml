@@ -1,0 +1,36 @@
+name: Package install canary
+
+on:
+  schedule:
+    - cron: "17 13 * * 1"
+  workflow_dispatch:
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install the production package without caches
+        run: |
+          python -m venv .package-canary
+          .package-canary/bin/python -m pip install --upgrade pip
+          .package-canary/bin/python -m pip install \
+            --no-cache-dir \
+            --index-url https://pypi.org/simple/ \
+            --report install-report.json \
+            "mattergraph==0.1.0"
+          .package-canary/bin/python -m pip check
+          .package-canary/bin/python scripts/release_checks.py report \
+            --report install-report.json \
+            --index pypi \
+            --version 0.1.0
+          .package-canary/bin/python scripts/release_checks.py smoke \
+            --version 0.1.0 \
+            --mode default

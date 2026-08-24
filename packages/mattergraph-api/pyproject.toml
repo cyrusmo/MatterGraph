@@ -20,9 +20,9 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-  "mattergraph-core",
-  "mattergraph-connectors",
-  "mattergraph-sim",
+  "mattergraph-core~=0.1.0",
+  "mattergraph-connectors~=0.1.0",
+  "mattergraph-sim~=0.1.0",
   "fastapi>=0.110",
   "uvicorn[standard]>=0.29.0",
   "pydantic>=2.5",
@@ -47,3 +47,7 @@ mattergraph-sim = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["mattergraph_api"]
+core-metadata-version = "2.4"
+
+[tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"
