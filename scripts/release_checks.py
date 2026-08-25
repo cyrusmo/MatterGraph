@@ -210,6 +210,31 @@ def split_artifacts(dist: Path, members: Path, metapackage: Path) -> None:
   print("Split 10 member artifacts and 2 metapackage artifacts.")
 
 
+def select_artifacts(dist: Path, package: str, output: Path) -> None:
+  """Copy exactly one package's wheel and sdist into an isolated publish directory."""
+
+  normalized_package = normalize_name(package)
+  if normalized_package not in EXPECTED_PACKAGES:
+    raise ReleaseCheckError(f"Unknown MatterGraph package: {package}")
+  artifacts = load_artifacts(dist)
+  selected = [
+    artifact
+    for artifact in artifacts
+    if normalize_name(artifact.message.get("Name", "")) == normalized_package
+  ]
+  if len(selected) != 2 or {artifact.kind for artifact in selected} != {"wheel", "sdist"}:
+    kinds = sorted(artifact.kind for artifact in selected)
+    raise ReleaseCheckError(
+      f"Expected one wheel and one sdist for {normalized_package}, found {kinds}"
+    )
+  if output.exists() and any(output.iterdir()):
+    raise ReleaseCheckError(f"Publish destination must be empty: {output}")
+  output.mkdir(parents=True, exist_ok=True)
+  for artifact in selected:
+    shutil.copy2(artifact.path, output / artifact.path.name)
+  print(f"Selected wheel and sdist for {normalized_package}.")
+
+
 def check_registry(index: str, version: str) -> None:
   base_url = REGISTRIES[index]
   failures: list[str] = []
@@ -336,6 +361,13 @@ def build_parser() -> argparse.ArgumentParser:
   split.add_argument("--members", type=Path, default=Path("dist-members"))
   split.add_argument("--metapackage", type=Path, default=Path("dist-meta"))
 
+  select = subparsers.add_parser(
+    "select", help="select one package's wheel and sdist for isolated publishing"
+  )
+  select.add_argument("--dist", type=Path, default=Path("dist"))
+  select.add_argument("--package", required=True)
+  select.add_argument("--output", type=Path, default=Path("publish-dist"))
+
   registry = subparsers.add_parser("registry", help="check project ownership and version space")
   registry.add_argument("--index", choices=sorted(REGISTRIES), required=True)
   registry.add_argument("--version", default="0.1.0")
@@ -358,6 +390,8 @@ def main() -> int:
       check_artifacts(args.dist, args.version)
     elif args.command == "split":
       split_artifacts(args.dist, args.members, args.metapackage)
+    elif args.command == "select":
+      select_artifacts(args.dist, args.package, args.output)
     elif args.command == "registry":
       check_registry(args.index, args.version)
     elif args.command == "report":
