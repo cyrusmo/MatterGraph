@@ -72,6 +72,18 @@ its publisher has not been registered yet. The workflow:
 5. Installs from TestPyPI and checks pip's installation report to prove all six MatterGraph
    distributions came from `test-files.pythonhosted.org`.
 
+The TestPyPI proof does not use `--extra-index-url`: pip does not prioritize indexes, so allowing
+both indexes to resolve every dependency can select unrelated TestPyPI projects. The workflow first
+seeds external dependencies exclusively from production PyPI, removes the locally installed
+MatterGraph distributions, and reinstalls all six exact MatterGraph versions from TestPyPI with
+dependency resolution disabled. `pip check`, the SDK smoke, and the install report then verify the
+combined environment and artifact origins.
+
+If every upload succeeded but a post-publication proof failed, rerun the workflow with
+`verify_existing` selected. This mode rebuilds and audits the local artifacts, skips the immutable
+version check and every upload job, and runs only the existing TestPyPI installation proof. Never
+rerun a publishing dispatch against filenames that already exist.
+
 If any package name is claimed, any `0.1.0` artifact already exists, or any archive emits metadata
 2.5 or newer, stop. Do not rename packages or weaken validation inside the release run.
 

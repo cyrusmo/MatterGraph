@@ -14,13 +14,20 @@ name: Release
 # environment claim and the initial deployments are approved in waves.
 #
 # Run the workflow manually (workflow_dispatch) to publish to TestPyPI instead,
-# which is the safe way to rehearse a release.
+# which is the safe way to rehearse a release. The verify-existing option reruns
+# only the post-publication proof when immutable TestPyPI files already exist.
 
 on:
   push:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      verify_existing:
+        description: Verify the existing TestPyPI 0.1.0 release without uploading
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   # Never publish something that does not pass its own test suite.
@@ -51,6 +58,7 @@ jobs:
           version: "0.11.7"
 
       - name: Check target registry and immutable version
+        if: ${{ !inputs.verify_existing }}
         env:
           RELEASE_INDEX: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
         run: python scripts/release_checks.py registry --index "$RELEASE_INDEX" --version 0.1.0
@@ -122,6 +130,7 @@ jobs:
 
   publish-members:
     needs: [build, install-artifacts]
+    if: ${{ !inputs.verify_existing }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -154,6 +163,7 @@ jobs:
 
   publish-metapackage:
     needs: publish-members
+    if: ${{ !inputs.verify_existing }}
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
     permissions:
@@ -176,7 +186,10 @@ jobs:
           repository-url: ${{ github.event_name == 'workflow_dispatch' && 'https://test.pypi.org/legacy/' || '' }}
 
   published-install:
-    needs: publish-metapackage
+    needs: [build, publish-metapackage]
+    if: >-
+      ${{ always() && needs.build.result == 'success' &&
+      (needs.publish-metapackage.result == 'success' || inputs.verify_existing) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -188,31 +201,74 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/download-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: release-dist
+          path: dist/
       - name: Install from the target registry
         env:
           RELEASE_INDEX: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
         run: |
           python -m venv .published-smoke
           .published-smoke/bin/python -m pip install --upgrade pip
-          spec="mattergraph==0.1.0"
-          if [ "${{ matrix.install-mode }}" = "all" ]; then
-            spec="mattergraph[all]==0.1.0"
-          fi
           if [ "$RELEASE_INDEX" = "testpypi" ]; then
-            index_args=(
-              --index-url https://test.pypi.org/simple/
-              --extra-index-url https://pypi.org/simple/
+            # Never let TestPyPI participate in external dependency resolution.
+            # Seed dependencies from production PyPI using the audited local
+            # wheels, remove only MatterGraph, then reinstall all six exact
+            # distributions from TestPyPI without dependency resolution.
+            .published-smoke/bin/python -m pip install \
+              --no-cache-dir \
+              --index-url https://pypi.org/simple/ \
+              dist/*.whl
+            if [ "${{ matrix.install-mode }}" = "all" ]; then
+              .published-smoke/bin/python -m pip install \
+                --no-cache-dir \
+                --index-url https://pypi.org/simple/ \
+                --find-links dist \
+                "mattergraph[all]==0.1.0"
+            fi
+            mattergraph_packages=(
+              mattergraph
+              mattergraph-api
+              mattergraph-benchmarks
+              mattergraph-connectors
+              mattergraph-core
+              mattergraph-sim
             )
+            .published-smoke/bin/python -m pip uninstall -y "${mattergraph_packages[@]}"
+            mattergraph_specs=(
+              "mattergraph==0.1.0"
+              "mattergraph-api==0.1.0"
+              "mattergraph-benchmarks==0.1.0"
+              "mattergraph-connectors==0.1.0"
+              "mattergraph-core==0.1.0"
+              "mattergraph-sim==0.1.0"
+            )
+            if [ "${{ matrix.install-mode }}" = "all" ]; then
+              mattergraph_specs[0]="mattergraph[all]==0.1.0"
+            fi
+            .published-smoke/bin/python -m pip install \
+              --no-cache-dir \
+              --retries 10 \
+              --timeout 15 \
+              --no-deps \
+              --index-url https://test.pypi.org/simple/ \
+              --report install-report.json \
+              "${mattergraph_specs[@]}"
           else
-            index_args=(--index-url https://pypi.org/simple/)
+            spec="mattergraph==0.1.0"
+            if [ "${{ matrix.install-mode }}" = "all" ]; then
+              spec="mattergraph[all]==0.1.0"
+            fi
+            .published-smoke/bin/python -m pip install \
+              --no-cache-dir \
+              --retries 10 \
+              --timeout 15 \
+              --index-url https://pypi.org/simple/ \
+              --report install-report.json \
+              "$spec"
           fi
-          .published-smoke/bin/python -m pip install \
-            --no-cache-dir \
-            --retries 10 \
-            --timeout 15 \
-            "${index_args[@]}" \
-            --report install-report.json \
-            "$spec"
           .published-smoke/bin/python -m pip check
           .published-smoke/bin/python scripts/release_checks.py report \
             --report install-report.json \

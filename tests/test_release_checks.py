@@ -97,3 +97,15 @@ def test_select_artifacts_isolates_one_wheel_and_sdist(
 def test_select_artifacts_rejects_unknown_package(tmp_path: Path) -> None:
   with pytest.raises(ReleaseCheckError, match="Unknown MatterGraph package"):
     select_artifacts(tmp_path / "dist", "not-mattergraph", tmp_path / "publish-dist")
+
+
+def test_testpypi_install_does_not_mix_dependency_indexes() -> None:
+  workflow = (Path(__file__).parents[1] / ".github" / "workflows" / "release.yml").read_text()
+
+  assert "--extra-index-url" not in workflow
+  assert "--index-url https://pypi.org/simple/" in workflow
+  assert "--index-url https://test.pypi.org/simple/" in workflow
+  assert "--no-deps" in workflow
+  assert "verify_existing" in workflow
+  for package in EXPECTED_PACKAGES:
+    assert f'"{package}==0.1.0"' in workflow
