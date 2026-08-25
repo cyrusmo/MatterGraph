@@ -1,6 +1,6 @@
 # MatterGraph
 
-[![PyPI](https://img.shields.io/pypi/v/mattergraph)](https://pypi.org/project/mattergraph/)
+[![PyPI](https://img.shields.io/pypi/v/mattergraph?cacheSeconds=300)](https://pypi.org/project/mattergraph/)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 [![Docs](https://github.com/cyrusmo/MatterGraph/actions/workflows/docs.yml/badge.svg)](https://cyrusmo.github.io/MatterGraph/)
