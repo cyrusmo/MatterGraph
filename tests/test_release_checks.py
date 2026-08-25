@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+from email.message import Message
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,7 @@ ReleaseCheckError = release_checks.ReleaseCheckError
 _validate_requirement = release_checks._validate_requirement
 check_install_report = release_checks.check_install_report
 normalize_name = release_checks.normalize_name
+select_artifacts = release_checks.select_artifacts
 
 
 def _write_report(path: Path, host: str) -> None:
@@ -64,3 +66,34 @@ def test_internal_requirements_must_use_compatible_registry_versions(requirement
 
 def test_distribution_names_use_pep_503_normalization() -> None:
   assert normalize_name("MatterGraph_API") == "mattergraph-api"
+
+
+def test_select_artifacts_isolates_one_wheel_and_sdist(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  dist = tmp_path / "dist"
+  dist.mkdir()
+  artifacts = []
+  for package in sorted(EXPECTED_PACKAGES):
+    for kind, suffix in (("wheel", ".whl"), ("sdist", ".tar.gz")):
+      path = dist / f"{package}-0.1.0{suffix}"
+      path.write_text(f"{package}-{kind}")
+      message = Message()
+      message["Name"] = package
+      artifacts.append(
+        release_checks.ArtifactMetadata(path=path, kind=kind, message=message, raw="")
+      )
+  monkeypatch.setattr(release_checks, "load_artifacts", lambda _: artifacts)
+
+  output = tmp_path / "publish-dist"
+  select_artifacts(dist, "MatterGraph_API", output)
+
+  assert sorted(path.name for path in output.iterdir()) == [
+    "mattergraph-api-0.1.0.tar.gz",
+    "mattergraph-api-0.1.0.whl",
+  ]
+
+
+def test_select_artifacts_rejects_unknown_package(tmp_path: Path) -> None:
+  with pytest.raises(ReleaseCheckError, match="Unknown MatterGraph package"):
+    select_artifacts(tmp_path / "dist", "not-mattergraph", tmp_path / "publish-dist")
