@@ -162,7 +162,7 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
   branches, so branch pushes keep getting feedback.
 - `SECURITY.md` now names an actual reporting channel.
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-08-24
 
 Initial public surface.
 
