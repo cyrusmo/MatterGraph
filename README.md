@@ -44,17 +44,21 @@ MatterGraph Core focuses on transparent workflow primitives and guardrails. Prop
 
 ## Install
 
+MatterGraph **0.1.0 is published on [PyPI](https://pypi.org/project/mattergraph/0.1.0/)**.
+The release supports Python 3.10 and newer; its wheels, source distributions, and provenance are
+also attached to the [GitHub release](https://github.com/cyrusmo/MatterGraph/releases/tag/v0.1.0).
+
 ```bash
-pip install mattergraph
+pip install "mattergraph==0.1.0"
 ```
 
 That installs the public toolkit without provider-specific SDKs. Opt into only the connector
 SDKs you need:
 
 ```bash
-pip install 'mattergraph[mp]'       # Materials Project SDK
-pip install 'mattergraph[jarvis]'   # JARVIS SDK
-pip install 'mattergraph[all]'      # all optional public connector SDKs
+pip install 'mattergraph[mp]==0.1.0'       # Materials Project SDK
+pip install 'mattergraph[jarvis]==0.1.0'   # JARVIS SDK
+pip install 'mattergraph[all]==0.1.0'      # all optional public connector SDKs
 ```
 
 Install an individual package for a smaller application surface:
