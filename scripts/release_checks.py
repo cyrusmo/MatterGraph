@@ -7,10 +7,12 @@ import argparse
 import asyncio
 import importlib
 import json
+import os
 import re
 import shutil
 import sys
 import tarfile
+import tempfile
 import urllib.error
 import urllib.request
 import zipfile
@@ -38,6 +40,13 @@ REPORT_HOSTS = {
   "testpypi": "test-files.pythonhosted.org",
 }
 REPOSITORY_URL = "https://github.com/cyrusmo/MatterGraph"
+EXPECTED_RESOURCES = {
+  "mattergraph-core": "mattergraph/resources/materials_sample.jsonl",
+  "mattergraph-connectors": (
+    "mattergraph_connectors/resources/spc_real_snapshot.json"
+  ),
+  "mattergraph-api": "mattergraph_api/resources/chgnet_reference.json",
+}
 
 
 class ReleaseCheckError(RuntimeError):
@@ -150,6 +159,24 @@ def _validate_metapackage_extras(artifact: ArtifactMetadata) -> None:
       )
 
 
+def _validate_packaged_resource(artifact: ArtifactMetadata, distribution: str) -> None:
+  expected = EXPECTED_RESOURCES.get(distribution)
+  if expected is None:
+    return
+  if artifact.kind == "wheel":
+    with zipfile.ZipFile(artifact.path) as archive:
+      present = expected in archive.namelist()
+  else:
+    with tarfile.open(artifact.path, mode="r:gz") as archive:
+      present = any(
+        member.isfile() and member.name.endswith(f"/{expected}") for member in archive
+      )
+  if not present:
+    raise ReleaseCheckError(
+      f"{artifact.path.name}: missing installed workflow resource {expected}"
+    )
+
+
 def check_artifacts(dist: Path, version: str) -> None:
   artifacts = load_artifacts(dist)
   observed: dict[tuple[str, str], Path] = {}
@@ -180,6 +207,7 @@ def check_artifacts(dist: Path, version: str) -> None:
       _validate_requirement(requirement, version, artifact.path)
     if name == "mattergraph":
       _validate_metapackage_extras(artifact)
+    _validate_packaged_resource(artifact, name)
 
   expected_keys = {
     (name, kind) for name in EXPECTED_PACKAGES for kind in ("wheel", "sdist")
@@ -307,21 +335,57 @@ def smoke_installed(version: str, mode: str) -> None:
     importlib.import_module(module)
 
   import httpx
-  from mattergraph import Material
+  from mattergraph import Material, MaterialStore
   from mattergraph_api.main import app
+  from mattergraph_connectors import LeMatBulk
 
   material = Material(material_id="release-smoke", formula="AlN")
   restored = Material.model_validate_json(material.model_dump_json())
   if restored != material:
     raise ReleaseCheckError("Material JSON round-trip changed the record")
-  async def request_health() -> httpx.Response:
+
+  async def request_api(path: str) -> httpx.Response:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://mattergraph.test") as client:
-      return await client.get("/health")
+      return await client.get(path)
 
-  response = asyncio.run(request_health())
-  if response.status_code != 200 or response.json() != {"status": "ok"}:
-    raise ReleaseCheckError(f"API health smoke failed: {response.status_code} {response.text}")
+  original_cwd = Path.cwd()
+  with tempfile.TemporaryDirectory() as temp_directory:
+    os.chdir(temp_directory)
+    try:
+      demo_store = MaterialStore.from_demo()
+      if len(demo_store.materials) != 3:
+        raise ReleaseCheckError(
+          f"Bundled core demo must contain 3 records, found {len(demo_store.materials)}"
+        )
+      example = LeMatBulk.example("spc-tialn-24")
+      graphs = example.to_graphs()
+      if len(example) != 24 or graphs.included_count != 24 or graphs.excluded_count != 0:
+        raise ReleaseCheckError(
+          "Bundled LeMaterial example must contain 24 graph-ready records"
+        )
+
+      health = asyncio.run(request_api("/health"))
+      preflight = asyncio.run(request_api("/demo/preflight"))
+      graph = asyncio.run(request_api("/materials/agm003273599/graph-summary"))
+      reference = asyncio.run(
+        request_api("/simulations/chgnet/reference/agm003273599")
+      )
+    finally:
+      os.chdir(original_cwd)
+
+  if health.status_code != 200 or health.json() != {"status": "ok"}:
+    raise ReleaseCheckError(f"API health smoke failed: {health.status_code} {health.text}")
+  if preflight.status_code != 200 or preflight.json().get("record_count") != 24:
+    raise ReleaseCheckError(
+      f"API preflight smoke failed: {preflight.status_code} {preflight.text}"
+    )
+  if graph.status_code != 200 or graph.json().get("validation", {}).get("state") != "valid":
+    raise ReleaseCheckError(f"API graph smoke failed: {graph.status_code} {graph.text}")
+  if reference.status_code != 200 or reference.json().get("label") != "cached_reference":
+    raise ReleaseCheckError(
+      f"CHGNet reference smoke failed: {reference.status_code} {reference.text}"
+    )
 
   optional_distributions = ("mp-api", "jarvis-tools")
   installed_optional = {
@@ -354,7 +418,7 @@ def build_parser() -> argparse.ArgumentParser:
 
   artifacts = subparsers.add_parser("artifacts", help="validate built wheels and sdists")
   artifacts.add_argument("--dist", type=Path, default=Path("dist"))
-  artifacts.add_argument("--version", default="0.1.0")
+  artifacts.add_argument("--version", default="0.1.1")
 
   split = subparsers.add_parser("split", help="split member and metapackage artifacts")
   split.add_argument("--dist", type=Path, default=Path("dist"))
@@ -370,15 +434,15 @@ def build_parser() -> argparse.ArgumentParser:
 
   registry = subparsers.add_parser("registry", help="check project ownership and version space")
   registry.add_argument("--index", choices=sorted(REGISTRIES), required=True)
-  registry.add_argument("--version", default="0.1.0")
+  registry.add_argument("--version", default="0.1.1")
 
   report = subparsers.add_parser("report", help="verify pip download provenance")
   report.add_argument("--report", type=Path, required=True)
   report.add_argument("--index", choices=sorted(REPORT_HOSTS), required=True)
-  report.add_argument("--version", default="0.1.0")
+  report.add_argument("--version", default="0.1.1")
 
   smoke = subparsers.add_parser("smoke", help="exercise installed distributions")
-  smoke.add_argument("--version", default="0.1.0")
+  smoke.add_argument("--version", default="0.1.1")
   smoke.add_argument("--mode", choices=("default", "all"), required=True)
   return parser
 

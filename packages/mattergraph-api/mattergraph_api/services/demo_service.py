@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from functools import lru_cache
-from pathlib import Path
+from importlib.resources import files
 from typing import Any
 
 from mattergraph import Material, MaterialStore, Scorecard
@@ -13,9 +13,8 @@ from mattergraph_connectors import LeMatBulk
 from mattergraph_sim.ase_runner import EMT_SUPPORTED_SPECIES
 
 FIXTURE_RELATIVE_PATH = "data/demo/spc_real_snapshot.json"
-CHGNET_REFERENCE_RELATIVE_PATH = "data/demo/chgnet_reference.json"
-SOURCE_DATASET = "LeMaterial/LeMat-Bulk"
-SOURCE_SUBSET = "compatible_pbe"
+CHGNET_REFERENCE_RESOURCE = "chgnet_reference.json"
+SPC_EXAMPLE_NAME = "spc-tialn-24"
 SLICE_NAME = "spc_tialn_candidates_v1"
 TARGET = "energy_above_hull"
 WORKFLOW_VERSION = "v1.0"
@@ -38,37 +37,13 @@ DEFAULT_CONSTRAINTS: dict[str, dict[str, float]] = {
 }
 
 
-def repo_root() -> Path:
-  return Path(__file__).resolve().parents[4]
-
-
-def fixture_path() -> Path:
-  return repo_root() / FIXTURE_RELATIVE_PATH
-
-
-def chgnet_reference_path() -> Path:
-  return repo_root() / CHGNET_REFERENCE_RELATIVE_PATH
-
-
-@lru_cache(maxsize=1)
-def get_demo_artifact() -> dict[str, Any]:
-  return json.loads(fixture_path().read_text())
-
-
 def get_demo_manifest() -> dict[str, Any]:
-  return dict(get_demo_artifact()["manifest"])
+  return dict(get_demo_dataset().metadata["snapshot_manifest"])
 
 
 @lru_cache(maxsize=1)
 def get_demo_dataset() -> MatterGraphDataset:
-  artifact = get_demo_artifact()
-  dataset = LeMatBulk.from_records(
-    artifact["records"],
-    source_dataset=SOURCE_DATASET,
-    subset=SOURCE_SUBSET,
-  )
-  dataset.metadata["snapshot_manifest"] = artifact["manifest"]
-  return dataset
+  return LeMatBulk.example(SPC_EXAMPLE_NAME)
 
 
 def get_filtered_demo_dataset() -> MatterGraphDataset:
@@ -272,10 +247,12 @@ def simulation_readiness(material: Material) -> dict[str, Any]:
 
 @lru_cache(maxsize=1)
 def get_chgnet_reference_artifact() -> dict[str, Any] | None:
-  path = chgnet_reference_path()
-  if not path.is_file():
+  resource = files("mattergraph_api").joinpath("resources", CHGNET_REFERENCE_RESOURCE)
+  try:
+    payload = resource.read_text(encoding="utf-8")
+  except FileNotFoundError:
     return None
-  artifact = json.loads(path.read_text())
+  artifact = json.loads(payload)
   artifact["scientific_boundary"] = ML_BOUNDARY
   return artifact
 

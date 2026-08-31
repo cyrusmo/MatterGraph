@@ -167,13 +167,18 @@ def test_crystal_roundtrip_preserves_site_properties_and_disorder() -> None:
   assert d.to_pymatgen()[0].species.num_atoms == pytest.approx(1.0)
 
 
-def test_from_demo() -> None:
+def test_from_demo_is_available_outside_repository(
+  monkeypatch: pytest.MonkeyPatch,
+  tmp_path: Path,
+) -> None:
+  monkeypatch.chdir(tmp_path)
   store = MaterialStore.from_demo()
-  if not store.materials:
-    sample = Path("data/demo/materials_sample.jsonl")
-    if not sample.is_file():
-      pytest.skip("no demo data")
-  assert len(store.materials) > 0
+  assert len(store.materials) == 3
+  assert [material.material_id for material in store.materials] == [
+    "demo-fe-bcc-1",
+    "demo-ti-bcc-1",
+    "demo-al-fcc-1",
+  ]
 
 
 def test_check_density_diagnoses_incomplete_basis() -> None:

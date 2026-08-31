@@ -44,21 +44,21 @@ MatterGraph Core focuses on transparent workflow primitives and guardrails. Prop
 
 ## Install
 
-MatterGraph **0.1.0 is published on [PyPI](https://pypi.org/project/mattergraph/0.1.0/)**.
-The release supports Python 3.10 and newer; its wheels, source distributions, and provenance are
-also attached to the [GitHub release](https://github.com/cyrusmo/MatterGraph/releases/tag/v0.1.0).
+MatterGraph is published on [PyPI](https://pypi.org/project/mattergraph/) for Python 3.10 and
+newer. Wheels, source distributions, and provenance are also attached to each
+[GitHub release](https://github.com/cyrusmo/MatterGraph/releases).
 
 ```bash
-pip install "mattergraph==0.1.0"
+pip install mattergraph
 ```
 
 That installs the public toolkit without provider-specific SDKs. Opt into only the connector
 SDKs you need:
 
 ```bash
-pip install 'mattergraph[mp]==0.1.0'       # Materials Project SDK
-pip install 'mattergraph[jarvis]==0.1.0'   # JARVIS SDK
-pip install 'mattergraph[all]==0.1.0'      # all optional public connector SDKs
+pip install 'mattergraph[mp]'       # Materials Project SDK
+pip install 'mattergraph[jarvis]'   # JARVIS SDK
+pip install 'mattergraph[all]'      # all optional public connector SDKs
 ```
 
 Install an individual package for a smaller application surface:
@@ -71,7 +71,39 @@ pip install mattergraph-benchmarks   # metrics and Matbench adapter
 pip install mattergraph-api          # FastAPI demo service
 ```
 
-## Quickstart (from source)
+## Ten-minute quickstart from PyPI
+
+The attributed 24-record Ti–Al–N example is bundled with `mattergraph-connectors`. It needs no
+credentials, network access, repository checkout, or external data path.
+
+```python
+from mattergraph_connectors import LeMatBulk
+
+dataset = LeMatBulk.example("spc-tialn-24")
+manifest = dataset.metadata["snapshot_manifest"]
+candidate_slice = (
+    dataset
+    .filter_elements(include=["Ti", "Al", "N"])
+    .filter_complexity(max_nsites=16, max_nelements=3)
+    .create_slice("spc_tialn_candidates_v1", target="energy_above_hull")
+)
+graphs = dataset.to_graphs()
+
+print(manifest["dataset"], manifest["license"], manifest["snapshot_sha256"])
+print(candidate_slice.report())
+print(graphs.included_count, graphs.excluded_count)
+```
+
+Run the installed API from any working directory:
+
+```bash
+python -m uvicorn mattergraph_api.main:app --host 127.0.0.1 --port 8000
+```
+
+`GET /demo/preflight` reports the same packaged fixture, graph validation, ranking readiness,
+and explicitly labelled cached CHGNet evidence.
+
+## Run the web workbench from source
 
 ```bash
 git clone https://github.com/cyrusmo/MatterGraph.git
@@ -104,16 +136,10 @@ Example: rank candidates with a **transparent baseline scorecard** (pool-relativ
 objectives plus hard constraints).
 
 ```python
-import json
-from pathlib import Path
-
 from mattergraph import Scorecard
 from mattergraph_connectors import LeMatBulk
 
-artifact = json.loads(Path("data/demo/spc_real_snapshot.json").read_text())
-store = LeMatBulk.from_records(
-    artifact["records"], subset="compatible_pbe"
-).to_material_store()
+store = LeMatBulk.example("spc-tialn-24").to_material_store()
 scorecard = Scorecard(
     objectives={
         "density": {"direction": "minimize", "weight": 0.6},
@@ -131,13 +157,9 @@ print(df.head(10))
 Example: turn LeMaterial-style records into a reproducible candidate slice.
 
 ```python
-import json
-from pathlib import Path
-
 from mattergraph_connectors import LeMatBulk
 
-artifact = json.loads(Path("data/demo/spc_real_snapshot.json").read_text())
-dataset = LeMatBulk.from_records(artifact["records"], subset="compatible_pbe")
+dataset = LeMatBulk.example("spc-tialn-24")
 
 candidate_slice = (
     dataset

@@ -162,6 +162,23 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
   branches, so branch pushes keep getting feedback.
 - `SECURITY.md` now names an actual reporting channel.
 
+## [0.1.1] - 2026-09-07
+
+### Added
+
+- Packaged, credential-free demo resources for `mattergraph-core`,
+  `mattergraph-connectors`, and `mattergraph-api`.
+- `LeMatBulk.example("spc-tialn-24")` loads the checksummed 24-record public snapshot with
+  its upstream revisions, CC-BY-4.0 license, DOI, field provenance, and manifest.
+- Installed-package release smoke coverage for the bundled store, 24 valid periodic graphs,
+  API preflight, graph summary, and cached CHGNet reference.
+
+### Changed
+
+- `MaterialStore.from_demo()` and the demo API now use package resources instead of locating
+  repository-relative fixture paths.
+- The README quickstart now runs directly from PyPI without a repository checkout.
+
 ## [0.1.0] - 2026-08-24
 
 Initial public surface.
@@ -198,5 +215,6 @@ Initial public surface.
   cookbook recipes, seven numbered example scripts, and an underwater-drone
   screening template.
 
-[Unreleased]: https://github.com/cyrusmo/MatterGraph/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/cyrusmo/MatterGraph/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/cyrusmo/MatterGraph/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cyrusmo/MatterGraph/releases/tag/v0.1.0

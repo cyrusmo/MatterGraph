@@ -1376,7 +1376,7 @@ wheels = [
 
 [[package]]
 name = "mattergraph"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "mattergraph-api" },
@@ -1444,7 +1444,7 @@ docs = [
 
 [[package]]
 name = "mattergraph-api"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/mattergraph-api" }
 dependencies = [
     { name = "fastapi" },
@@ -1472,7 +1472,7 @@ requires-dist = [
 
 [[package]]
 name = "mattergraph-benchmarks"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/mattergraph-benchmarks" }
 dependencies = [
     { name = "httpx" },
@@ -1499,7 +1499,7 @@ requires-dist = [
 
 [[package]]
 name = "mattergraph-connectors"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/mattergraph-connectors" }
 dependencies = [
     { name = "httpx" },
@@ -1541,7 +1541,7 @@ provides-extras = ["mp", "jarvis", "all"]
 
 [[package]]
 name = "mattergraph-core"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/mattergraph-core" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -1563,7 +1563,7 @@ requires-dist = [
 
 [[package]]
 name = "mattergraph-sim"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/mattergraph-sim" }
 dependencies = [
     { name = "ase" },

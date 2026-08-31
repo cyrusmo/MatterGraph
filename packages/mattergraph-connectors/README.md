@@ -26,13 +26,9 @@ pip install mattergraph-connectors
 ## Example
 
 ```python
-import json
-from pathlib import Path
-
 from mattergraph_connectors import LeMatBulk
 
-artifact = json.loads(Path("data/demo/spc_real_snapshot.json").read_text())
-dataset = LeMatBulk.from_records(artifact["records"], subset="compatible_pbe")
+dataset = LeMatBulk.example("spc-tialn-24")
 
 candidates = (
     dataset
@@ -40,6 +36,7 @@ candidates = (
     .filter_complexity(max_nsites=16, max_nelements=3)
     .create_slice("spc_tialn_candidates_v1", target="energy_above_hull")
 )
+print(dataset.metadata["snapshot_manifest"])
 print(candidates.report())
 ```
 

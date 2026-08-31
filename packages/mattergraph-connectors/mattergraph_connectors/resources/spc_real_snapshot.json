@@ -1,0 +1,4179 @@
+{
+  "manifest": {
+    "checksum_scope": "SHA-256 of canonical JSON records array",
+    "citation_doi": "10.57967/hf/3762",
+    "created_at": "2026-08-13T18:08:38.167314+00:00",
+    "dataset": "LeMaterial/LeMat-Bulk",
+    "field_sources": {
+      "density": "derived from reconstructed pymatgen Structure",
+      "energy": "LeMat-Bulk energy",
+      "energy_above_hull": "LeMat-Bulk-DFT-Hull-All dft_hull",
+      "fingerprint": "LeMat-Bulk entalpic_fingerprint",
+      "forces": "LeMat-Bulk forces",
+      "max_force": "derived maximum Euclidean norm of forces",
+      "structure": "LeMat-Bulk lattice_vectors + cartesian_site_positions + species_at_sites"
+    },
+    "hull_dataset": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+    "hull_revision": "fc063a965498df6481911bdfdb3cad5619016d81",
+    "license": "CC-BY-4.0",
+    "schema_version": "spc-demo-snapshot-v1",
+    "selection": {
+      "base_shards_scanned": 3,
+      "chemistry": "8 Al-N + 8 Ti-N + 8 Ti-Al-N records; formulas canonicalized by pymatgen",
+      "max_sites": 16,
+      "ordered_only": true,
+      "required_elements": [
+        "N"
+      ],
+      "unique_by": "entalpic_fingerprint",
+      "valid_forces": "one finite numeric 3-vector per site"
+    },
+    "snapshot_count": 24,
+    "snapshot_sha256": "e1a925b5b047b9fc3d4172b7647c23de656f7422e990234c343dcbb9fa333c14",
+    "source_population": 5335299,
+    "subset": "compatible_pbe",
+    "upstream_revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+  },
+  "records": [
+    {
+      "density": 5.052641548794521,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -95.31569101,
+      "energy_above_hull": 0.04673654125000226,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00255879,
+          0.00905012,
+          -0.0290505
+        ],
+        [
+          -0.00011211,
+          -0.01100989,
+          0.02905467
+        ],
+        [
+          5.913e-05,
+          0.01101295,
+          -0.02929394
+        ],
+        [
+          0.00247775,
+          -0.00905056,
+          0.02929177
+        ],
+        [
+          0.00614372,
+          0.00347002,
+          0.00376973
+        ],
+        [
+          -0.00557611,
+          -0.00241449,
+          0.00192237
+        ],
+        [
+          0.00511501,
+          -0.00810829,
+          -0.0073855
+        ],
+        [
+          -0.0050577,
+          0.00808865,
+          0.00754007
+        ],
+        [
+          0.00559323,
+          0.00241321,
+          -0.00193389
+        ],
+        [
+          -0.00608414,
+          -0.00345171,
+          -0.0039148
+        ]
+      ],
+      "formula": "Ti3N2",
+      "functional": "pbe",
+      "immutable_id": "agm002163329",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm002163329",
+      "max_force": 0.03129574227883084,
+      "nelements": 2,
+      "nsites": 10,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm002163329"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm002163329"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm002163329"
+        }
+      ],
+      "reduced_formula": "Ti3N2",
+      "source_reduced_formula": "N2Ti3",
+      "structure": {
+        "coords": [
+          [
+            0.6593874099999999,
+            0.3183469,
+            0.9777112000000001
+          ],
+          [
+            0.8410401299999999,
+            0.6816507200000002,
+            0.52228881
+          ],
+          [
+            0.15897994,
+            0.31834939,
+            0.47771186000000004
+          ],
+          [
+            0.34063220999999994,
+            0.6816512500000002,
+            0.0222881
+          ],
+          [
+            0.57265726,
+            0.8223964900000001,
+            0.74987107
+          ],
+          [
+            0.9271468499999999,
+            0.49999946,
+            0.7500003
+          ],
+          [
+            0.25026028,
+            0.17760389,
+            0.75012882
+          ],
+          [
+            0.74975999,
+            0.8223952900000001,
+            0.24987065000000003
+          ],
+          [
+            0.07287318,
+            0.5000000900000001,
+            0.24999998
+          ],
+          [
+            0.42736275000000007,
+            0.17760252000000004,
+            0.2501292
+          ]
+        ],
+        "lattice": [
+          [
+            5.19575416,
+            -2.39e-06,
+            -1.31e-06
+          ],
+          [
+            -2.59787932,
+            4.4984038,
+            -0.00164618
+          ],
+          [
+            4.7e-07,
+            -2.99895407,
+            4.82732123
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "N",
+          "N",
+          "N",
+          "N",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti"
+        ]
+      },
+      "structure_fingerprint": "a20b8408a050e89d634dfb2c2a121a3f_167_Ti6N4"
+    },
+    {
+      "density": 4.709656108832582,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -65.60565875,
+      "energy_above_hull": 0.2487008008928555,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00502058,
+          -0.00296061,
+          -0.00801549
+        ],
+        [
+          -0.00146739,
+          -0.0008681,
+          0.00221478
+        ],
+        [
+          0.00146739,
+          0.0008681,
+          -0.00221478
+        ],
+        [
+          0.00502058,
+          0.00296061,
+          0.00801549
+        ],
+        [
+          0.00399243,
+          0.00236009,
+          -0.00216082
+        ],
+        [
+          -0.00399243,
+          -0.00236009,
+          0.00216082
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "Ti3N4",
+      "functional": "pbe",
+      "immutable_id": "agm002164077",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm002164077",
+      "max_force": 0.00991057591911792,
+      "nelements": 2,
+      "nsites": 7,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm002164077"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm002164077"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm002164077"
+        }
+      ],
+      "reduced_formula": "Ti3N4",
+      "source_reduced_formula": "N4Ti3",
+      "structure": {
+        "coords": [
+          [
+            0.3782611600000002,
+            0.3782612,
+            0.8651941700000001
+          ],
+          [
+            0.1321099600000001,
+            0.13210989999999997,
+            0.60367142
+          ],
+          [
+            0.8678900400000005,
+            0.8678900999999999,
+            0.39632858
+          ],
+          [
+            0.6217388400000003,
+            0.6217388,
+            0.13480583
+          ],
+          [
+            0.7764122700000002,
+            0.7764120800000001,
+            0.6708784800000002
+          ],
+          [
+            0.22358773000000018,
+            0.22358791999999994,
+            0.32912152
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "lattice": [
+          [
+            3.17656025,
+            0.00017762,
+            -0.00025576
+          ],
+          [
+            1.58843395,
+            2.75089348,
+            -0.00025555
+          ],
+          [
+            1.58768547,
+            0.91665134,
+            8.05480234
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "N",
+          "N",
+          "N",
+          "N",
+          "Ti",
+          "Ti",
+          "Ti"
+        ]
+      },
+      "structure_fingerprint": "7e5284f322ad88dbf64104067165ffdd_166_Ti3N4"
+    },
+    {
+      "density": 5.34196122141012,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -38.89500647,
+      "energy_above_hull": 0.11022863250000015,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "TiN",
+      "functional": "pbe",
+      "immutable_id": "agm002164923",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm002164923",
+      "max_force": 0.0,
+      "nelements": 2,
+      "nsites": 4,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm002164923"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm002164923"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm002164923"
+        }
+      ],
+      "reduced_formula": "TiN",
+      "source_reduced_formula": "NTi",
+      "structure": {
+        "coords": [
+          [
+            0.0,
+            0.0,
+            0.5
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.3333333300000001,
+            0.66666667,
+            0.25
+          ],
+          [
+            0.6666666700000001,
+            0.33333333,
+            0.7499999999999999
+          ]
+        ],
+        "lattice": [
+          [
+            2.94126905,
+            0.0,
+            0.0
+          ],
+          [
+            -1.47063453,
+            2.54721372,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            5.1343363
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "N",
+          "N",
+          "Ti",
+          "Ti"
+        ]
+      },
+      "structure_fingerprint": "9056118a33f3a7590ed80b3a7a8d9a5c_194_Ti2N2"
+    },
+    {
+      "density": 3.3290189458191306,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -17.25661509,
+      "energy_above_hull": 0.4600851558333323,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00369943,
+          -0.00213587,
+          0.01196312
+        ],
+        [
+          0.00369943,
+          0.00213587,
+          -0.01196312
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "Al2N",
+      "functional": "pbe",
+      "immutable_id": "agm002346334",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm002346334",
+      "max_force": 0.012702911599952193,
+      "nelements": 2,
+      "nsites": 3,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm002346334"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm002346334"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm002346334"
+        }
+      ],
+      "reduced_formula": "Al2N",
+      "source_reduced_formula": "Al2N",
+      "structure": {
+        "coords": [
+          [
+            0.7553285499999999,
+            0.7553285499999998,
+            0.7369466600000001
+          ],
+          [
+            0.24467145,
+            0.24467144999999998,
+            0.2630533400000001
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "lattice": [
+          [
+            2.9268983,
+            0.00531521,
+            0.00831597
+          ],
+          [
+            1.46805226,
+            2.53211068,
+            0.00831597
+          ],
+          [
+            1.48226609,
+            0.85578673,
+            4.58508608
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "Al",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "9331434903b02740a322860c9434b112_12_Al2N1"
+    },
+    {
+      "density": 3.7153059521400693,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -66.27049473,
+      "energy_above_hull": 0.3567557050000012,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.00559158,
+          0.0,
+          0.0
+        ],
+        [
+          -0.00559158,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.00559158,
+          0.0
+        ],
+        [
+          0.0,
+          0.00559158,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "TiAlN2",
+      "functional": "pbe",
+      "immutable_id": "agm002858657",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm002858657",
+      "max_force": 0.00559158,
+      "nelements": 3,
+      "nsites": 8,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm002858657"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm002858657"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm002858657"
+        }
+      ],
+      "reduced_formula": "TiAlN2",
+      "source_reduced_formula": "AlN2Ti",
+      "structure": {
+        "coords": [
+          [
+            0.60858675,
+            0.125,
+            0.25
+          ],
+          [
+            0.14141325,
+            0.625,
+            0.25
+          ],
+          [
+            0.3750000000000001,
+            0.39141325000000005,
+            0.75
+          ],
+          [
+            0.875,
+            0.85858675,
+            0.75
+          ],
+          [
+            0.5,
+            0.5,
+            0.0
+          ],
+          [
+            0.25,
+            0.75,
+            0.5
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.75,
+            0.25,
+            0.5
+          ]
+        ],
+        "lattice": [
+          [
+            4.54699646,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            4.54699646,
+            0.0
+          ],
+          [
+            2.27349823,
+            2.27349823,
+            4.44723402
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "N",
+          "N",
+          "N",
+          "N",
+          "Al",
+          "Al",
+          "Ti",
+          "Ti"
+        ]
+      },
+      "structure_fingerprint": "8b57bad91a66398bd4d701babd7f108e_122_Ti2Al2N4"
+    },
+    {
+      "density": 4.738948763820881,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -144.09813356,
+      "energy_above_hull": 0.0,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          -0.00376286
+        ],
+        [
+          0.0,
+          0.0,
+          0.00376286
+        ],
+        [
+          0.0,
+          0.0,
+          0.00695212
+        ],
+        [
+          0.0,
+          0.0,
+          0.00695212
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00695212
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00376286
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00695212
+        ],
+        [
+          0.0,
+          0.0,
+          0.00376286
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0015511
+        ],
+        [
+          0.0,
+          0.0,
+          0.0015511
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -0.0015511
+        ],
+        [
+          0.0,
+          0.0,
+          -0.0015511
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "Ti4AlN3",
+      "functional": "pbe",
+      "immutable_id": "agm003220445",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm003220445",
+      "max_force": 0.00695212,
+      "nelements": 3,
+      "nsites": 16,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm003220445"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm003220445"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm003220445"
+        }
+      ],
+      "reduced_formula": "Ti4AlN3",
+      "source_reduced_formula": "AlN3Ti4",
+      "structure": {
+        "coords": [
+          [
+            0.33333299999999993,
+            0.666667,
+            0.44607943
+          ],
+          [
+            0.666667,
+            0.333333,
+            0.55392057
+          ],
+          [
+            0.0,
+            0.0,
+            0.65448025
+          ],
+          [
+            0.0,
+            0.0,
+            0.15448025
+          ],
+          [
+            0.0,
+            0.0,
+            0.8455197500000001
+          ],
+          [
+            0.666667,
+            0.333333,
+            0.94607943
+          ],
+          [
+            0.0,
+            0.0,
+            0.34551975
+          ],
+          [
+            0.33333299999999993,
+            0.666667,
+            0.05392057
+          ],
+          [
+            0.666667,
+            0.333333,
+            0.75
+          ],
+          [
+            0.33333299999999993,
+            0.666667,
+            0.25
+          ],
+          [
+            0.666667,
+            0.333333,
+            0.10569327000000002
+          ],
+          [
+            0.33333299999999993,
+            0.666667,
+            0.60569327
+          ],
+          [
+            0.0,
+            0.0,
+            0.5
+          ],
+          [
+            0.666667,
+            0.333333,
+            0.39430673
+          ],
+          [
+            0.33333299999999993,
+            0.666667,
+            0.89430673
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "lattice": [
+          [
+            2.99683082,
+            0.0,
+            0.0
+          ],
+          [
+            -1.49841609,
+            2.59533122,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            23.4692478
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "3e76edcbf366790f9a364ea860b33d23_194_Ti8Al2N6"
+    },
+    {
+      "density": 3.194834761016404,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -14.84649699,
+      "energy_above_hull": 0.023906347499999647,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "agm003273599",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm003273599",
+      "max_force": 0.0,
+      "nelements": 2,
+      "nsites": 2,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm003273599"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm003273599"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm003273599"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.75,
+            0.75,
+            0.75
+          ]
+        ],
+        "lattice": [
+          [
+            3.11165651,
+            0.0,
+            0.0
+          ],
+          [
+            1.55582826,
+            2.69477359,
+            0.0
+          ],
+          [
+            1.55582826,
+            0.89825786,
+            2.5406569
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "742084d6f56f27dbb363dc37b3da9643_216_Al1N1"
+    },
+    {
+      "density": 4.293837716559259,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -85.03419645,
+      "energy_above_hull": 0.3912714524999972,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -4e-07,
+          -0.00087801,
+          -3.8e-07
+        ],
+        [
+          4e-07,
+          0.00087801,
+          3.8e-07
+        ],
+        [
+          4e-07,
+          0.00087801,
+          3.8e-07
+        ],
+        [
+          -4e-07,
+          -0.00087801,
+          -3.8e-07
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -1.07e-06,
+          -0.00236101,
+          -1.02e-06
+        ],
+        [
+          1.07e-06,
+          0.00236101,
+          1.02e-06
+        ],
+        [
+          0.00124413,
+          -1.14e-06,
+          0.00132422
+        ],
+        [
+          -0.00124413,
+          1.14e-06,
+          -0.00132422
+        ],
+        [
+          -0.00015743,
+          0.0,
+          0.00014791
+        ],
+        [
+          0.00015743,
+          0.0,
+          -0.00014791
+        ]
+      ],
+      "formula": "Ti7(AlN)2",
+      "functional": "pbe",
+      "immutable_id": "agm003319993",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm003319993",
+      "max_force": 0.0023610104627891848,
+      "nelements": 3,
+      "nsites": 11,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm003319993"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm003319993"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm003319993"
+        }
+      ],
+      "reduced_formula": "Ti7(AlN)2",
+      "source_reduced_formula": "Al2N2Ti7",
+      "structure": {
+        "coords": [
+          [
+            0.9999981099999998,
+            0.23296607000000005,
+            0.4999854
+          ],
+          [
+            0.4999857199999999,
+            0.7670352300000002,
+            0.9999997200000001
+          ],
+          [
+            1.8900000000143628e-06,
+            0.7670339300000001,
+            0.5000146
+          ],
+          [
+            0.5000142799999999,
+            0.23296477000000007,
+            2.799999999978086e-07
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.49999525,
+            0.7684711600000003,
+            0.50000199
+          ],
+          [
+            0.5000047499999999,
+            0.23152884000000007,
+            0.49999801000000005
+          ],
+          [
+            0.8207797999999998,
+            0.4999999800000001,
+            0.8207794200000001
+          ],
+          [
+            0.1792202,
+            0.5000000200000001,
+            0.17922058000000002
+          ],
+          [
+            0.7232748999999999,
+            0.9999930100000001,
+            0.27672245000000006
+          ],
+          [
+            0.27672510000000006,
+            6.9899999999999585e-06,
+            0.72327755
+          ]
+        ],
+        "lattice": [
+          [
+            5.52882247,
+            -0.00201669,
+            -0.62043761
+          ],
+          [
+            0.00247041,
+            5.43094406,
+            0.00234846
+          ],
+          [
+            -0.96369996,
+            -0.00215633,
+            5.47943697
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "78e64e81d82c1e5f79a958f159dcde98_65_Ti7Al2N2"
+    },
+    {
+      "density": 4.35983835948408,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -67.34748219,
+      "energy_above_hull": 0.20899919888888885,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          4.057e-05,
+          0.0
+        ],
+        [
+          0.0,
+          0.00067359,
+          -7.805e-05
+        ],
+        [
+          0.0,
+          0.00067359,
+          7.805e-05
+        ],
+        [
+          0.0,
+          0.00632128,
+          0.0
+        ],
+        [
+          0.0,
+          -0.00233682,
+          8.597e-05
+        ],
+        [
+          0.0,
+          -0.00233682,
+          -8.597e-05
+        ],
+        [
+          0.0,
+          -0.00251196,
+          -0.00285846
+        ],
+        [
+          0.0,
+          -0.00251196,
+          0.00285846
+        ],
+        [
+          0.0,
+          0.00198852,
+          0.0
+        ]
+      ],
+      "formula": "Ti6Al2N",
+      "functional": "pbe",
+      "immutable_id": "agm003492481",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm003492481",
+      "max_force": 0.00632128,
+      "nelements": 3,
+      "nsites": 9,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm003492481"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm003492481"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm003492481"
+        }
+      ],
+      "reduced_formula": "Ti6Al2N",
+      "source_reduced_formula": "Al2NTi6",
+      "structure": {
+        "coords": [
+          [
+            0.5,
+            0.58554608,
+            0.0
+          ],
+          [
+            0.5,
+            0.37923302,
+            0.37934823000000006
+          ],
+          [
+            0.5,
+            0.99988478,
+            0.62065177
+          ],
+          [
+            0.0,
+            0.24150393999999997,
+            0.0
+          ],
+          [
+            0.0,
+            0.7707829399999999,
+            0.77838236
+          ],
+          [
+            0.0,
+            0.9924005800000001,
+            0.22161764
+          ],
+          [
+            0.0,
+            0.32502820000000004,
+            0.6554704700000001
+          ],
+          [
+            0.0,
+            0.6695577300000001,
+            0.34452953000000003
+          ],
+          [
+            0.5,
+            0.03609572999999994,
+            0.0
+          ]
+        ],
+        "lattice": [
+          [
+            3.06709033,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            7.21527954,
+            0.0
+          ],
+          [
+            0.0,
+            -3.60763977,
+            6.1127612
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "b163beb13ea4e1d24458ea182f0d6656_38_Ti6Al2N1"
+    },
+    {
+      "density": 4.341965492752432,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -80.73323234,
+      "energy_above_hull": 0.06302070399999948,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.00390419,
+          0.00235357
+        ],
+        [
+          0.0,
+          -0.00390419,
+          -0.00235357
+        ],
+        [
+          0.0,
+          -0.00425257,
+          -0.00011563
+        ],
+        [
+          0.0,
+          0.00425257,
+          0.00011563
+        ],
+        [
+          0.0,
+          0.0021601,
+          0.00092559
+        ],
+        [
+          0.0,
+          -0.0021601,
+          -0.00092559
+        ],
+        [
+          0.0,
+          -0.00223874,
+          -0.00051365
+        ],
+        [
+          0.0,
+          0.00223874,
+          0.00051365
+        ],
+        [
+          0.0,
+          -0.00129776,
+          0.00085699
+        ],
+        [
+          0.0,
+          0.00129776,
+          -0.00085699
+        ]
+      ],
+      "formula": "Ti3AlN",
+      "functional": "pbe",
+      "immutable_id": "agm003707212",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm003707212",
+      "max_force": 0.004558726938631004,
+      "nelements": 3,
+      "nsites": 10,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm003707212"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm003707212"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm003707212"
+        }
+      ],
+      "reduced_formula": "Ti3AlN",
+      "source_reduced_formula": "AlNTi3",
+      "structure": {
+        "coords": [
+          [
+            0.10906963,
+            0.21813925,
+            0.19713078999999997
+          ],
+          [
+            0.89093037,
+            0.7818607499999999,
+            0.8028692099999999
+          ],
+          [
+            0.6436540199999999,
+            0.28730803999999993,
+            0.9415396799999998
+          ],
+          [
+            0.35634598,
+            0.7126919599999999,
+            0.05846032000000001
+          ],
+          [
+            0.8669010400000001,
+            0.7338020799999999,
+            0.33374512999999995
+          ],
+          [
+            0.13309895999999996,
+            0.2661979199999999,
+            0.6662548699999999
+          ],
+          [
+            0.39098961,
+            0.7819792199999999,
+            0.5684591599999999
+          ],
+          [
+            0.6090103899999999,
+            0.21802077999999997,
+            0.4315408399999999
+          ],
+          [
+            0.12333012999999995,
+            0.2466602599999999,
+            0.9322478899999997
+          ],
+          [
+            0.8766698699999999,
+            0.7533397399999998,
+            0.06775210999999998
+          ]
+        ],
+        "lattice": [
+          [
+            4.18104643,
+            0.0,
+            0.0
+          ],
+          [
+            -2.09052321,
+            4.75126419,
+            -0.9069316
+          ],
+          [
+            0.0,
+            -1.74276759,
+            7.43996795
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "f488a5ab253397a80cb2ef6cdbdffec3_12_Ti6Al2N2"
+    },
+    {
+      "density": 3.618815494222162,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -113.36994902,
+      "energy_above_hull": 0.3864844983333331,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00098362,
+          0.00032641,
+          0.0
+        ],
+        [
+          -0.00077449,
+          -0.00068863,
+          0.0
+        ],
+        [
+          0.00020913,
+          -0.00101504,
+          0.0
+        ],
+        [
+          0.00098362,
+          -0.00032641,
+          0.0
+        ],
+        [
+          0.00077449,
+          0.00068863,
+          0.0
+        ],
+        [
+          -0.00020913,
+          0.00101504,
+          0.0
+        ],
+        [
+          -0.00145189,
+          -0.00388614,
+          0.0
+        ],
+        [
+          0.00263955,
+          -0.00320044,
+          0.0
+        ],
+        [
+          0.00409144,
+          0.0006857,
+          0.0
+        ],
+        [
+          0.00145189,
+          0.00388614,
+          0.0
+        ],
+        [
+          -0.00263955,
+          0.00320044,
+          0.0
+        ],
+        [
+          -0.00409144,
+          -0.0006857,
+          0.0
+        ]
+      ],
+      "formula": "TiN",
+      "functional": "pbe",
+      "immutable_id": "agm004462264",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm004462264",
+      "max_force": 0.004148501979232985,
+      "nelements": 2,
+      "nsites": 12,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm004462264"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm004462264"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm004462264"
+        }
+      ],
+      "reduced_formula": "TiN",
+      "source_reduced_formula": "NTi",
+      "structure": {
+        "coords": [
+          [
+            0.88846,
+            0.32177,
+            0.25
+          ],
+          [
+            0.56669,
+            0.88846,
+            0.7499999999999999
+          ],
+          [
+            0.6782299999999999,
+            0.5666899999999999,
+            0.25
+          ],
+          [
+            0.11153999999999994,
+            0.6782299999999999,
+            0.7499999999999999
+          ],
+          [
+            0.43331,
+            0.11153999999999999,
+            0.25
+          ],
+          [
+            0.32177,
+            0.43331,
+            0.7499999999999999
+          ],
+          [
+            0.6631,
+            0.03899999999999999,
+            0.25
+          ],
+          [
+            0.6241,
+            0.6630999999999999,
+            0.7499999999999999
+          ],
+          [
+            0.961,
+            0.6240999999999999,
+            0.25
+          ],
+          [
+            0.3368999999999999,
+            0.9609999999999999,
+            0.7499999999999999
+          ],
+          [
+            0.3759,
+            0.3369,
+            0.25
+          ],
+          [
+            0.03899999999999998,
+            0.3759,
+            0.7499999999999999
+          ]
+        ],
+        "lattice": [
+          [
+            7.60144,
+            0.0,
+            0.0
+          ],
+          [
+            -3.80072,
+            6.58304015,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            3.40422
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "d39c08a433ec14ccaff5ee4efb446a99_176_Ti6N6"
+    },
+    {
+      "density": 3.0761415039125417,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -59.31093157,
+      "energy_above_hull": 0.033288396249999685,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00201683,
+          -0.00201683,
+          0.0
+        ],
+        [
+          -0.00201683,
+          0.00201683,
+          0.0
+        ],
+        [
+          0.00201683,
+          -0.00201683,
+          0.0
+        ],
+        [
+          0.00201683,
+          0.00201683,
+          0.0
+        ],
+        [
+          0.00124267,
+          -0.00124267,
+          0.0
+        ],
+        [
+          0.00124267,
+          0.00124267,
+          0.0
+        ],
+        [
+          -0.00124267,
+          -0.00124267,
+          0.0
+        ],
+        [
+          -0.00124267,
+          0.00124267,
+          0.0
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "agm004462854",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm004462854",
+      "max_force": 0.002852228339000929,
+      "nelements": 2,
+      "nsites": 8,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm004462854"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm004462854"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm004462854"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.32309,
+            0.32309,
+            0.0
+          ],
+          [
+            0.82309,
+            0.17691,
+            0.49999999999999994
+          ],
+          [
+            0.17691,
+            0.82309,
+            0.49999999999999994
+          ],
+          [
+            0.67691,
+            0.67691,
+            0.0
+          ],
+          [
+            0.31529999999999997,
+            0.6847,
+            0.0
+          ],
+          [
+            0.8153,
+            0.8153,
+            0.49999999999999994
+          ],
+          [
+            0.1847,
+            0.1847,
+            0.49999999999999994
+          ],
+          [
+            0.6847,
+            0.31529999999999997,
+            0.0
+          ]
+        ],
+        "lattice": [
+          [
+            5.32569,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            5.32569,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            3.1204
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "Al",
+          "Al",
+          "Al",
+          "N",
+          "N",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "77e31dee8864f314b514874899e6c465_136_Al4N4"
+    },
+    {
+      "density": 4.700203600957015,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -71.78246945,
+      "energy_above_hull": 0.022714780000001156,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          5.771e-05,
+          -3.332e-05
+        ],
+        [
+          0.0,
+          -5.771e-05,
+          3.332e-05
+        ],
+        [
+          0.0,
+          0.0,
+          -6.664e-05
+        ],
+        [
+          0.0,
+          -5.771e-05,
+          -3.332e-05
+        ],
+        [
+          0.0,
+          0.0,
+          6.664e-05
+        ],
+        [
+          0.0,
+          5.771e-05,
+          3.332e-05
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "Ti3N",
+      "functional": "pbe",
+      "immutable_id": "agm005543670",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm005543670",
+      "max_force": 6.664e-05,
+      "nelements": 2,
+      "nsites": 8,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm005543670"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm005543670"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm005543670"
+        }
+      ],
+      "reduced_formula": "Ti3N",
+      "source_reduced_formula": "NTi3",
+      "structure": {
+        "coords": [
+          [
+            0.47399541999999995,
+            0.34587739,
+            0.9999925799999999
+          ],
+          [
+            0.9739954199999998,
+            0.65412261,
+            7.420000000035731e-06
+          ],
+          [
+            0.9739954199999998,
+            0.99999258,
+            0.65411519
+          ],
+          [
+            0.47399541999999995,
+            0.6541151900000001,
+            0.65412261
+          ],
+          [
+            0.47399541999999995,
+            7.420000000000001e-06,
+            0.34588481
+          ],
+          [
+            0.9739954199999998,
+            0.34588481,
+            0.34587739
+          ],
+          [
+            0.72401374,
+            0.33333300000000005,
+            0.666667
+          ],
+          [
+            0.22401374,
+            0.666667,
+            0.33333300000000005
+          ]
+        ],
+        "lattice": [
+          [
+            4.84975339,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            4.4593897,
+            -2.57462931
+          ],
+          [
+            0.0,
+            1.8e-07,
+            5.14925932
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "96f1f519ea14d9802fbd96b43d59c327_182_Ti6N2"
+    },
+    {
+      "density": 4.279968436530036,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -64.9238007,
+      "energy_above_hull": 0.02484963374999971,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00098702,
+          -0.00433624,
+          -0.00058643
+        ],
+        [
+          0.00114437,
+          -0.00034412,
+          0.00159279
+        ],
+        [
+          0.00141507,
+          -0.00116983,
+          0.00109953
+        ],
+        [
+          -0.00187406,
+          -0.00323875,
+          -0.00026493
+        ],
+        [
+          0.00039717,
+          0.00297921,
+          -0.00058676
+        ],
+        [
+          0.00143121,
+          0.00420605,
+          -0.00064703
+        ],
+        [
+          -0.00113413,
+          0.00141801,
+          1.1e-05
+        ],
+        [
+          -0.00039261,
+          0.00048567,
+          -0.00061818
+        ]
+      ],
+      "formula": "Ti2AlN",
+      "functional": "pbe",
+      "immutable_id": "agm005708132",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm005708132",
+      "max_force": 0.004489751272342378,
+      "nelements": 3,
+      "nsites": 8,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm005708132"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm005708132"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm005708132"
+        }
+      ],
+      "reduced_formula": "Ti2AlN",
+      "source_reduced_formula": "AlNTi2",
+      "structure": {
+        "coords": [
+          [
+            0.15453224,
+            0.9767710899999998,
+            0.4718158900000001
+          ],
+          [
+            0.48296156999999995,
+            0.08641538,
+            0.13039747000000002
+          ],
+          [
+            0.98296211,
+            0.58642089,
+            0.13040918000000004
+          ],
+          [
+            0.65457173,
+            0.47676233999999995,
+            0.47181022000000006
+          ],
+          [
+            0.3203022099999999,
+            0.3654548799999999,
+            0.8030088300000001
+          ],
+          [
+            0.8201694499999999,
+            0.8654082700000001,
+            0.8030008200000001
+          ],
+          [
+            0.06794719999999999,
+            0.2812125,
+            0.29944841
+          ],
+          [
+            0.5679225,
+            0.78121466,
+            0.2994581800000001
+          ]
+        ],
+        "lattice": [
+          [
+            2.89338694,
+            -0.00103706,
+            -0.74284627
+          ],
+          [
+            -0.21401617,
+            5.0972245,
+            -0.8471878
+          ],
+          [
+            0.27499152,
+            0.3127963,
+            7.06758145
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "7fd00d7833a936d10430cff1f3b4f893_160_Ti4Al2N2"
+    },
+    {
+      "density": 4.470892388132185,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -94.61064631,
+      "energy_above_hull": 0.22518993041666757,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.00031578,
+          0.00070651,
+          -0.00180358
+        ],
+        [
+          0.00031578,
+          0.00070651,
+          0.00180358
+        ],
+        [
+          -0.00031578,
+          -0.00070651,
+          -0.00180358
+        ],
+        [
+          0.00031578,
+          -0.00070651,
+          0.00180358
+        ],
+        [
+          -0.0008551,
+          0.0,
+          -0.00488386
+        ],
+        [
+          0.0008551,
+          0.0,
+          0.00488386
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -7e-06,
+          0.0,
+          -3.998e-05
+        ],
+        [
+          7e-06,
+          0.0,
+          3.998e-05
+        ],
+        [
+          4.14e-06,
+          0.0,
+          2.363e-05
+        ],
+        [
+          -4.14e-06,
+          0.0,
+          -2.363e-05
+        ]
+      ],
+      "formula": "Ti4AlN",
+      "functional": "pbe",
+      "immutable_id": "agm005779324",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm005779324",
+      "max_force": 0.0049581533366365345,
+      "nelements": 3,
+      "nsites": 12,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm005779324"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm005779324"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm005779324"
+        }
+      ],
+      "reduced_formula": "Ti4AlN",
+      "source_reduced_formula": "AlNTi4",
+      "structure": {
+        "coords": [
+          [
+            0.30670836999999995,
+            0.9935936399999998,
+            0.61341574
+          ],
+          [
+            0.69329163,
+            0.49359364,
+            0.38658425999999996
+          ],
+          [
+            0.30670836999999995,
+            0.50640636,
+            0.61341574
+          ],
+          [
+            0.69329163,
+            0.00640636,
+            0.38658425999999996
+          ],
+          [
+            0.9024919799999999,
+            0.75,
+            0.80498396
+          ],
+          [
+            0.09750802,
+            0.25,
+            0.19501604
+          ],
+          [
+            0.5,
+            0.0,
+            1.5502136788984631e-18
+          ],
+          [
+            0.5,
+            0.5,
+            1.5502136788984631e-18
+          ],
+          [
+            0.0973261,
+            0.75,
+            0.1946532
+          ],
+          [
+            0.9026739,
+            0.25,
+            0.8053468
+          ],
+          [
+            0.78730291,
+            0.75,
+            0.57460582
+          ],
+          [
+            0.21269708999999998,
+            0.25,
+            0.42539418
+          ]
+        ],
+        "lattice": [
+          [
+            3.01602725,
+            0.0,
+            -0.528065
+          ],
+          [
+            0.0,
+            5.70532262,
+            0.0
+          ],
+          [
+            0.19669306,
+            0.0,
+            10.00040549
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "22ef1514570401bdde037174396ec24c_63_Ti8Al2N2"
+    },
+    {
+      "density": 4.608980122484348,
+      "elements": [
+        "Al",
+        "N",
+        "Ti"
+      ],
+      "energy": -120.27741005,
+      "energy_above_hull": 0.07243490785714535,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          -0.00183605,
+          -0.00057084
+        ],
+        [
+          0.0,
+          -0.00183605,
+          0.00057084
+        ],
+        [
+          0.0,
+          0.00183605,
+          0.00057084
+        ],
+        [
+          0.0,
+          0.00183605,
+          -0.00057084
+        ],
+        [
+          0.0,
+          0.00184153,
+          0.0
+        ],
+        [
+          0.0,
+          -0.00184153,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.00209321,
+          0.0
+        ],
+        [
+          0.0,
+          -0.00209321,
+          0.0
+        ],
+        [
+          0.0,
+          -0.00161977,
+          0.00070232
+        ],
+        [
+          0.0,
+          0.00161977,
+          0.00070232
+        ],
+        [
+          0.0,
+          -0.00161977,
+          -0.00070232
+        ],
+        [
+          0.0,
+          0.00161977,
+          -0.00070232
+        ]
+      ],
+      "formula": "Ti4AlN2",
+      "functional": "pbe",
+      "immutable_id": "agm005909527",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm005909527",
+      "max_force": 0.00209321,
+      "nelements": 3,
+      "nsites": 14,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm005909527"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm005909527"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm005909527"
+        }
+      ],
+      "reduced_formula": "Ti4AlN2",
+      "source_reduced_formula": "AlN2Ti4",
+      "structure": {
+        "coords": [
+          [
+            0.7578189,
+            0.5156388,
+            0.10116707999999999
+          ],
+          [
+            0.7578189,
+            0.5156388,
+            0.39883292
+          ],
+          [
+            0.24218110000000007,
+            0.48436120000000005,
+            0.89883292
+          ],
+          [
+            0.24218110000000007,
+            0.48436120000000005,
+            0.60116708
+          ],
+          [
+            0.9091261300000002,
+            0.81825126,
+            0.75
+          ],
+          [
+            0.09087387000000001,
+            0.18174874,
+            0.25
+          ],
+          [
+            0.5,
+            0.0,
+            0.0
+          ],
+          [
+            0.5,
+            0.0,
+            0.5
+          ],
+          [
+            0.60958228,
+            0.21916557,
+            0.75
+          ],
+          [
+            0.39041772000000013,
+            0.7808344300000001,
+            0.25
+          ],
+          [
+            0.13377152000000003,
+            0.26754404,
+            0.43996895
+          ],
+          [
+            0.86622848,
+            0.73245596,
+            0.93996895
+          ],
+          [
+            0.13377152000000003,
+            0.26754404,
+            0.060031049999999996
+          ],
+          [
+            0.86622848,
+            0.73245596,
+            0.56003105
+          ]
+        ],
+        "lattice": [
+          [
+            3.11697658,
+            0.0,
+            0.0
+          ],
+          [
+            -1.5584888,
+            5.22014458,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            10.91464991
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Al",
+          "Al",
+          "N",
+          "N",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "3ef251516d685c91093cd20e2e448796_63_Ti8Al2N4"
+    },
+    {
+      "density": 4.709174012331552,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -43.60178235,
+      "energy_above_hull": 0.055590968999998935,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "Ti4N",
+      "functional": "pbe",
+      "immutable_id": "agm006182041",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm006182041",
+      "max_force": 0.0,
+      "nelements": 2,
+      "nsites": 5,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm006182041"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm006182041"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm006182041"
+        }
+      ],
+      "reduced_formula": "Ti4N",
+      "source_reduced_formula": "NTi4",
+      "structure": {
+        "coords": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.5,
+            0.0,
+            0.5
+          ],
+          [
+            0.0,
+            0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.0
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "lattice": [
+          [
+            4.1688945,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            4.1688945,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            4.1688945
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "c4b02cd815736fc30da89a6b7bc97dab_221_Ti4N1"
+    },
+    {
+      "density": 0.5362390874785398,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -13.86852829,
+      "energy_above_hull": 0.5128906974999996,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -0.0018038,
+          0.00055507,
+          0.0
+        ],
+        [
+          0.0018038,
+          -0.00055507,
+          0.0
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "agm2000002653",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm2000002653",
+      "max_force": 0.001887272408768803,
+      "nelements": 2,
+      "nsites": 2,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm2000002653"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm2000002653"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm2000002653"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.25363093,
+            0.022697739999999998,
+            0.5
+          ],
+          [
+            0.92027559,
+            0.35604330999999995,
+            0.5
+          ]
+        ],
+        "lattice": [
+          [
+            3.12582023,
+            0.0,
+            0.0
+          ],
+          [
+            -1.56291012,
+            2.70703973,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            15.0
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "742084d6f56f27dbb363dc37b3da9643_187_Al1N1"
+    },
+    {
+      "density": 1.3618212959891942,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -42.44589997,
+      "energy_above_hull": 0.372838180833333,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.00030874,
+          0.00067189,
+          0.00127744
+        ],
+        [
+          -0.00030874,
+          -0.00067189,
+          -0.00127744
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.00016544,
+          0.00046736,
+          0.00154766
+        ],
+        [
+          -0.00016544,
+          -0.00046736,
+          -0.00154766
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "agm2000006184",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm2000006184",
+      "max_force": 0.001625129914437612,
+      "nelements": 2,
+      "nsites": 6,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm2000006184"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm2000006184"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm2000006184"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.27071409,
+            0.39079897,
+            0.60673286
+          ],
+          [
+            0.27085394,
+            0.3909953199999999,
+            0.39326721
+          ],
+          [
+            0.77076714,
+            0.39085589,
+            0.50000013
+          ],
+          [
+            0.7707271400000001,
+            0.39080486999999997,
+            0.61045688
+          ],
+          [
+            0.7708463,
+            0.39097395,
+            0.38954279
+          ],
+          [
+            0.27077225,
+            0.3908499,
+            0.50000013
+          ]
+        ],
+        "lattice": [
+          [
+            3.9464552,
+            0.00076086,
+            0.0
+          ],
+          [
+            -1.97284718,
+            1.97293457,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            19.25333241
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "Al",
+          "Al",
+          "N",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "a1c8ee16aab0b6064d29b04cbc34e908_123_Al3N3"
+    },
+    {
+      "density": 1.3909324113569037,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -75.97366161,
+      "energy_above_hull": 0.33727254875000057,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          -0.00037234
+        ],
+        [
+          0.0,
+          0.0,
+          0.00037234
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00037234
+        ],
+        [
+          0.0,
+          0.0,
+          0.00037234
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00048688
+        ],
+        [
+          0.0,
+          0.0,
+          0.00048688
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00048688
+        ],
+        [
+          0.0,
+          0.0,
+          0.00048688
+        ]
+      ],
+      "formula": "TiN",
+      "functional": "pbe",
+      "immutable_id": "agm2000008813",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm2000008813",
+      "max_force": 0.00048688,
+      "nelements": 2,
+      "nsites": 8,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm2000008813"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm2000008813"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm2000008813"
+        }
+      ],
+      "reduced_formula": "TiN",
+      "source_reduced_formula": "NTi",
+      "structure": {
+        "coords": [
+          [
+            0.9605732700000001,
+            0.44429422,
+            0.56690341
+          ],
+          [
+            0.9605732700000001,
+            0.94430338,
+            0.43309659
+          ],
+          [
+            0.46057327,
+            0.94429422,
+            0.56690341
+          ],
+          [
+            0.46057327,
+            0.44430338,
+            0.43309659
+          ],
+          [
+            0.96055373,
+            0.94429735,
+            0.5559509
+          ],
+          [
+            0.96055373,
+            0.44430025,
+            0.44404910000000003
+          ],
+          [
+            0.46055373000000005,
+            0.44429735000000004,
+            0.5559509
+          ],
+          [
+            0.46055373000000005,
+            0.94430025,
+            0.44404910000000003
+          ]
+        ],
+        "lattice": [
+          [
+            4.13063031,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            4.13063031,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            17.31715302
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "N",
+          "N",
+          "N",
+          "N",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti"
+        ]
+      },
+      "structure_fingerprint": "9016faf13fa01ebd7cfbcc0a3acabe18_129_Ti4N4"
+    },
+    {
+      "density": 1.3619925114749387,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -84.89204673,
+      "energy_above_hull": 0.37281761499999977,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          -7.973e-05,
+          -0.00032967,
+          -0.00313802
+        ],
+        [
+          -7.241e-05,
+          0.00024552,
+          0.00323007
+        ],
+        [
+          7.241e-05,
+          -0.00024552,
+          0.00323007
+        ],
+        [
+          7.973e-05,
+          0.00032967,
+          -0.00313802
+        ],
+        [
+          0.00018904,
+          0.00040534,
+          0.00012094
+        ],
+        [
+          -0.00018904,
+          -0.00040534,
+          0.00012094
+        ],
+        [
+          7.378e-05,
+          0.00016347,
+          0.00129401
+        ],
+        [
+          -2.29e-05,
+          -0.00046074,
+          -0.00158762
+        ],
+        [
+          2.29e-05,
+          0.00046074,
+          -0.00158762
+        ],
+        [
+          -7.378e-05,
+          -0.00016347,
+          0.00129401
+        ],
+        [
+          0.00038435,
+          0.0001903,
+          8.062e-05
+        ],
+        [
+          -0.00038435,
+          -0.0001903,
+          8.062e-05
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "agm2000021145",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm2000021145",
+      "max_force": 0.003240196827879442,
+      "nelements": 2,
+      "nsites": 12,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm2000021145"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm2000021145"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm2000021145"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.75000091,
+            0.7500066199999998,
+            0.6067667799999998
+          ],
+          [
+            0.25000104,
+            0.24999357999999997,
+            0.39323317
+          ],
+          [
+            0.74999897,
+            0.75000642,
+            0.39323318
+          ],
+          [
+            0.24999908999999998,
+            0.24999337999999996,
+            0.6067667799999998
+          ],
+          [
+            0.24999870999999999,
+            0.74999219,
+            0.49999954999999996
+          ],
+          [
+            0.7500012999999999,
+            0.25000781,
+            0.49999954999999996
+          ],
+          [
+            0.24999975,
+            0.7499957399999999,
+            0.61047928
+          ],
+          [
+            0.7500001999999999,
+            0.25000725999999995,
+            0.38952159
+          ],
+          [
+            0.24999981999999998,
+            0.7499927399999999,
+            0.38952159
+          ],
+          [
+            0.75000027,
+            0.25000424999999993,
+            0.61047928
+          ],
+          [
+            0.24999658999999996,
+            0.24999499999999997,
+            0.4999996299999999
+          ],
+          [
+            0.7500034199999999,
+            0.7500049999999999,
+            0.49999962
+          ]
+        ],
+        "lattice": [
+          [
+            3.94618484,
+            -4.1e-07,
+            0.0
+          ],
+          [
+            -1.03e-06,
+            3.94618327,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            19.25440974
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "Al",
+          "Al",
+          "Al",
+          "Al",
+          "Al",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "e0697484c31c501f08a561fafc000d0e_123_Al6N6"
+    },
+    {
+      "density": 2.2520156443366375,
+      "elements": [
+        "N",
+        "Ti"
+      ],
+      "energy": -65.31231613,
+      "energy_above_hull": 0.34089854249999973,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.00125478
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00125478
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00122458
+        ],
+        [
+          0.0,
+          0.0,
+          0.00122458
+        ],
+        [
+          0.0,
+          0.0,
+          0.00347915
+        ],
+        [
+          0.0,
+          0.0,
+          -0.00347915
+        ]
+      ],
+      "formula": "Ti4N3",
+      "functional": "pbe",
+      "immutable_id": "agm2000110212",
+      "last_modified": "2023-11-16 06:57:59",
+      "material_id": "agm2000110212",
+      "max_force": 0.00347915,
+      "nelements": 2,
+      "nsites": 7,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "agm2000110212"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "agm2000110212"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "agm2000110212"
+        }
+      ],
+      "reduced_formula": "Ti4N3",
+      "source_reduced_formula": "N3Ti4",
+      "structure": {
+        "coords": [
+          [
+            0.0,
+            0.0,
+            0.5
+          ],
+          [
+            0.6666666700000001,
+            0.33333333000000004,
+            0.38789872
+          ],
+          [
+            0.3333333299999999,
+            0.66666667,
+            0.61210128
+          ],
+          [
+            0.3333333299999999,
+            0.66666667,
+            0.44309885000000004
+          ],
+          [
+            0.6666666700000001,
+            0.33333333000000004,
+            0.55690115
+          ],
+          [
+            0.0,
+            0.0,
+            0.33745572
+          ],
+          [
+            0.0,
+            0.0,
+            0.66254428
+          ]
+        ],
+        "lattice": [
+          [
+            2.99077451,
+            0.0,
+            0.0
+          ],
+          [
+            -1.49538725,
+            2.5900867,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            22.22513838
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "N",
+          "N",
+          "N",
+          "Ti",
+          "Ti",
+          "Ti",
+          "Ti"
+        ]
+      },
+      "structure_fingerprint": "61f5bd244101a30d2177f1d00aa09529_164_Ti4N3"
+    },
+    {
+      "density": 3.4233655305292556,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -29.32762423,
+      "energy_above_hull": 0.11524878499999947,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "mp-13178",
+      "last_modified": "2023-03-11 04:48:23",
+      "material_id": "mp-13178",
+      "max_force": 0.0,
+      "nelements": 2,
+      "nsites": 4,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "mp-13178"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "mp-13178"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "mp-13178"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.666667,
+            0.333333,
+            0.25
+          ],
+          [
+            0.333333,
+            0.666667,
+            0.75
+          ],
+          [
+            0.666667,
+            0.333333,
+            0.75
+          ],
+          [
+            0.333333,
+            0.666667,
+            0.25
+          ]
+        ],
+        "lattice": [
+          [
+            1.65577809,
+            -2.86789118,
+            0.0
+          ],
+          [
+            1.65577809,
+            2.86789118,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            4.18687775
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "Al",
+          "N",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "6a2f174258e1081b1a20f82f322b26bc_194_Al2N2"
+    },
+    {
+      "density": 4.0433763327460115,
+      "elements": [
+        "Al",
+        "N"
+      ],
+      "energy": -14.55060213,
+      "energy_above_hull": 0.17185377749999997,
+      "field_provenance": {
+        "density": "MatterGraph:pymatgen.Structure.density",
+        "energy": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "energy_above_hull": "LeMaterial/LeMat-Bulk-DFT-Hull-All@fc063a965498df6481911bdfdb3cad5619016d81",
+        "forces": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "functional": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "max_force": "MatterGraph:max(||force_i||)",
+        "structure": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+        "structure_fingerprint": "LeMaterial/LeMat-Bulk/compatible_pbe@0dc17eea904b860ad7288141e9870f67f8e6bb2c"
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "formula": "AlN",
+      "functional": "pbe",
+      "immutable_id": "mp-1330",
+      "last_modified": "2023-03-11 07:13:34",
+      "material_id": "mp-1330",
+      "max_force": 0.0,
+      "nelements": 2,
+      "nsites": 2,
+      "provenance": [
+        {
+          "method": "dft",
+          "notes": "Structure, energy, force, and functional fields from compatible_pbe.",
+          "parameters": {
+            "revision": "0dc17eea904b860ad7288141e9870f67f8e6bb2c",
+            "subset": "compatible_pbe"
+          },
+          "source": "LeMaterial/LeMat-Bulk",
+          "source_id": "mp-1330"
+        },
+        {
+          "method": "dft",
+          "notes": "DFT energy above hull joined on immutable_id.",
+          "parameters": {
+            "revision": "fc063a965498df6481911bdfdb3cad5619016d81"
+          },
+          "source": "LeMaterial/LeMat-Bulk-DFT-Hull-All",
+          "source_id": "mp-1330"
+        },
+        {
+          "method": "derived",
+          "notes": "Density reconstructed from lattice/species; max_force is the largest force norm.",
+          "parameters": {
+            "curation_schema": "spc-demo-snapshot-v1"
+          },
+          "source": "MatterGraph",
+          "source_id": "mp-1330"
+        }
+      ],
+      "reduced_formula": "AlN",
+      "source_reduced_formula": "AlN",
+      "structure": {
+        "coords": [
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "lattice": [
+          [
+            0.0,
+            2.034127,
+            2.034127
+          ],
+          [
+            2.034127,
+            0.0,
+            2.034127
+          ],
+          [
+            2.034127,
+            2.034127,
+            0.0
+          ]
+        ],
+        "site_properties": null,
+        "species": [
+          "Al",
+          "N"
+        ]
+      },
+      "structure_fingerprint": "ef58a2c65adbbc4258f1f4fbfce643c8_225_Al1N1"
+    }
+  ]
+}
