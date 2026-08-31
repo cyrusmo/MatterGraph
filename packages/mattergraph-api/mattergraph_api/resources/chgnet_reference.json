@@ -1,0 +1,87 @@
+{
+  "artifact_version": "chgnet-reference-v1",
+  "created_at": "2026-08-13T18:16:48.939368+00:00",
+  "formula": "AlN",
+  "input_checksum": "eee5560f4c2ab12528ec8cb50da64503a788472843b10fdc27180448d304b568",
+  "label": "cached_reference",
+  "material_id": "agm003273599",
+  "model": {
+    "name": "CHGNet",
+    "runtime_package_version": "0.4.2",
+    "version": "0.3.0",
+    "weight_checksum": "d14ab7c0f093efe64b60a7bcd540bca10e74fb7f46c86108a079af60524659d1",
+    "weight_filename": "chgnet_0.3.0_e29f68s314m37.pth.tar"
+  },
+  "result": {
+    "converged": true,
+    "energy_per_atom": -7.572085380554199,
+    "final_volume": 21.30394109642822,
+    "initial_volume": 21.30394109642822,
+    "lattice_change_percent": 0.0,
+    "max_force": 2.3328290169036378e-06,
+    "max_stress_ev_a3": 0.0012712280731648207,
+    "relaxed_structure": {
+      "coords": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.75,
+          0.75,
+          0.75
+        ]
+      ],
+      "lattice": [
+        [
+          3.11165651,
+          0.0,
+          0.0
+        ],
+        [
+          1.55582826,
+          2.69477359,
+          0.0
+        ],
+        [
+          1.55582826,
+          0.89825786,
+          2.5406569
+        ]
+      ],
+      "site_properties": null,
+      "species": [
+        "Al",
+        "N"
+      ]
+    },
+    "steps": 1,
+    "trajectory": [
+      {
+        "energy_per_atom": -7.572085380554199,
+        "max_force": 2.3328290169036378e-06,
+        "max_stress_ev_a3": 0.0012712280731648207,
+        "step": 0,
+        "volume": 21.303941096428215
+      },
+      {
+        "energy_per_atom": -7.572085380554199,
+        "max_force": 2.3328290169036378e-06,
+        "max_stress_ev_a3": 0.0012712280731648207,
+        "step": 1,
+        "volume": 21.303941096428215
+      }
+    ],
+    "volume_change_percent": 0.0
+  },
+  "run": {
+    "ase_filter": "FrechetCellFilter",
+    "device": "cpu",
+    "fmax_ev_a": 0.1,
+    "max_steps": 50,
+    "optimizer": "FIRE",
+    "relax_cell": true,
+    "runtime_seconds": 0.3231630828231573
+  }
+}

@@ -25,12 +25,12 @@ jobs:
             --no-cache-dir \
             --index-url https://pypi.org/simple/ \
             --report install-report.json \
-            "mattergraph==0.1.0"
+            "mattergraph==0.1.1"
           .package-canary/bin/python -m pip check
           .package-canary/bin/python scripts/release_checks.py report \
             --report install-report.json \
             --index pypi \
-            --version 0.1.0
+            --version 0.1.1
           .package-canary/bin/python scripts/release_checks.py smoke \
-            --version 0.1.0 \
+            --version 0.1.1 \
             --mode default

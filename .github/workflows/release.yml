@@ -24,7 +24,7 @@ on:
   workflow_dispatch:
     inputs:
       verify_existing:
-        description: Verify the existing TestPyPI 0.1.0 release without uploading
+        description: Verify the existing TestPyPI 0.1.1 release without uploading
         required: true
         type: boolean
         default: false
@@ -61,9 +61,9 @@ jobs:
         if: ${{ !inputs.verify_existing }}
         env:
           RELEASE_INDEX: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
-        run: python scripts/release_checks.py registry --index "$RELEASE_INDEX" --version 0.1.0
+        run: python scripts/release_checks.py registry --index "$RELEASE_INDEX" --version 0.1.1
 
-      # Guard against tagging v1.2.3 while pyproject still says 0.1.0.
+      # Guard against tagging v1.2.3 while pyproject still says 0.1.1.
       - name: Check tag matches project version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
@@ -81,7 +81,7 @@ jobs:
           --build-constraints build-constraints.txt
 
       - name: Audit release artifacts
-        run: python scripts/release_checks.py artifacts --dist dist --version 0.1.0
+        run: python scripts/release_checks.py artifacts --dist dist --version 0.1.1
 
       - name: Check package metadata
         run: uvx --from twine==6.2.0 twine check dist/*
@@ -121,11 +121,11 @@ jobs:
             .release-smoke/bin/python -m pip install \
               --no-cache-dir \
               --find-links dist \
-              "mattergraph[all]==0.1.0"
+              "mattergraph[all]==0.1.1"
           fi
           .release-smoke/bin/python -m pip check
           .release-smoke/bin/python scripts/release_checks.py smoke \
-            --version 0.1.0 \
+            --version 0.1.1 \
             --mode "${{ matrix.install-mode }}"
 
   publish-members:
@@ -226,7 +226,7 @@ jobs:
                 --no-cache-dir \
                 --index-url https://pypi.org/simple/ \
                 --find-links dist \
-                "mattergraph[all]==0.1.0"
+                "mattergraph[all]==0.1.1"
             fi
             mattergraph_packages=(
               mattergraph
@@ -238,15 +238,15 @@ jobs:
             )
             .published-smoke/bin/python -m pip uninstall -y "${mattergraph_packages[@]}"
             mattergraph_specs=(
-              "mattergraph==0.1.0"
-              "mattergraph-api==0.1.0"
-              "mattergraph-benchmarks==0.1.0"
-              "mattergraph-connectors==0.1.0"
-              "mattergraph-core==0.1.0"
-              "mattergraph-sim==0.1.0"
+              "mattergraph==0.1.1"
+              "mattergraph-api==0.1.1"
+              "mattergraph-benchmarks==0.1.1"
+              "mattergraph-connectors==0.1.1"
+              "mattergraph-core==0.1.1"
+              "mattergraph-sim==0.1.1"
             )
             if [ "${{ matrix.install-mode }}" = "all" ]; then
-              mattergraph_specs[0]="mattergraph[all]==0.1.0"
+              mattergraph_specs[0]="mattergraph[all]==0.1.1"
             fi
             .published-smoke/bin/python -m pip install \
               --no-cache-dir \
@@ -257,9 +257,9 @@ jobs:
               --report install-report.json \
               "${mattergraph_specs[@]}"
           else
-            spec="mattergraph==0.1.0"
+            spec="mattergraph==0.1.1"
             if [ "${{ matrix.install-mode }}" = "all" ]; then
-              spec="mattergraph[all]==0.1.0"
+              spec="mattergraph[all]==0.1.1"
             fi
             .published-smoke/bin/python -m pip install \
               --no-cache-dir \
@@ -273,9 +273,9 @@ jobs:
           .published-smoke/bin/python scripts/release_checks.py report \
             --report install-report.json \
             --index "$RELEASE_INDEX" \
-            --version 0.1.0
+            --version 0.1.1
           .published-smoke/bin/python scripts/release_checks.py smoke \
-            --version 0.1.0 \
+            --version 0.1.1 \
             --mode "${{ matrix.install-mode }}"
 
   github-release:

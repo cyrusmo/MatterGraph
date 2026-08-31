@@ -1,9 +1,11 @@
 import json
 import time
+from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 from mattergraph_api.main import app
+from mattergraph_api.services import demo_service, store_service
 
 pytestmark = pytest.mark.asyncio
 
@@ -25,6 +27,48 @@ async def test_health_does_not_materialize_demo(monkeypatch: pytest.MonkeyPatch)
     r = await ac.get("/health")
   assert r.status_code == 200
   assert r.json() == {"status": "ok"}
+
+
+async def test_bundled_workflow_is_available_outside_repository(
+  monkeypatch: pytest.MonkeyPatch,
+  tmp_path: Path,
+) -> None:
+  monkeypatch.chdir(tmp_path)
+  monkeypatch.setattr(store_service, "_store", None)
+  demo_service.get_demo_dataset.cache_clear()
+  demo_service.get_demo_store.cache_clear()
+  demo_service.get_chgnet_reference_artifact.cache_clear()
+
+  score_request = {
+    "objectives": {
+      "density": {"direction": "minimize", "weight": 0.6},
+      "energy_above_hull": {"direction": "minimize", "weight": 0.4},
+    },
+    "constraints": {
+      "energy_above_hull": {"max": 0.05},
+      "max_force": {"max": 0.2},
+    },
+  }
+  transport = ASGITransport(app=app)
+  async with AsyncClient(transport=transport, base_url="http://test") as ac:
+    health = await ac.get("/health")
+    preflight = await ac.get("/demo/preflight")
+    workflow = await ac.get("/workflows/lematerial/demo")
+    graph = await ac.get("/materials/agm003273599/graph-summary")
+    ranking = await ac.post("/scores/rank/audit", json=score_request)
+    reference = await ac.get("/simulations/chgnet/reference/agm003273599")
+
+  assert health.status_code == 200
+  assert preflight.status_code == 200
+  assert preflight.json()["record_count"] == 24
+  assert workflow.status_code == 200
+  assert workflow.json()["schema_report"]["row_count"] == 24
+  assert graph.status_code == 200
+  assert graph.json()["validation"]["state"] == "valid"
+  assert ranking.status_code == 200
+  assert len(ranking.json()["ranked"]) == 6
+  assert reference.status_code == 200
+  assert reference.json()["label"] == "cached_reference"
 
 
 async def test_materials_list() -> None:

@@ -8,8 +8,8 @@ installation from production PyPI passes; uploading files alone is not sufficien
 Confirm that all six names are available before configuring publishers:
 
 ```bash
-python scripts/release_checks.py registry --index testpypi --version 0.1.0
-python scripts/release_checks.py registry --index pypi --version 0.1.0
+python scripts/release_checks.py registry --index testpypi --version 0.1.1
+python scripts/release_checks.py registry --index pypi --version 0.1.1
 ```
 
 Create the base GitHub environments `testpypi` and `pypi`, plus one component environment per
@@ -84,17 +84,17 @@ If every upload succeeded but a post-publication proof failed, rerun the workflo
 version check and every upload job, and runs only the existing TestPyPI installation proof. Never
 rerun a publishing dispatch against filenames that already exist.
 
-If any package name is claimed, any `0.1.0` artifact already exists, or any archive emits metadata
+If any package name is claimed, any `0.1.1` artifact already exists, or any archive emits metadata
 2.5 or newer, stop. Do not rename packages or weaken validation inside the release run.
 
-## Publish 0.1.0
+## Publish 0.1.1
 
-After TestPyPI is green, replace `Unreleased` on the `0.1.0` changelog heading with the release
+After TestPyPI is green, replace `Unreleased` on the `0.1.1` changelog heading with the release
 date. Create and push an annotated tag:
 
 ```bash
-git tag -a v0.1.0 -m "MatterGraph 0.1.0"
-git push origin v0.1.0
+git tag -a v0.1.1 -m "MatterGraph 0.1.1"
+git push origin v0.1.1
 ```
 
 Only a `v*` tag can target production PyPI. The protected `pypi*` environments supply the approval

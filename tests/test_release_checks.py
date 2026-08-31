@@ -27,8 +27,8 @@ def _write_report(path: Path, host: str) -> None:
   payload = {
     "install": [
       {
-        "metadata": {"name": name, "version": "0.1.0"},
-        "download_info": {"url": f"https://{host}/packages/{name}-0.1.0.whl"},
+        "metadata": {"name": name, "version": "0.1.1"},
+        "download_info": {"url": f"https://{host}/packages/{name}-0.1.1.whl"},
       }
       for name in sorted(EXPECTED_PACKAGES)
     ]
@@ -40,7 +40,7 @@ def test_install_report_requires_all_packages_from_target_index(tmp_path: Path) 
   report = tmp_path / "install-report.json"
   _write_report(report, "test-files.pythonhosted.org")
 
-  check_install_report(report, "testpypi", "0.1.0")
+  check_install_report(report, "testpypi", "0.1.1")
 
 
 def test_install_report_rejects_wrong_package_origin(tmp_path: Path) -> None:
@@ -48,20 +48,20 @@ def test_install_report_rejects_wrong_package_origin(tmp_path: Path) -> None:
   _write_report(report, "files.pythonhosted.org")
 
   with pytest.raises(ReleaseCheckError, match="test-files.pythonhosted.org"):
-    check_install_report(report, "testpypi", "0.1.0")
+    check_install_report(report, "testpypi", "0.1.1")
 
 
 @pytest.mark.parametrize(
   "requirement",
   [
     "mattergraph-core",
-    "mattergraph-core>=0.1.0",
+    "mattergraph-core>=0.1.1",
     "mattergraph-core @ file:///tmp/mattergraph-core",
   ],
 )
 def test_internal_requirements_must_use_compatible_registry_versions(requirement: str) -> None:
   with pytest.raises(ReleaseCheckError):
-    _validate_requirement(requirement, "0.1.0", Path("artifact.whl"))
+    _validate_requirement(requirement, "0.1.1", Path("artifact.whl"))
 
 
 def test_distribution_names_use_pep_503_normalization() -> None:
@@ -76,7 +76,7 @@ def test_select_artifacts_isolates_one_wheel_and_sdist(
   artifacts = []
   for package in sorted(EXPECTED_PACKAGES):
     for kind, suffix in (("wheel", ".whl"), ("sdist", ".tar.gz")):
-      path = dist / f"{package}-0.1.0{suffix}"
+      path = dist / f"{package}-0.1.1{suffix}"
       path.write_text(f"{package}-{kind}")
       message = Message()
       message["Name"] = package
@@ -89,8 +89,8 @@ def test_select_artifacts_isolates_one_wheel_and_sdist(
   select_artifacts(dist, "MatterGraph_API", output)
 
   assert sorted(path.name for path in output.iterdir()) == [
-    "mattergraph-api-0.1.0.tar.gz",
-    "mattergraph-api-0.1.0.whl",
+    "mattergraph-api-0.1.1.tar.gz",
+    "mattergraph-api-0.1.1.whl",
   ]
 
 
@@ -108,4 +108,4 @@ def test_testpypi_install_does_not_mix_dependency_indexes() -> None:
   assert "--no-deps" in workflow
   assert "verify_existing" in workflow
   for package in EXPECTED_PACKAGES:
-    assert f'"{package}==0.1.0"' in workflow
+    assert f'"{package}==0.1.1"' in workflow

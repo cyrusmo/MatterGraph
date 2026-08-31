@@ -18,7 +18,7 @@ app = FastAPI(
     "Evidence-first demo API for provenanced materials records, reciprocal graph summaries, "
     "audited ranking, and explicitly labeled simulation evidence."
   ),
-  version="0.1.0",
+  version="0.1.1",
 )
 app.add_middleware(
   CORSMiddleware,

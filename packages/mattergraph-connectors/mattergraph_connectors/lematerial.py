@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
+from copy import deepcopy
+from functools import lru_cache
 from importlib import import_module
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -38,9 +42,28 @@ _PROPERTY_UNITS = {
   "energy": "eV",
 }
 
+EXAMPLE_NAMES = ("spc-tialn-24",)
+_EXAMPLE_RESOURCES = {
+  "spc-tialn-24": "spc_real_snapshot.json",
+}
+
 
 class LeMatBulk:
   """Adapter for turning LeMaterial bulk-style records into MatterGraph workflows."""
+
+  @classmethod
+  def example(cls, name: str = "spc-tialn-24") -> MatterGraphDataset:
+    """Load a checksummed, credential-free LeMaterial example bundled with the package."""
+    artifact = deepcopy(_load_example_artifact(name))
+    manifest = artifact["manifest"]
+    dataset = cls.from_records(
+      artifact["records"],
+      source_dataset=str(manifest["dataset"]),
+      subset=str(manifest["subset"]),
+    )
+    dataset.metadata["snapshot_manifest"] = manifest
+    dataset.metadata["example_name"] = name
+    return dataset
 
   @classmethod
   def from_hf(
@@ -215,6 +238,21 @@ class LeMatBulk:
       if non_null.map(lambda value: isinstance(value, (int, float, str, bool))).all():
         columns.append(column)
     return columns
+
+
+@lru_cache(maxsize=len(EXAMPLE_NAMES))
+def _load_example_artifact(name: str) -> dict[str, Any]:
+  resource_name = _EXAMPLE_RESOURCES.get(name)
+  if resource_name is None:
+    available = ", ".join(EXAMPLE_NAMES)
+    msg = f"unknown LeMatBulk example {name!r}; available examples: {available}"
+    raise ValueError(msg)
+  resource = files("mattergraph_connectors").joinpath("resources", resource_name)
+  artifact = json.loads(resource.read_text(encoding="utf-8"))
+  if not isinstance(artifact, dict) or not isinstance(artifact.get("records"), list):
+    msg = f"bundled LeMatBulk example {name!r} is malformed"
+    raise ValueError(msg)
+  return artifact
 
 
 def _reconstruct_structure(row: pd.Series) -> CrystalStructure | None:

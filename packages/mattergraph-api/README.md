@@ -19,9 +19,11 @@ This is a **demonstration surface**, not a production service: storage is an in-
 
 ```bash
 pip install mattergraph-api
-export MATTERGRAPH_DEMO_DATA=data/demo/materials_sample.jsonl
 uvicorn mattergraph_api.main:app --host 0.0.0.0 --port 8000
 ```
+
+The default API uses the packaged, checksummed 24-record LeMaterial example. Set
+`MATTERGRAPH_DEMO_DATA` only when intentionally replacing it with a custom JSONL store.
 
 ## License
 

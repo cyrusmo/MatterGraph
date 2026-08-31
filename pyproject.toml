@@ -1,6 +1,6 @@
 [project]
 name = "mattergraph"
-version = "0.1.0"
+version = "0.1.1"
 description = "Open-source materials data infrastructure for physics-aware ML and simulation workflows."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,17 +26,17 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-  "mattergraph-core~=0.1.0",
-  "mattergraph-connectors~=0.1.0",
-  "mattergraph-benchmarks~=0.1.0",
-  "mattergraph-sim~=0.1.0",
-  "mattergraph-api~=0.1.0",
+  "mattergraph-core~=0.1.1",
+  "mattergraph-connectors~=0.1.1",
+  "mattergraph-benchmarks~=0.1.1",
+  "mattergraph-sim~=0.1.1",
+  "mattergraph-api~=0.1.1",
 ]
 
 [project.optional-dependencies]
-mp = ["mattergraph-connectors[mp]~=0.1.0"]
-jarvis = ["mattergraph-connectors[jarvis]~=0.1.0"]
-all = ["mattergraph-connectors[all]~=0.1.0"]
+mp = ["mattergraph-connectors[mp]~=0.1.1"]
+jarvis = ["mattergraph-connectors[jarvis]~=0.1.1"]
+all = ["mattergraph-connectors[all]~=0.1.1"]
 
 [dependency-groups]
 dev = [

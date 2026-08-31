@@ -64,7 +64,7 @@ jobs:
           uv build --all-packages --out-dir dist --clear --no-create-gitignore
           --build-constraints build-constraints.txt
       - name: Audit release artifacts
-        run: python scripts/release_checks.py artifacts --dist dist --version 0.1.0
+        run: python scripts/release_checks.py artifacts --dist dist --version 0.1.1
       - name: Check metadata
         run: uvx --from twine==6.2.0 twine check dist/*
       - uses: actions/upload-artifact@v4
@@ -102,11 +102,11 @@ jobs:
             .release-smoke/bin/python -m pip install \
               --no-cache-dir \
               --find-links dist \
-              "mattergraph[all]==0.1.0"
+              "mattergraph[all]==0.1.1"
           fi
           .release-smoke/bin/python -m pip check
           .release-smoke/bin/python scripts/release_checks.py smoke \
-            --version 0.1.0 \
+            --version 0.1.1 \
             --mode "${{ matrix.install-mode }}"
 
   memory-budget:

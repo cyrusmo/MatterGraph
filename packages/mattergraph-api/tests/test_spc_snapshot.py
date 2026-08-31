@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from importlib.resources import files
 from pathlib import Path
 
 import pytest
@@ -99,3 +100,20 @@ def test_chgnet_reference_input_checksum_matches_selected_record() -> None:
   )
   assert reference["model"]["version"] == "0.3.0"
   assert reference["label"] == "cached_reference"
+
+
+def test_packaged_api_and_connector_resources_match_canonical_artifacts() -> None:
+  root = Path(__file__).resolve().parents[3]
+  packaged_snapshot = (
+    files("mattergraph_connectors")
+    .joinpath("resources", "spc_real_snapshot.json")
+    .read_bytes()
+  )
+  packaged_reference = (
+    files("mattergraph_api")
+    .joinpath("resources", "chgnet_reference.json")
+    .read_bytes()
+  )
+
+  assert packaged_snapshot == (root / "data/demo/spc_real_snapshot.json").read_bytes()
+  assert packaged_reference == (root / "data/demo/chgnet_reference.json").read_bytes()

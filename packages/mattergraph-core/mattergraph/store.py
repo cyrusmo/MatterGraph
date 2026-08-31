@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from importlib.resources import files
 from io import StringIO
 from pathlib import Path
 from typing import Any, Iterator
@@ -83,16 +84,17 @@ class MaterialStore:
 
   @classmethod
   def from_demo(cls) -> MaterialStore:
-    here = Path(__file__).resolve().parent
-    # demo next to install: use env or CWD
-    for candidate in [
-      Path("data/demo/materials_sample.jsonl"),
-      here / "../../../data/demo/materials_sample.jsonl",
-    ]:
-      p = Path(candidate)
-      if p.is_file():
-        return cls.from_jsonl(p)
-    return cls([])
+    """Load the deterministic three-record smoke fixture bundled with ``mattergraph-core``.
+
+    This deliberately remains the small backwards-compatible SDK fixture. Research examples
+    should use ``LeMatBulk.example('spc-tialn-24')`` for the attributed public dataset.
+    """
+    content = (
+      files("mattergraph")
+      .joinpath("resources", "materials_sample.jsonl")
+      .read_text(encoding="utf-8")
+    )
+    return cls.from_jsonl_text(content)
 
 
 def _material_from_dict(d: dict[str, Any]) -> Material:
