@@ -6,6 +6,7 @@ import os
 import secrets
 from collections import OrderedDict
 from dataclasses import dataclass
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +24,6 @@ from mattergraph_connectors import LeMatBulk
 
 from mattergraph_api.services import store_service
 
-MODEL_CONTRACT_RELATIVE_PATH = "configs/navigator/model_contract.json"
 MAX_PUBLIC_REPLAYS = 64
 
 
@@ -77,8 +77,8 @@ def get_runtime() -> NavigatorRuntime:
 
 
 def model_contract() -> dict[str, Any]:
-  path = _repo_root() / MODEL_CONTRACT_RELATIVE_PATH
-  return json.loads(path.read_text())
+  contract = resources.files("mattergraph.navigator").joinpath("model_contract.json")
+  return json.loads(contract.read_text(encoding="utf-8"))
 
 
 def material_payload(material_id: str) -> dict[str, Any] | None:
@@ -138,13 +138,6 @@ def get_public_replay(replay_id: str) -> dict[str, Any] | None:
   if payload is not None:
     _public_replays.move_to_end(replay_id)
   return payload
-
-
-def _repo_root() -> Path:
-  configured = os.environ.get("MATTERGRAPH_REPO_ROOT")
-  if configured:
-    return Path(configured).resolve()
-  return Path(__file__).resolve().parents[4]
 
 
 @dataclass(frozen=True)

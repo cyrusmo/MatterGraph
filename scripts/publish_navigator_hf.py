@@ -35,7 +35,7 @@ def main() -> None:
   root = Path(__file__).resolve().parents[1]
   with tempfile.TemporaryDirectory(prefix="mattergraph-hf-space-") as temporary:
     staging = Path(temporary)
-    for relative in ["packages", "apps/web", "data/demo", "configs/navigator"]:
+    for relative in ["packages", "apps/web", "data/demo"]:
       shutil.copytree(root / relative, staging / relative)
     (staging / "data" / "navigator").mkdir(parents=True)
     shutil.copy2(args.index, staging / "data" / "navigator" / "index_v1.jsonl")

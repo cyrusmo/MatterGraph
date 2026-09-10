@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+import zipfile
 from email.message import Message
 from pathlib import Path
 
@@ -21,6 +22,7 @@ _validate_requirement = release_checks._validate_requirement
 check_install_report = release_checks.check_install_report
 normalize_name = release_checks.normalize_name
 select_artifacts = release_checks.select_artifacts
+_validate_packaged_resource = release_checks._validate_packaged_resource
 
 
 def _write_report(path: Path, host: str) -> None:
@@ -97,6 +99,46 @@ def test_select_artifacts_isolates_one_wheel_and_sdist(
 def test_select_artifacts_rejects_unknown_package(tmp_path: Path) -> None:
   with pytest.raises(ReleaseCheckError, match="Unknown MatterGraph package"):
     select_artifacts(tmp_path / "dist", "not-mattergraph", tmp_path / "publish-dist")
+
+
+def test_packaged_resource_check_accepts_multiple_core_resources(
+  tmp_path: Path,
+) -> None:
+  wheel = tmp_path / "mattergraph_core-0.1.1-py3-none-any.whl"
+
+  with zipfile.ZipFile(wheel, "w") as archive:
+    archive.writestr("mattergraph/resources/materials_sample.jsonl", "{}\n")
+    archive.writestr("mattergraph/navigator/model_contract.json", "{}\n")
+  message = Message()
+  message["Name"] = "mattergraph-core"
+  artifact = release_checks.ArtifactMetadata(
+    path=wheel,
+    kind="wheel",
+    message=message,
+    raw="",
+  )
+
+  _validate_packaged_resource(artifact, "mattergraph-core")
+
+
+def test_packaged_resource_check_rejects_missing_model_contract(
+  tmp_path: Path,
+) -> None:
+  wheel = tmp_path / "mattergraph_core-0.1.1-py3-none-any.whl"
+
+  with zipfile.ZipFile(wheel, "w") as archive:
+    archive.writestr("mattergraph/resources/materials_sample.jsonl", "{}\n")
+  message = Message()
+  message["Name"] = "mattergraph-core"
+  artifact = release_checks.ArtifactMetadata(
+    path=wheel,
+    kind="wheel",
+    message=message,
+    raw="",
+  )
+
+  with pytest.raises(ReleaseCheckError, match="model_contract.json"):
+    _validate_packaged_resource(artifact, "mattergraph-core")
 
 
 def test_testpypi_install_does_not_mix_dependency_indexes() -> None:

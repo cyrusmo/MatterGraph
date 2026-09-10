@@ -44,8 +44,8 @@ inferring chemical bonds.
 ## Interpreter contract
 
 The checked-in runtime uses a bounded deterministic fallback so the public workflow remains
-reproducible without model weights. The frozen Qwen3-4B contract is recorded in
-`configs/navigator/model_contract.json` and remains disabled until
+reproducible without model weights. The frozen Qwen3-4B contract is packaged at
+`mattergraph.navigator/model_contract.json` and remains disabled until
 `scripts/smoke_navigator_model.py` passes in the exact pinned environment.
 
 Qualification requires two clean processes. The first writes a manifest; the second must match it:

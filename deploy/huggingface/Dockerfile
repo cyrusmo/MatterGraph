@@ -10,7 +10,6 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    MATTERGRAPH_REPO_ROOT=/app \
     MATTERGRAPH_WEB_DIST=/app/web \
     MATTERGRAPH_NAVIGATOR_INDEX_RAW=/app/data/navigator/index_v1.jsonl
 
@@ -18,7 +17,6 @@ WORKDIR /app
 COPY packages/ ./packages/
 COPY data/demo/ ./data/demo/
 COPY data/navigator/ ./data/navigator/
-COPY configs/navigator/ ./configs/navigator/
 COPY LICENSE README.md ./
 COPY --from=web /src/apps/web/dist ./web/
 

@@ -41,11 +41,14 @@ REPORT_HOSTS = {
 }
 REPOSITORY_URL = "https://github.com/cyrusmo/MatterGraph"
 EXPECTED_RESOURCES = {
-  "mattergraph-core": "mattergraph/resources/materials_sample.jsonl",
-  "mattergraph-connectors": (
-    "mattergraph_connectors/resources/spc_real_snapshot.json"
+  "mattergraph-core": (
+    "mattergraph/resources/materials_sample.jsonl",
+    "mattergraph/navigator/model_contract.json",
   ),
-  "mattergraph-api": "mattergraph_api/resources/chgnet_reference.json",
+  "mattergraph-connectors": (
+    "mattergraph_connectors/resources/spc_real_snapshot.json",
+  ),
+  "mattergraph-api": ("mattergraph_api/resources/chgnet_reference.json",),
 }
 
 
@@ -160,20 +163,25 @@ def _validate_metapackage_extras(artifact: ArtifactMetadata) -> None:
 
 
 def _validate_packaged_resource(artifact: ArtifactMetadata, distribution: str) -> None:
-  expected = EXPECTED_RESOURCES.get(distribution)
-  if expected is None:
+  expected_resources = EXPECTED_RESOURCES.get(distribution)
+  if expected_resources is None:
     return
+  missing: list[str] = []
   if artifact.kind == "wheel":
     with zipfile.ZipFile(artifact.path) as archive:
-      present = expected in archive.namelist()
+      names = set(archive.namelist())
+    missing = [expected for expected in expected_resources if expected not in names]
   else:
     with tarfile.open(artifact.path, mode="r:gz") as archive:
-      present = any(
-        member.isfile() and member.name.endswith(f"/{expected}") for member in archive
-      )
-  if not present:
+      names = [member.name for member in archive.getmembers() if member.isfile()]
+    missing = [
+      expected
+      for expected in expected_resources
+      if not any(name.endswith(f"/{expected}") for name in names)
+    ]
+  if missing:
     raise ReleaseCheckError(
-      f"{artifact.path.name}: missing installed workflow resource {expected}"
+      f"{artifact.path.name}: missing installed workflow resources {missing}"
     )
 
 
@@ -371,6 +379,7 @@ def smoke_installed(version: str, mode: str) -> None:
       reference = asyncio.run(
         request_api("/simulations/chgnet/reference/agm003273599")
       )
+      model_contract = asyncio.run(request_api("/navigator/model-contract"))
     finally:
       os.chdir(original_cwd)
 
@@ -385,6 +394,14 @@ def smoke_installed(version: str, mode: str) -> None:
   if reference.status_code != 200 or reference.json().get("label") != "cached_reference":
     raise ReleaseCheckError(
       f"CHGNet reference smoke failed: {reference.status_code} {reference.text}"
+    )
+  if (
+    model_contract.status_code != 200
+    or model_contract.json().get("active_interpreter") != "deterministic-fallback-v1"
+  ):
+    raise ReleaseCheckError(
+      "Navigator model-contract smoke failed: "
+      f"{model_contract.status_code} {model_contract.text}"
     )
 
   optional_distributions = ("mp-api", "jarvis-tools")

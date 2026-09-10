@@ -172,6 +172,10 @@ Python API. Breaking changes are always listed under **Changed** or **Removed**.
   its upstream revisions, CC-BY-4.0 license, DOI, field provenance, and manifest.
 - Installed-package release smoke coverage for the bundled store, 24 valid periodic graphs,
   API preflight, graph summary, and cached CHGNet reference.
+- Constraint-to-Crystal Navigator demo with deterministic request interpretation, confirmed
+  constraint execution, source-backed crystal inspection, and index-relative recovery paths.
+- Packaged navigator model contract and release smoke coverage for `/navigator/model-contract`,
+  so installed wheels do not depend on repository-root config files.
 
 ### Changed
 

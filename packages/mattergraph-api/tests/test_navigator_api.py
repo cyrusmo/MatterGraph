@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from importlib import resources
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -124,6 +125,7 @@ async def test_material_contract_and_public_replay_exclude_raw_prompt() -> None:
 
 
 async def test_model_contract_omits_sampling_controls_from_generate_contract() -> None:
+  assert resources.files("mattergraph.navigator").joinpath("model_contract.json").is_file()
   async with _client() as client:
     response = await client.get("/navigator/model-contract")
   data = response.json()

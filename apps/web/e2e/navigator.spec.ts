@@ -14,7 +14,7 @@ test("executes the grounded navigator golden loop", async ({ page }) => {
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto("/?view=navigator");
-  await expect(page.getByRole("heading", { name: "Navigate a real crystal design space." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Navigate a frozen public crystal index." })).toBeVisible();
   await expect(page.getByText("24 frozen records")).toBeVisible();
   await page.getByRole("button", { name: "Compile request" }).click();
   await expect(page.getByText(/proposed · 0 unresolved/)).toBeVisible();

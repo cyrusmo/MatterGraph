@@ -209,7 +209,7 @@ export function NavigatorWorkspace({ onReturnDemo }: { onReturnDemo: () => void 
         <section className="navigator-hero">
           <div>
             <p className="eyebrow">ASK → CONFIRM → NAVIGATE → INSPECT → RECOVER</p>
-            <h1>Navigate a real crystal design space.</h1>
+            <h1>Navigate a frozen public crystal index.</h1>
             <p className="subhead">
               Language proposes a reviewable plan. A deterministic engine owns filtering,
               exclusions, missing evidence, and index-relative recovery.
