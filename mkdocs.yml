@@ -39,6 +39,7 @@ nav:
   - Architecture: architecture.md
   - Data model: data-model.md
   - Local contributor workbench: local-workbench.md
+  - Constraint-to-Crystal Navigator: navigator.md
   - Connectors: connectors.md
   - LeMaterial integration: integrations/lematerial.md
   - Scoring: scoring.md

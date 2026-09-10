@@ -10,6 +10,7 @@ from mattergraph.schema.provenance import ProvenanceRecord
 from mattergraph.schema.result import SimulationResultEnvelope
 from mattergraph.scoring.scorecard import Scorecard
 from mattergraph.store import MaterialStore
+from mattergraph.navigator import NavigatorEngine
 
 __all__ = [
   "DatasetManifest",
@@ -21,6 +22,7 @@ __all__ = [
   "SimulationResultEnvelope",
   "SourceArtifact",
   "MaterialStore",
+  "NavigatorEngine",
   "Scorecard",
   "__version__",
 ]

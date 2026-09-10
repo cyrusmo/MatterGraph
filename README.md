@@ -35,6 +35,8 @@ Materials data is fragmented across repositories, schemas, units, structures, an
 - Provide adapters for benchmarking and **simulation job specs** (e.g. ASE)
 - Expose a **small demo API** and **minimal web UI** for end-to-end exploration
 - Inspect, validate, graph, rank, and export small local CSV/JSONL datasets without uploading them
+- Compile natural-language requirements into confirmed constraints, exact exclusions, and
+  index-relative recovery paths with the Constraint-to-Crystal Navigator
 
 ## Scope
 
@@ -131,6 +133,11 @@ The UI opens in **Guided demo** mode. Choose **Local workbench** to inspect a CS
 up to 5 MiB / 5,000 rows. Imported datasets are ephemeral: normalized JSONL remains in memory,
 the registry is capped at eight entries and 32 MiB, and only the selected dataset is
 materialized. Imported content is never sent to an external service or written to disk.
+
+Choose **Constraint navigator**, or open `/?view=navigator`, for the provenance-backed
+constraint-to-crystal workflow. The bundled UI truthfully identifies its 24-record evidence
+surface; see [the navigator contract](docs/navigator.md) for the deterministic 25,000-record index
+builder and Hugging Face release gate.
 
 Example: rank candidates with a **transparent baseline scorecard** (pool-relative min–max
 objectives plus hard constraints).

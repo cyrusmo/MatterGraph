@@ -28,6 +28,7 @@ node_modules/
 apps/web/dist/
 apps/web/playwright-report/
 apps/web/test-results/
+output/playwright/
 *.tsbuildinfo
 .next/
 out/
@@ -44,5 +45,18 @@ out/
 data/cache/
 *.sqlite3
 
-.claude
+# Private local cross-agent configuration (never commit)
+/.claude
+/.claude/
+/.agents
+/.agents/
+/.codex
+/.codex/
+/.cursor
+/.cursor/
+/AGENTS.md
+/AGENTS.override.md
+/CLAUDE.md
+/CLAUDE.local.md
+
 apps/private-platform-ui/

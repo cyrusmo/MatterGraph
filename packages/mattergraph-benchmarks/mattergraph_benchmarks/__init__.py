@@ -6,6 +6,11 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
   from mattergraph_benchmarks.discovery_metrics import dcg, ndcg_at_k
   from mattergraph_benchmarks.matbench_adapter import matbench_dataframe, matbench_regression
+  from mattergraph_benchmarks.structure_intent import (
+    public_release_gate,
+    seal_benchmark_splits,
+    sft_investigation_gate,
+  )
   from mattergraph_benchmarks.uncertainty import coverage_at_target
   from mattergraph_benchmarks.validation_split import stratified_regression_split
 
@@ -43,6 +48,21 @@ _EXPORTS: dict[str, tuple[str, str, str | None]] = {
       "`uv sync --all-packages --group dev` to use stratified_regression_split."
     ),
   ),
+  "sft_investigation_gate": (
+    "mattergraph_benchmarks.structure_intent",
+    "sft_investigation_gate",
+    None,
+  ),
+  "public_release_gate": (
+    "mattergraph_benchmarks.structure_intent",
+    "public_release_gate",
+    None,
+  ),
+  "seal_benchmark_splits": (
+    "mattergraph_benchmarks.structure_intent",
+    "seal_benchmark_splits",
+    None,
+  ),
 }
 
 __all__ = [
@@ -52,6 +72,9 @@ __all__ = [
   "dcg",
   "coverage_at_target",
   "stratified_regression_split",
+  "sft_investigation_gate",
+  "public_release_gate",
+  "seal_benchmark_splits",
 ]
 
 

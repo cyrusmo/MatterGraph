@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const apiPort = process.env.MATTERGRAPH_API_PORT ?? "8013";
+const webPort = process.env.MATTERGRAPH_WEB_PORT ?? "5193";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -7,12 +10,12 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://127.0.0.1:5193",
+    baseURL: `http://127.0.0.1:${webPort}`,
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "MATTERGRAPH_API_PORT=8013 MATTERGRAPH_WEB_PORT=5193 ../../scripts/run_public_demo.sh",
-    url: "http://127.0.0.1:5193",
+    command: `MATTERGRAPH_API_PORT=${apiPort} MATTERGRAPH_WEB_PORT=${webPort} ../../scripts/run_public_demo.sh`,
+    url: `http://127.0.0.1:${webPort}`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },

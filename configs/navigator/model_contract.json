@@ -1,0 +1,32 @@
+{
+  "contract_version": "navigator-model-contract-v1",
+  "active_interpreter": "deterministic-fallback-v1",
+  "fallback_boundary": "The public app remains usable without model weights. The fallback recognizes a bounded grammar and never maps unsupported concepts onto supported properties.",
+  "qwen_candidate": {
+    "model": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "enable_thinking": false,
+    "generation": {
+      "do_sample": false,
+      "num_beams": 1,
+      "num_return_sequences": 1,
+      "max_new_tokens": 512,
+      "temperature": "unset",
+      "top_p": "unset",
+      "top_k": "unset"
+    },
+    "packages": {
+      "transformers": "4.52.4",
+      "trl": "0.18.2",
+      "peft": "0.15.2",
+      "outlines": "1.0.3"
+    },
+    "status": "optional_not_qualified",
+    "qualification_required": "Run scripts/smoke_navigator_model.py in the pinned environment before enabling this interpreter."
+  },
+  "privacy": {
+    "persist_raw_prompts": false,
+    "persist_provider_outputs": false,
+    "public_replay_requires_opt_in": true
+  }
+}

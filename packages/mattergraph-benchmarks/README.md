@@ -8,6 +8,8 @@ Benchmark adapters and evaluation utilities for [MatterGraph](https://github.com
 - **Uncertainty** — `coverage_at_target` for checking whether predicted intervals are calibrated.
 - **Validation splits** — stratified splitting helpers that respect composition and structure grouping.
 - **Matbench adapter** — optional bridge to [Matbench](https://matbench.materialsproject.org/) tasks. Install `matbench` separately to enable it.
+- **Structure-intent gates** — sealed-split overlap checks, optional-SFT triggers, strict release
+  thresholds, and the human-request publication/consent contract for the Grounded Explorer.
 
 ## Install
 

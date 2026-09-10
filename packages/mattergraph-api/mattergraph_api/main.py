@@ -1,11 +1,24 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from mattergraph_connectors.local_import import ImportLimitError, ImportValidationError
 
-from mattergraph_api.routes import datasets, demo, materials, scores, search, simulations, workflows
+from mattergraph_api.routes import (
+  datasets,
+  demo,
+  materials,
+  navigator,
+  scores,
+  search,
+  simulations,
+  workflows,
+)
 from mattergraph_api.services.dataset_registry import (
   DatasetBusyError,
   DatasetCapacityError,
@@ -35,6 +48,7 @@ app.include_router(simulations.router, tags=["simulations"])
 app.include_router(workflows.router, tags=["workflows"])
 app.include_router(demo.router, tags=["demo"])
 app.include_router(datasets.router, tags=["datasets"])
+app.include_router(navigator.router, tags=["navigator"])
 
 
 @app.exception_handler(DatasetNotFoundError)
@@ -75,3 +89,8 @@ def invalid_import(_request: Request, error: ImportValidationError) -> JSONRespo
 @app.get("/health")
 def health() -> dict[str, str]:
   return {"status": "ok"}
+
+
+_web_dist = os.environ.get("MATTERGRAPH_WEB_DIST")
+if _web_dist and Path(_web_dist).is_dir():
+  app.mount("/", StaticFiles(directory=_web_dist, html=True), name="web")

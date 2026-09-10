@@ -13,6 +13,14 @@ import type {
   SlicePreview,
   SimulationJob,
 } from "../types/material";
+import type {
+  ConstraintPlan,
+  EvaluationResult,
+  InterpretationResult,
+  NavigatorMaterial,
+  NavigatorRegistry,
+  RelaxationResult,
+} from "../types/navigator";
 
 const API = import.meta.env.VITE_API_URL || "";
 const REQUEST_TIMEOUT_MS = 5_000;
@@ -202,6 +210,46 @@ export async function runAseRelax(materialId: string): Promise<SimulationJob> {
     }
     throw error;
   }
+}
+
+export async function fetchNavigatorRegistry(): Promise<NavigatorRegistry> {
+  return requestJson<NavigatorRegistry>(
+    "/navigator/registry",
+    {},
+    "navigator registry request failed",
+  );
+}
+
+export async function interpretNavigatorRequest(text: string): Promise<InterpretationResult> {
+  return requestJson<InterpretationResult>(
+    "/navigator/interpret",
+    jsonPost({ text }),
+    "navigator interpretation failed",
+  );
+}
+
+export async function evaluateNavigatorPlan(plan: ConstraintPlan): Promise<EvaluationResult> {
+  return requestJson<EvaluationResult>(
+    "/navigator/evaluate",
+    jsonPost(plan),
+    "navigator evaluation failed",
+  );
+}
+
+export async function fetchNavigatorRelaxations(plan: ConstraintPlan): Promise<RelaxationResult> {
+  return requestJson<RelaxationResult>(
+    "/navigator/relaxations",
+    jsonPost(plan),
+    "navigator recovery request failed",
+  );
+}
+
+export async function fetchNavigatorMaterial(materialId: string): Promise<NavigatorMaterial> {
+  return requestJson<NavigatorMaterial>(
+    `/navigator/materials/${encodeURIComponent(materialId)}`,
+    {},
+    "navigator structure request failed",
+  );
 }
 
 async function requestJson<T>(

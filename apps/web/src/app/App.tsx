@@ -40,10 +40,23 @@ const DEFAULT_HULL_WEIGHT = 0.4;
 type ApiState = "loading" | "ready" | "degraded" | "offline";
 
 export function App() {
-  const [mode, setMode] = useState<"demo" | "workbench">("demo");
+  const [mode, setMode] = useState<"demo" | "workbench" | "navigator">(() => (
+    new URLSearchParams(window.location.search).get("view") === "navigator" ? "navigator" : "demo"
+  ));
   const [demoStartScreen, setDemoStartScreen] = useState(0);
+  if (mode === "navigator") {
+    return (
+      <Suspense fallback={<main className="workbench-loading">Loading constraint navigator…</main>}>
+        <NavigatorWorkspace onReturnDemo={() => setMode("demo")} />
+      </Suspense>
+    );
+  }
   return mode === "demo" ? (
-    <GuidedDemo initialScreen={demoStartScreen} onOpenWorkbench={() => setMode("workbench")} />
+    <GuidedDemo
+      initialScreen={demoStartScreen}
+      onOpenWorkbench={() => setMode("workbench")}
+      onOpenNavigator={() => setMode("navigator")}
+    />
   ) : (
     <Suspense fallback={<main className="workbench-loading">Loading local workbench…</main>}>
       <LocalWorkbench onReturnDemo={(screen = 0) => {
@@ -62,13 +75,18 @@ const GraphSummaryPanel = lazy(() =>
 const LocalWorkbench = lazy(() =>
   import("./LocalWorkbench").then((module) => ({ default: module.LocalWorkbench })),
 );
+const NavigatorWorkspace = lazy(() =>
+  import("./NavigatorWorkspace").then((module) => ({ default: module.NavigatorWorkspace })),
+);
 
 function GuidedDemo({
   initialScreen,
   onOpenWorkbench,
+  onOpenNavigator,
 }: {
   initialScreen: number;
   onOpenWorkbench: () => void;
+  onOpenNavigator: () => void;
 }) {
   const [screen, setScreen] = useState(initialScreen);
   const [rows, setRows] = useState<Material[]>([]);
@@ -174,6 +192,7 @@ function GuidedDemo({
         </div>
         <div className="topbar-actions">
           <span>offline snapshot · v1</span>
+          <button className="text-button" type="button" onClick={onOpenNavigator}>Constraint navigator</button>
           <button className="text-button" type="button" onClick={onOpenWorkbench}>Local workbench</button>
           <button className="text-button" type="button" onClick={resetDemo}>Reset demo</button>
         </div>

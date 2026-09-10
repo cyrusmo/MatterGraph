@@ -12,6 +12,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  private-agent-path-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Reject tracked private agent configuration
+        run: python scripts/check_private_agent_files.py
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -182,6 +192,7 @@ jobs:
   # Stable branch-protection context for the complete matrix and release gates.
   tests:
     needs:
+      - private-agent-path-guard
       - test
       - build-wheels
       - install-wheels

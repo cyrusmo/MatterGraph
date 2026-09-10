@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
         "/demo": { target: proxyTarget, changeOrigin: true },
         "/datasets": { target: proxyTarget, changeOrigin: true },
         "/materials": { target: proxyTarget, changeOrigin: true },
+        "/navigator": { target: proxyTarget, changeOrigin: true },
         "/search": { target: proxyTarget, changeOrigin: true },
         "/scores": { target: proxyTarget, changeOrigin: true },
         "/simulations": { target: proxyTarget, changeOrigin: true },
